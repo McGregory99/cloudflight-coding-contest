@@ -20,3 +20,17 @@
 - Always write `check.py` that re-simulates the rules independently of the solver.
 - Heuristic search is acceptable if it finds a solution on every input; also stress it on random feasible instances (and say it is not proven).
 - Statement vs example mismatches happen (Room Planner L7 says "matrix of integers", example shows X/.): follow the example.
+
+## Optimisation last level (lessons from Nano Fabricator, CCC42 classic, L6)
+
+Score = total lines of the program you output, lower is better. Final 14966 vs 66031 first valid upload; world top was ~14400. What moved the score, in order of payoff:
+
+1. **Get a valid baseline uploaded in minutes** (simple constructive planner), then iterate. The grader keeps the best upload.
+2. **Tick-level beam search in C++** over all actors at once (bitset state, potential = distance to cells still missing, heavy penalty on forbidden matter). Took 66k -> 17k. Python was too slow for this.
+3. **Variance is huge between runs** (one pattern: 117-152 lines by seed). Many randomized restarts per instance beat a wider beam. Spread them over many cloud sessions (4 processes each), each on a slice of instances, budget proportional to current length.
+4. **Exact CP-SAT** (OR-Tools installs with pip) on small instances / single copies: per-copy re-solve with free end state, tail re-solve, cycles of copies for high-K repeats. Good for the last 2-5%.
+5. **Per-instance merge**: keep a `merge.py` that takes the shortest *verified* program per instance from every source dir, and always include the previously uploaded outputs as a source (an agent that empties its JSON must never make the merge worse).
+
+Did not pay: line sweeps with blocker beams, instruction-level SA/compaction, symmetry transfer, rule-loophole hunting. The gap to the top was emitter travel between high-yield configurations: next time try configuration-level planning (pick high-yield setups, order them by travel cost) seeded into the beam search early, not in the last hour.
+
+Process lessons: push every improvement immediately and tell Goyo to re-upload; schedule merges before the deadline; cloud sessions take ~3 min to start and must push by a hard time; compute-only sessions should run on a cheap model.
