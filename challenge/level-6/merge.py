@@ -25,8 +25,7 @@ def main():
             pats.append((R, K, t[p:p + rows])); p += rows
         cands = {i: [] for i in range(n)}
         for src in SOURCES:
-            f = src / f"out_{name}.json"
-            if f.exists():
+            for f in list(src.glob(f"out_{name}.json")) + list(src.glob(f"out_v*_{name}.json")):
                 for k, prog in json.loads(f.read_text()).items():
                     cands[int(k)].append((len(prog), src.name, prog))
         out = []; used = {}; total = 0
