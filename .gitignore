@@ -1,3 +1,5 @@
 __pycache__/
 challenge/level-6/mb/mb
 challenge/level-6/mb/raw_*
+challenge/level-6/mb/mb_*
+!challenge/level-6/mb/mb_dbl.cpp
