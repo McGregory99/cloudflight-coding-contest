@@ -7,12 +7,14 @@ from pathlib import Path
 
 H = Path(__file__).parent; L6 = H.parent
 name, s, ns, spl, wb = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), sys.argv[4], sys.argv[5]
+TO = sys.argv[6] if len(sys.argv) > 6 else "2100"
+TAG = sys.argv[7] if len(sys.argv) > 7 else "m"
 subprocess.run(["g++", "-O2", "-march=native", "-o", str(H / "mb2_bin"), str(H / "mb2.cpp")], check=True)
 inp = L6 / f"in_level-6_{name}.txt"
 procs = []
 for c in range(4):
     out = H / f"raw_m_{name}_{s}_{c}.out"; out.write_text("")
-    procs.append(subprocess.Popen(["timeout", "2100", str(H / "mb2_bin"), "multi", str(inp), str(H / f"prev_{name}.txt"),
+    procs.append(subprocess.Popen(["timeout", TO, str(H / "mb2_bin"), "multi", str(inp), str(H / f"prev_{name}.txt"),
                                    str(out), str(s * 4 + c), str(4 * ns), spl, wb], stderr=subprocess.DEVNULL))
 for p in procs:
     p.wait()
@@ -32,5 +34,5 @@ for c in range(4):
                 best[str(idx)] = cur
         elif cur is not None and ln: cur.append(ln)
 (L6 / "results").mkdir(exist_ok=True)
-(L6 / "results" / f"shard_{name}_m{s}_0_0.json").write_text(json.dumps(best))
+(L6 / "results" / f"shard_{name}_{TAG}{s}_0_0.json").write_text(json.dumps(best))
 print("verified improved patterns", len(best), "lines", sum(len(v) for v in best.values()))
