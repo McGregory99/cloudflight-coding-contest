@@ -93,4 +93,4 @@ Large contest inputs (the two ~60 MB Migratory Birds files) are not committed: d
 
 ## 📜 Notes
 
-Statements, inputs and the Colony: One engine belong to Cloudflight and are included only for reference alongside the solutions. Everything else is personal work, published to learn from.
+The PDF statements are Cloudflight material and are not published here: get them from [codingcontest.org](https://codingcontest.org). Inputs and the Colony: One engine also belong to Cloudflight and are included only so the solutions can run. Everything else is personal work, published to learn from.

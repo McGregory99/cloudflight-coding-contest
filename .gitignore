@@ -22,3 +22,6 @@ CCC24/level5/data/level5/*YouTube*
 CCC42/nano_fabricator/challenge/level-6/mb/mb
 CCC42/nano_fabricator/challenge/level-6/mb/raw_*
 CCC42/nano_fabricator/challenge/level-6/mb/mb2_bin
+
+# Contest statements are Cloudflight material: kept locally, not published
+*.pdf
