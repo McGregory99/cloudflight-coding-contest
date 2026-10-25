@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Magic Money Explainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Martian+Mono:wght@400;600&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#140a24; --bg2:#1c1031; --panel:#22143a; --line:#3d2a63; --line2:#57408a;
+  --ink:#f1e8ff; --dim:#a593c9; --gold:#f6c945; --goldD:#a8781c; --goldL:#ffe9a3;
+  --purple:#a46bff; --mint:#5fe0a0; --red:#ff6b7f; --teal:#4cc9f0;
+  --pix:"Silkscreen", ui-monospace, monospace;
+  --mono:"Martian Mono", ui-monospace, Menlo, monospace;
+  --serif:"Literata", Georgia, serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.6;
+  background-image:
+    radial-gradient(1200px 500px at 80% -10%, rgba(164,107,255,.18), transparent 60%),
+    radial-gradient(900px 400px at -10% 30%, rgba(246,201,69,.07), transparent 60%),
+    linear-gradient(var(--bg),var(--bg));}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.07;
+  background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);
+  background-size:8px 8px;}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+a{color:var(--gold)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+/* chunky pixel frame: notched corners via clip-path + inset shadow border */
+.px{position:relative;background:var(--panel);
+  clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px));
+  box-shadow:inset 0 0 0 3px var(--line);}
+header.hero{padding:72px 0 40px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:center}
+.eyebrow{font-family:var(--pix);color:var(--purple);letter-spacing:.12em;font-size:13px}
+h1{font-family:var(--pix);font-weight:700;font-size:clamp(44px,9vw,92px);line-height:.95;margin:.25em 0 .2em;color:var(--gold);
+  text-shadow:4px 4px 0 var(--goldD),8px 8px 0 #2b1748}
+.story{font-size:clamp(18px,2.2vw,21px);max-width:34em;color:var(--ink)}
+.story em{color:var(--goldL)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.chip{font-family:var(--pix);font-size:12px;padding:8px 12px;color:var(--ink)}
+.chip b{color:var(--gold);font-weight:400}
+#heroCoins{width:100%;height:300px;display:block}
+nav.levels{position:sticky;top:0;z-index:10;background:rgba(20,10,36,.92);backdrop-filter:blur(6px);border-bottom:3px solid var(--line)}
+nav.levels .wrap{display:flex;gap:6px;align-items:center;overflow-x:auto;padding-top:10px;padding-bottom:10px}
+nav.levels .brand{font-family:var(--pix);color:var(--gold);margin-right:auto;font-size:14px;white-space:nowrap;padding-right:12px}
+nav.levels a{font-family:var(--pix);font-size:13px;text-decoration:none;color:var(--dim);padding:6px 10px;border:2px solid var(--line);white-space:nowrap}
+nav.levels a.on,nav.levels a:hover{color:#2a1a00;background:var(--gold);border-color:var(--gold)}
+section.level{padding:56px 0 24px;border-bottom:3px dashed var(--line)}
+.lvl-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+.lvl-num{font-family:var(--pix);font-size:15px;color:#2a1a00;background:var(--gold);padding:6px 10px;box-shadow:4px 4px 0 var(--goldD)}
+h2{font-family:var(--pix);font-weight:400;font-size:clamp(24px,4vw,36px);margin:.2em 0;color:var(--ink)}
+h3{font-family:var(--pix);font-weight:400;font-size:15px;color:var(--purple);margin:1.6em 0 .5em;letter-spacing:.06em}
+.cols{display:grid;grid-template-columns:1.1fr 1fr;gap:28px}
+.cols>*,.ex>*,.hero-grid>*{min-width:0}
+body{overflow-x:hidden}
+.fmt{font-family:var(--mono);font-size:13px;line-height:1.55;padding:14px 16px;color:var(--dim)}
+.fmt b{color:var(--goldL);font-weight:600}
+.ex{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ex figure{margin:0}
+.ex figcaption{font-family:var(--pix);font-size:11px;color:var(--dim);margin-bottom:6px}
+pre{margin:0;font-family:var(--mono);font-size:12.5px;line-height:1.5;overflow:auto;max-height:240px;padding:12px 14px;color:var(--ink);white-space:pre}
+.stage{margin-top:22px;padding:14px}
+.stage-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.stage-title{font-family:var(--pix);font-size:13px;color:var(--gold);margin-right:auto}
+.canvas-wrap{width:100%}
+canvas.viz{display:block;width:100%;background:var(--bg2);box-shadow:inset 0 0 0 2px var(--line)}
+.controls{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px}
+button,select{font-family:var(--pix);font-size:12px;color:var(--ink);background:#2c1b4b;border:2px solid var(--line2);padding:8px 11px;cursor:pointer;box-shadow:3px 3px 0 #0c0617;border-radius:0}
+button:hover,select:hover{border-color:var(--gold)}
+button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #0c0617}
+button.play{background:var(--gold);color:#2a1a00;border-color:var(--gold);min-width:84px}
+button:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.counter{font-family:var(--mono);font-size:12px;color:var(--dim);margin-left:auto}
+.caption{margin-top:12px;font-family:var(--mono);font-size:13.5px;line-height:1.6;min-height:4.8em;padding:12px 14px;color:var(--ink);background:#170c2b;border-left:4px solid var(--gold)}
+.caption .ok{color:var(--mint)} .caption .bad{color:var(--red)}
+.idea{padding:16px 18px}
+.idea p{margin:.3em 0}
+ul.pit{margin:.3em 0;padding-left:1.1em}
+ul.pit li{margin:.25em 0}
+ul.pit li::marker{content:"▪ ";color:var(--gold)}
+.cx{font-family:var(--mono);font-size:13px;color:var(--goldL)}
+details{margin-top:18px}
+summary{font-family:var(--pix);font-size:13px;cursor:pointer;color:var(--gold);padding:10px 12px;background:#2a1946;border:2px solid var(--line2);list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";} details[open] summary::before{content:"▾ ";}
+details pre{max-height:420px;background:#120921;border:2px solid var(--line);border-top:0}
+code{font-family:var(--mono);font-size:.86em;color:var(--goldL)}
+footer{padding:40px 0 60px;color:var(--dim);font-size:14px}
+@media (max-width:820px){
+  .hero-grid,.cols{grid-template-columns:1fr}
+  #heroCoins{height:200px}
+  header.hero{padding:40px 0 24px}
+}
+@media (max-width:520px){
+  .ex{grid-template-columns:1fr}
+  body{font-size:16px}
+  .counter{width:100%;margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">CCC39 · SCHOOL TRACK · 5 LEVELS</div>
+      <h1>MAGIC<br>MONEY</h1>
+      <p class="story">The goblin bank mints a different set of coins for every wizard currency. Your job: work out what each currency <em>cannot</em> pay, and then pay any amount with the <em>fewest coins</em>, first with unlimited coins and finally from a vault with limited stock.</p>
+      <div class="hero-meta">
+        <span class="chip px"><b>L1</b> missing amount</span>
+        <span class="chip px"><b>L2</b> two-sum</span>
+        <span class="chip px"><b>L3</b> coin DP</span>
+        <span class="chip px"><b>L4</b> huge amounts</span>
+        <span class="chip px"><b>L5</b> limited vault</span>
+      </div>
+    </div>
+    <canvas id="heroCoins" aria-hidden="true"></canvas>
+  </div>
+</header>
+
+<nav class="levels" aria-label="Levels">
+  <div class="wrap">
+    <span class="brand">MAGIC MONEY</span>
+    <a href="#level-1">L1</a><a href="#level-2">L2</a><a href="#level-3">L3</a><a href="#level-4">L4</a><a href="#level-5">L5</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- ===================== LEVEL 1 ===================== -->
+<section class="level" id="level-1" data-level="1">
+  <div class="lvl-head"><span class="lvl-num">LEVEL 1</span><h2>The first amount no coin pays</h2></div>
+  <div class="cols">
+    <div>
+      <p>Each currency has a handful of coin values. Find the smallest positive amount that is <strong>not</strong> itself a coin value, i.e. the first amount you cannot hand over as a single coin.</p>
+      <div class="fmt px"><b>Input</b> N (currencies), C (coins per currency), then N lines of C sorted coin values.<br><b>Output</b> one line per currency: the smallest positive integer that is not a coin.</div>
+    </div>
+    <div class="ex">
+      <figure><figcaption>input/in_level-1_0-example.txt</figcaption><pre class="px" data-src="in1"></pre></figure>
+      <figure><figcaption>expected/out_level-1_0-example.txt</figcaption><pre class="px" data-src="out1"></pre></figure>
+    </div>
+  </div>
+  <div class="stage px">
+    <div class="stage-top"><span class="stage-title">▶ COUNTING UP THROUGH THE COIN SET</span></div>
+    <div class="canvas-wrap"><canvas class="viz" role="img" aria-label="Level 1 animation"></canvas></div>
+    <div class="controls"></div>
+    <div class="caption" aria-live="polite"></div>
+  </div>
+  <div class="cols">
+    <div><h3>KEY IDEA</h3><div class="idea px"><p>Put the coins in a set and walk <code>m = 1, 2, 3, ...</code> until <code>m</code> is missing. At most <code>C + 1</code> checks per currency.</p><p class="cx">Complexity: O(N·C)</p></div></div>
+    <div><h3>PITFALLS</h3><ul class="pit"><li>The answer can be <code>C + 1</code> (or bigger) when the coins are <code>1..C</code>.</li><li>One answer per line, file ends with a single newline.</li></ul></div>
+  </div>
+  <details><summary>CORE OF solution.py</summary><pre><code>def solve(text):
+    tok = text.split()
+    n, c = int(tok[0]), int(tok[1])
+    out = []
+    pos = 2
+    for _ in range(n):
+        coins = set(map(int, tok[pos:pos + c]))
+        pos += c
+        m = 1
+        while m in coins:
+            m += 1
+        out.append(str(m))
+    return &quot;\n&quot;.join(out) + &quot;\n&quot;</code></pre></details>
+</section>
+
+<!-- ===================== LEVEL 2 ===================== -->
+<section class="level" id="level-2" data-level="2">
+  <div class="lvl-head"><span class="lvl-num">LEVEL 2</span><h2>Pay with exactly two coins</h2></div>
+  <div class="cols">
+    <div>
+      <p>Now every currency also gets a list of amounts. Pay each amount with exactly two coins of that currency; the same coin value may be used twice. Every amount is payable and any valid pair is accepted.</p>
+      <div class="fmt px"><b>Input</b> N, C, A on three lines, then per currency a line of C coins and a line of A amounts.<br><b>Output</b> one line per amount: two coin values separated by a space.</div>
+    </div>
+    <div class="ex">
+      <figure><figcaption>input/in_level-2_0-example.txt</figcaption><pre class="px" data-src="in2"></pre></figure>
+      <figure><figcaption>expected/out_level-2_0-example.txt</figcaption><pre class="px" data-src="out2"></pre></figure>
+    </div>
+  </div>
+  <div class="stage px">
+    <div class="stage-top"><span class="stage-title">▶ TWO-SUM SCAN, SMALLEST COIN FIRST</span></div>
+    <div class="canvas-wrap"><canvas class="viz" role="img" aria-label="Level 2 animation"></canvas></div>
+    <div class="controls"></div>
+    <div class="caption" aria-live="polite"></div>
+  </div>
+  <div class="cols">
+    <div><h3>KEY IDEA</h3><div class="idea px"><p>Classic two-sum: keep the coins in a set; for an amount <code>t</code> scan coins ascending and stop at the first <code>x</code> whose partner <code>t − x</code> is also a coin. Ascending order prints the smaller coin first, which reproduces the example exactly.</p><p class="cx">Complexity: O(A·C) per currency</p></div></div>
+    <div><h3>PITFALLS</h3><ul class="pit"><li><code>C</code> and <code>A</code> are given once at the top, not per currency.</li><li><code>x == t − x</code> is allowed (<code>2 2</code>); a set lookup handles it naturally.</li><li><code>check.py</code> accepts any valid pair.</li></ul></div>
+  </div>
+  <details><summary>CORE OF solution.py</summary><pre><code>def solve(text):
+    tok = text.split()
+    n, c, a = int(tok[0]), int(tok[1]), int(tok[2])
+    pos = 3
+    out = []
+    for _ in range(n):
+        coins = sorted(set(map(int, tok[pos:pos + c])))
+        pos += c
+        amounts = tok[pos:pos + a]
+        pos += a
+        cs = set(coins)
+        for s in amounts:
+            t = int(s)
+            for x in coins:  # ascending -&gt; smaller coin printed first
+                if (t - x) in cs:
+                    out.append(&quot;%d %d&quot; % (x, t - x))
+                    break
+            else:
+                raise ValueError(&quot;no pair for %d&quot; % t)
+    return &quot;\n&quot;.join(out) + &quot;\n&quot;</code></pre></details>
+</section>
+
+<!-- ===================== LEVEL 3 ===================== -->
+<section class="level" id="level-3" data-level="3">
+  <div class="lvl-head"><span class="lvl-num">LEVEL 3</span><h2>Fewest coins for 1..100</h2></div>
+  <div class="cols">
+    <div>
+      <p>Back to the level-1 input, but every currency now contains the coin 1 and the supply is unlimited. For each currency print, for every amount 1 to 100, a way to pay it with the fewest coins. Greedy fails on odd coin systems, so this needs dynamic programming.</p>
+      <div class="fmt px"><b>Input</b> N, C, then N lines of C coin values.<br><b>Output</b> N·100 lines <code>QxV QxV ...</code> (Q coins of value V).</div>
+    </div>
+    <div class="ex">
+      <figure><figcaption>input/in_level-3_0-example.txt</figcaption><pre class="px" data-src="in3"></pre></figure>
+      <figure><figcaption>expected/out_level-3_0-example.txt (300 lines)</figcaption><pre class="px" data-src="out3"></pre></figure>
+    </div>
+  </div>
+  <div class="stage px">
+    <div class="stage-top"><span class="stage-title">▶ FILLING THE DP TABLE</span><label><select class="cur" aria-label="Currency"></select></label></div>
+    <div class="canvas-wrap"><canvas class="viz" role="img" aria-label="Level 3 animation"></canvas></div>
+    <div class="controls"></div>
+    <div class="caption" aria-live="polite"></div>
+  </div>
+  <div class="cols">
+    <div><h3>KEY IDEA</h3><div class="idea px"><p><code>dp[a] = 1 + min(dp[a − c])</code> over all coins <code>c ≤ a</code>, filled from 1 up to 100. Remember which coin won (<code>last[a]</code>) and walk back <code>a → a − last[a]</code> to list the coins. Trying coins ascending with a strict <code>&lt;</code> reproduces the example byte for byte.</p><p class="cx">Complexity: O(100·C) per currency</p></div></div>
+    <div><h3>PITFALLS</h3><ul class="pit"><li>Greedy is wrong: 6 with {1,3,4} greedy gives 4+1+1 (3 coins), optimal is 3+3.</li><li>Exactly N·100 lines.</li><li><code>check.py</code> re-checks minimality with an independent DP.</li></ul></div>
+  </div>
+  <details><summary>CORE OF solution.py</summary><pre><code>def min_coins_table(coins):
+    &quot;&quot;&quot;dp[a] = fewest coins for amount a; last[a] = a coin used (smallest on ties).&quot;&quot;&quot;
+    inf = float(&quot;inf&quot;)
+    dp = [0] + [inf] * LIMIT
+    last = [0] * (LIMIT + 1)
+    for a in range(1, LIMIT + 1):
+        for c in coins:  # ascending; strict &#x27;&lt;&#x27; keeps the smallest coin on ties
+            if c &lt;= a and dp[a - c] + 1 &lt; dp[a]:
+                dp[a] = dp[a - c] + 1
+                last[a] = c
+    return last</code></pre></details>
+</section>
+
+<!-- ===================== LEVEL 4 ===================== -->
+<section class="level" id="level-4" data-level="4">
+  <div class="lvl-head"><span class="lvl-num">LEVEL 4</span><h2>Fewest coins for a billion</h2></div>
+  <div class="cols">
+    <div>
+      <p>Same question as level 3, but the amounts go up to about 10⁹, so a table over the amount is impossible. Coins are at most 20 and coin 1 is always present; any optimal answer is accepted.</p>
+      <div class="fmt px"><b>Input</b> N, C, A, then per currency a line of C coins and a line of A amounts.<br><b>Output</b> one line <code>QxV ...</code> per amount with the fewest coins.</div>
+    </div>
+    <div class="ex">
+      <figure><figcaption>input/in_level-4_0-example.txt</figcaption><pre class="px" data-src="in4"></pre></figure>
+      <figure><figcaption>expected/out_level-4_0-example.txt</figcaption><pre class="px" data-src="out4"></pre></figure>
+    </div>
+  </div>
+  <div class="stage px">
+    <div class="stage-top"><span class="stage-title">▶ SMALL TABLE + PEEL THE BIG COIN</span><label><select class="cur" aria-label="Currency"></select></label></div>
+    <div class="canvas-wrap"><canvas class="viz" role="img" aria-label="Level 4 animation"></canvas></div>
+    <div class="controls"></div>
+    <div class="caption" aria-live="polite"></div>
+  </div>
+  <div class="cols">
+    <div><h3>KEY IDEA</h3><div class="idea px"><p>Let <code>M</code> be the largest coin. Among any <code>M</code> smaller coins some subset sums to a multiple of <code>M</code> (pigeonhole on prefix sums), and that subset can be swapped for no more <code>M</code>-coins. So for amounts <code>≥ M²</code> an optimum always contains an <code>M</code>: <code>f(x) = f(x − M) + 1</code>. Build the DP once up to <code>M² + M</code>, peel <code>k</code> copies of <code>M</code> so the rest lands in <code>[M², M² + M)</code>, and read the rest from the table.</p><p class="cx">Complexity: O(C·M²) per currency + O(M²) per amount</p></div></div>
+    <div><h3>PITFALLS</h3><ul class="pit"><li>Never loop over the amount or allocate a table that large.</li><li>Counts reach tens of millions; keep integers.</li><li><code>check.py</code> proves optimality independently with Dijkstra over residues mod <code>M</code>.</li></ul></div>
+  </div>
+  <details><summary>CORE OF solution.py</summary><pre><code>def build_table(coins):
+    &quot;&quot;&quot;Fewest-coins DP for amounts 0 .. M*M + M - 1 (M = largest coin).&quot;&quot;&quot;
+    m = coins[-1]
+    size = m * m + m
+    inf = float(&quot;inf&quot;)
+    dp = [0] + [inf] * (size - 1)
+    last = [0] * size
+    for a in range(1, size):
+        best = inf
+        bc = 0
+        for c in coins:  # ascending, strict &#x27;&lt;&#x27; -&gt; smallest coin on ties
+            if c &gt; a:
+                break
+            v = dp[a - c] + 1
+            if v &lt; best:
+                best = v
+                bc = c
+        dp[a] = best
+        last[a] = bc
+    return last
+
+def construct(amount, coins, last):
+    m = coins[-1]
+    base = m * m
+    cnt = {}
+    if amount &gt;= base + m:
+        k = (amount - base) // m  # for x &gt;= M^2 an optimal solution uses a largest coin
+        amount -= k * m
+        cnt[m] = k
+    while amount:
+        c = last[amount]
+        cnt[c] = cnt.get(c, 0) + 1
+        amount -= c
+    return &quot; &quot;.join(&quot;%dx%d&quot; % (cnt[v], v) for v in sorted(cnt, reverse=True))</code></pre></details>
+</section>
+
+<!-- ===================== LEVEL 5 ===================== -->
+<section class="level" id="level-5" data-level="5">
+  <div class="lvl-head"><span class="lvl-num">LEVEL 5</span><h2>Paying from a limited vault</h2></div>
+  <div class="cols">
+    <div>
+      <p>The vault now holds a fixed number of coins of each value (<code>100x1</code> means 100 coins of value 1). Pay each amount (up to ~3·10⁸) with the fewest coins without exceeding the stock. Amounts are independent: paying one does not empty the vault for the next.</p>
+      <div class="fmt px"><b>Input</b> N, C, A, then per currency an inventory line of C items <code>QxV</code> and a line of A amounts.<br><b>Output</b> one line <code>QxV ...</code> per amount, fewest coins, within inventory.</div>
+    </div>
+    <div class="ex">
+      <figure><figcaption>input/in_level-5_0-example.txt</figcaption><pre class="px" data-src="in5"></pre></figure>
+      <figure><figcaption>expected/out_level-5_0-example.txt</figcaption><pre class="px" data-src="out5"></pre></figure>
+    </div>
+  </div>
+  <div class="stage px">
+    <div class="stage-top"><span class="stage-title">▶ ONE FREE COIN TYPE, EVERYTHING ELSE BOUNDED</span><label><select class="cur" aria-label="Currency"></select></label></div>
+    <div class="canvas-wrap"><canvas class="viz" role="img" aria-label="Level 5 animation"></canvas></div>
+    <div class="controls"></div>
+    <div class="caption" aria-live="polite"></div>
+  </div>
+  <div class="cols">
+    <div><h3>KEY IDEA</h3><div class="idea px"><p>Exchange argument: if a smaller type <code>a</code> is used at least <code>v_b</code> times while a bigger type <code>b</code> still has <code>v_a</code> coins left, swapping <code>v_b</code> coins of <code>a</code> for <code>v_a</code> coins of <code>b</code> saves coins. So in an optimum at most one type <code>j</code> is "free": types above it are within <code>Vmax − 1</code> of their stock and types below it are used fewer than <code>v_j</code> times.</p><p>For each choice of <code>j</code> (or none) build one small bounded knapsack per currency over the bounded "extra" coins. An amount is answered by scanning the residue class mod <code>v_j</code>, pre-sorted by <code>v_j·g[s] − s</code>, and taking the first entry that keeps <code>j</code> within stock.</p><p class="cx">Complexity: ~7 knapsacks of ~2k states per currency, then ~O(C) lookups per amount</p></div></div>
+    <div><h3>PITFALLS</h3><ul class="pit"><li><code>QxV</code> is count first, value second, in input and output.</li><li>The free type can be any type, so every <code>j</code> (plus "none") must be tried; keep <code>j</code>'s count within <code>[0, u_j]</code>.</li><li>Our example output differs from the official one only in tie-breaking: every line has the same coin count. Verified against an exact bounded-knapsack brute force on ~800k random instances.</li></ul></div>
+  </div>
+  <details><summary>CORE OF solution.py</summary><pre><code>    def solve(self, t):
+        best = None
+        for case in self.cases:
+            j = case[&quot;j&quot;]
+            r = t - case[&quot;base_val&quot;]
+            if r &lt; 0:
+                continue
+            if j is None:
+                if r &lt; len(case[&quot;g&quot;]) and case[&quot;g&quot;][r] &lt; INF:
+                    total = case[&quot;base_cnt&quot;] + case[&quot;g&quot;][r]
+                    if best is None or total &lt; best[0]:
+                        best = (total, case, r, 0)
+                continue
+            vj = self.v[j]
+            lo = r - vj * self.u[j]
+            for _, s in case[&quot;lists&quot;][r % vj]:
+                if lo &lt;= s &lt;= r:
+                    xj = (r - s) // vj
+                    total = case[&quot;base_cnt&quot;] + case[&quot;g&quot;][s] + xj
+                    if best is None or total &lt; best[0]:
+                        best = (total, case, s, xj)
+                    break
+        if best is None:
+            raise ValueError(&quot;amount %d cannot be built&quot; % t)
+        ...  # backtrack through the stored layers</code></pre></details>
+</section>
+
+</main>
+<footer class="wrap">Magic Money (CCC39 School). Every animation runs a JavaScript port of the level's <code>solution.py</code> on the official example; the final frame is compared with <code>expected/</code>.</footer>
+
+<script id="data">
+const DATA = {
+ "in1": "3\n5\n1 2 6 9 14\n1 2 3 4 7\n1 3 5 8 11\n",
+ "out1": "3\n5\n2\n",
+ "in2": "3\n5\n3\n1 2 6 9 14\n10 4 15\n1 2 3 4 7\n7 11 10\n1 3 5 8 11\n12 14 6\n",
+ "out2": "1 9\n2 2\n1 14\n3 4\n4 7\n3 7\n1 11\n3 11\n1 5\n",
+ "in3": "3\n5\n1 2 6 9 14\n1 2 3 4 7\n1 3 5 8 11\n",
+ "out3": "1x1\n1x2\n1x2 1x1\n2x2\n2x2 1x1\n1x6\n1x6 1x1\n1x6 1x2\n1x9\n1x9 1x1\n1x9 1x2\n2x6\n2x6 1x1\n1x14\n1x14 1x1\n1x14 1x2\n1x14 1x2 1x1\n2x9\n2x9 1x1\n1x14 1x6\n1x14 1x6 1x1\n1x14 1x6 1x2\n1x14 1x9\n1x14 1x9 1x1\n1x14 1x9 1x2\n1x14 2x6\n3x9\n2x14\n2x14 1x1\n2x14 1x2\n2x14 1x2 1x1\n1x14 2x9\n1x14 2x9 1x1\n2x14 1x6\n2x14 1x6 1x1\n2x14 1x6 1x2\n2x14 1x9\n2x14 1x9 1x1\n2x14 1x9 1x2\n2x14 2x6\n1x14 3x9\n3x14\n3x14 1x1\n3x14 1x2\n3x14 1x2 1x1\n2x14 2x9\n2x14 2x9 1x1\n3x14 1x6\n3x14 1x6 1x1\n3x14 1x6 1x2\n3x14 1x9\n3x14 1x9 1x1\n3x14 1x9 1x2\n3x14 2x6\n2x14 3x9\n4x14\n4x14 1x1\n4x14 1x2\n4x14 1x2 1x1\n3x14 2x9\n3x14 2x9 1x1\n4x14 1x6\n4x14 1x6 1x1\n4x14 1x6 1x2\n4x14 1x9\n4x14 1x9 1x1\n4x14 1x9 1x2\n4x14 2x6\n3x14 3x9\n5x14\n5x14 1x1\n5x14 1x2\n5x14 1x2 1x1\n4x14 2x9\n4x14 2x9 1x1\n5x14 1x6\n5x14 1x6 1x1\n5x14 1x6 1x2\n5x14 1x9\n5x14 1x9 1x1\n5x14 1x9 1x2\n5x14 2x6\n4x14 3x9\n6x14\n6x14 1x1\n6x14 1x2\n6x14 1x2 1x1\n5x14 2x9\n5x14 2x9 1x1\n6x14 1x6\n6x14 1x6 1x1\n6x14 1x6 1x2\n6x14 1x9\n6x14 1x9 1x1\n6x14 1x9 1x2\n6x14 2x6\n5x14 3x9\n7x14\n7x14 1x1\n7x14 1x2\n1x1\n1x2\n1x3\n1x4\n1x4 1x1\n1x4 1x2\n1x7\n1x7 1x1\n1x7 1x2\n1x7 1x3\n1x7 1x4\n1x7 1x4 1x1\n1x7 1x4 1x2\n2x7\n2x7 1x1\n2x7 1x2\n2x7 1x3\n2x7 1x4\n2x7 1x4 1x1\n2x7 1x4 1x2\n3x7\n3x7 1x1\n3x7 1x2\n3x7 1x3\n3x7 1x4\n3x7 1x4 1x1\n3x7 1x4 1x2\n4x7\n4x7 1x1\n4x7 1x2\n4x7 1x3\n4x7 1x4\n4x7 1x4 1x1\n4x7 1x4 1x2\n5x7\n5x7 1x1\n5x7 1x2\n5x7 1x3\n5x7 1x4\n5x7 1x4 1x1\n5x7 1x4 1x2\n6x7\n6x7 1x1\n6x7 1x2\n6x7 1x3\n6x7 1x4\n6x7 1x4 1x1\n6x7 1x4 1x2\n7x7\n7x7 1x1\n7x7 1x2\n7x7 1x3\n7x7 1x4\n7x7 1x4 1x1\n7x7 1x4 1x2\n8x7\n8x7 1x1\n8x7 1x2\n8x7 1x3\n8x7 1x4\n8x7 1x4 1x1\n8x7 1x4 1x2\n9x7\n9x7 1x1\n9x7 1x2\n9x7 1x3\n9x7 1x4\n9x7 1x4 1x1\n9x7 1x4 1x2\n10x7\n10x7 1x1\n10x7 1x2\n10x7 1x3\n10x7 1x4\n10x7 1x4 1x1\n10x7 1x4 1x2\n11x7\n11x7 1x1\n11x7 1x2\n11x7 1x3\n11x7 1x4\n11x7 1x4 1x1\n11x7 1x4 1x2\n12x7\n12x7 1x1\n12x7 1x2\n12x7 1x3\n12x7 1x4\n12x7 1x4 1x1\n12x7 1x4 1x2\n13x7\n13x7 1x1\n13x7 1x2\n13x7 1x3\n13x7 1x4\n13x7 1x4 1x1\n13x7 1x4 1x2\n14x7\n14x7 1x1\n14x7 1x2\n1x1\n2x1\n1x3\n1x3 1x1\n1x5\n1x5 1x1\n1x5 2x1\n1x8\n1x8 1x1\n2x5\n1x11\n1x11 1x1\n1x8 1x5\n1x11 1x3\n1x11 1x3 1x1\n1x11 1x5\n1x11 1x5 1x1\n1x8 2x5\n1x11 1x8\n1x11 1x8 1x1\n1x11 2x5\n2x11\n2x11 1x1\n1x11 1x8 1x5\n2x11 1x3\n2x11 1x3 1x1\n2x11 1x5\n2x11 1x5 1x1\n1x11 1x8 2x5\n2x11 1x8\n2x11 1x8 1x1\n2x11 2x5\n3x11\n3x11 1x1\n2x11 1x8 1x5\n3x11 1x3\n3x11 1x3 1x1\n3x11 1x5\n3x11 1x5 1x1\n2x11 1x8 2x5\n3x11 1x8\n3x11 1x8 1x1\n3x11 2x5\n4x11\n4x11 1x1\n3x11 1x8 1x5\n4x11 1x3\n4x11 1x3 1x1\n4x11 1x5\n4x11 1x5 1x1\n3x11 1x8 2x5\n4x11 1x8\n4x11 1x8 1x1\n4x11 2x5\n5x11\n5x11 1x1\n4x11 1x8 1x5\n5x11 1x3\n5x11 1x3 1x1\n5x11 1x5\n5x11 1x5 1x1\n4x11 1x8 2x5\n5x11 1x8\n5x11 1x8 1x1\n5x11 2x5\n6x11\n6x11 1x1\n5x11 1x8 1x5\n6x11 1x3\n6x11 1x3 1x1\n6x11 1x5\n6x11 1x5 1x1\n5x11 1x8 2x5\n6x11 1x8\n6x11 1x8 1x1\n6x11 2x5\n7x11\n7x11 1x1\n6x11 1x8 1x5\n7x11 1x3\n7x11 1x3 1x1\n7x11 1x5\n7x11 1x5 1x1\n6x11 1x8 2x5\n7x11 1x8\n7x11 1x8 1x1\n7x11 2x5\n8x11\n8x11 1x1\n7x11 1x8 1x5\n8x11 1x3\n8x11 1x3 1x1\n8x11 1x5\n8x11 1x5 1x1\n7x11 1x8 2x5\n8x11 1x8\n8x11 1x8 1x1\n8x11 2x5\n9x11\n9x11 1x1\n",
+ "in4": "3\n5\n4\n1 2 6 9 14\n412 31 512 630\n1 2 3 4 7\n77775 432444 322344 54345\n1 3 5 8 11\n6554 456534 645645 234545\n",
+ "out4": "29x14 1x6\n2x14 1x2 1x1\n36x14 1x6 1x2\n45x14\n11110x7 1x4 1x1\n61777x7 1x4 1x1\n46049x7 1x1\n7763x7 1x4\n595x11 1x8 1x1\n41503x11 1x1\n58695x11\n21322x11 1x3\n",
+ "in5": "3\n5\n4\n100x1 12x4 18x6 42x9 13x14\n412 31 512 630\n100x1 5234334x5 3453343x7 63454334x18 356513x20\n77775 432444 322344 54345\n100x1 234452x4 675456x7 2342345x16 15522x19\n6554 456534 645645 234545\n",
+ "out5": "13x14 25x9 1x4 1x1\n1x14 1x9 2x4\n13x14 36x9 1x6\n13x14 42x9 11x6 1x4\n3886x20 3x18 1x1\n21615x20 8x18\n16110x20 8x18\n2717x20 1x5\n344x19 1x16 2x1\n15522x19 10101x16\n15522x19 21920x16 1x7\n12344x19 1x7 2x1\n",
+ "ours5": "11x14 28x9 1x6\n3x9 1x4\n13x14 36x9 1x6\n13x14 42x9 11x6 1x4\n3886x20 3x18 1x1\n21615x20 8x18\n16110x20 8x18\n2717x20 1x5\n344x19 2x7 1x4\n15522x19 10101x16\n15519x19 21924x16\n12344x19 2x4 1x1\n"
+};
+</script>
+
+<script id="algo">
+"use strict";
+/* ---------- pure ports of solution.py (no DOM) ---------- */
+function toks(s){ return s.trim().split(/\s+/); }
+
+function parseCoinsOnly(text){ // levels 1 and 3
+  const t = toks(text); const n=+t[0], c=+t[1]; let p=2; const cur=[];
+  for(let i=0;i<n;i++){ cur.push(t.slice(p,p+c).map(Number)); p+=c; }
+  return cur;
+}
+function parseWithAmounts(text, inv){ // levels 2, 4, 5
+  const t = toks(text); const n=+t[0], c=+t[1], a=+t[2]; let p=3; const cur=[];
+  for(let i=0;i<n;i++){
+    const coins = t.slice(p,p+c); p+=c;
+    const amounts = t.slice(p,p+a).map(Number); p+=a;
+    cur.push({coins: inv ? coins.map(s=>{const [q,v]=s.split("x"); return [+q,+v];}) : coins.map(Number), amounts});
+  }
+  return cur;
+}
+const uniqSorted = arr => [...new Set(arr)].sort((x,y)=>x-y);
+function fmtCounts(cnt){ return [...cnt.keys()].sort((a,b)=>b-a).map(v=>cnt.get(v)+"x"+v).join(" "); }
+
+function solve1(coins){ const s=new Set(coins); let m=1; while(s.has(m)) m++; return m; }
+
+function solve2pair(coins, t){ const cs=new Set(coins); for(const x of uniqSorted(coins)) if(cs.has(t-x)) return [x,t-x]; return null; }
+
+function table3(coinsRaw, limit){
+  const coins=uniqSorted(coinsRaw); const dp=[0], last=[0];
+  for(let a=1;a<=limit;a++){ dp[a]=Infinity; last[a]=0;
+    for(const c of coins) if(c<=a && dp[a-c]+1<dp[a]){ dp[a]=dp[a-c]+1; last[a]=c; } }
+  return {coins, dp, last};
+}
+function walk(last, a){ const cnt=new Map(); while(a){ cnt.set(last[a],(cnt.get(last[a])||0)+1); a-=last[a]; } return cnt; }
+
+function table4(coinsRaw){
+  const coins=uniqSorted(coinsRaw), m=coins[coins.length-1], size=m*m+m;
+  const dp=[0], last=[0];
+  for(let a=1;a<size;a++){ let best=Infinity, bc=0;
+    for(const c of coins){ if(c>a) break; const v=dp[a-c]+1; if(v<best){best=v;bc=c;} }
+    dp[a]=best; last[a]=bc; }
+  return {coins, m, size, dp, last};
+}
+function construct4(T, amount){
+  const m=T.m, base=m*m; let k=0; if(amount>=base+m){ k=Math.floor((amount-base)/m); amount-=k*m; }
+  const path=[amount]; const cnt=new Map(); if(k) cnt.set(m,k);
+  while(amount){ const c=T.last[amount]; cnt.set(c,(cnt.get(c)||0)+1); amount-=c; path.push(amount); }
+  return {k, path, cnt, line: fmtCounts(cnt)};
+}
+
+class Currency5{
+  constructor(inv){
+    const s=inv.slice().sort((a,b)=>a[1]-b[1]);
+    this.u=s.map(p=>p[0]); this.v=s.map(p=>p[1]); this.k=s.length;
+    const vmax=this.v[this.k-1]; this.vmax=vmax; this.cases=[];
+    for(let j=0;j<this.k;j++) this.cases.push(this.build(j,vmax));
+    this.cases.push(this.build(null,vmax));
+  }
+  build(j,vmax){
+    const {k,u,v}=this; const base=new Array(k).fill(0), ym=new Array(k).fill(0), items=[];
+    for(let i=0;i<k;i++){ if(i===j) continue;
+      if(j===null || i>j){ const dm=Math.min(u[i],vmax-1); base[i]=u[i]-dm; ym[i]=dm; }
+      else ym[i]=Math.min(u[i], v[j]-1);
+      items.push(i); }
+    let size=1; for(const i of items) size+=ym[i]*v[i];
+    const first=new Array(size).fill(Infinity); first[0]=0; const layers=[first];
+    for(const i of items){ const old=layers[layers.length-1], nw=old.slice(), w=v[i];
+      for(let c=1;c<=ym[i];c++){ const sh=c*w; if(sh>=size) break;
+        for(let x=sh;x<size;x++){ const y=old[x-sh]+c; if(nw[x]>y) nw[x]=y; } }
+      layers.push(nw); }
+    const g=layers[layers.length-1];
+    let baseCnt=0, baseVal=0; for(let i=0;i<k;i++){ baseCnt+=base[i]; baseVal+=base[i]*v[i]; }
+    let lists=null;
+    if(j!==null){ const vj=v[j]; lists=Array.from({length:vj},()=>[]);
+      for(let s=0;s<size;s++) if(g[s]<Infinity) lists[s%vj].push([vj*g[s]-s, s]);
+      for(const l of lists) l.sort((a,b)=>a[0]-b[0]||a[1]-b[1]); }
+    return {j, base, ym, items, layers, g, baseCnt, baseVal, lists};
+  }
+  solve(t){
+    let best=null; const per=[];
+    this.cases.forEach((cs,ci)=>{
+      const j=cs.j, r=t-cs.baseVal, e={j, size:cs.g.length, total:null};
+      per.push(e); if(r<0) return;
+      if(j===null){ if(r<cs.g.length && cs.g[r]<Infinity){ const total=cs.baseCnt+cs.g[r]; e.total=total;
+          if(!best||total<best.total) best={total, cs, s:r, xj:0, ci}; } return; }
+      const vj=this.v[j], lo=r-vj*this.u[j];
+      for(const [,s] of cs.lists[r%vj]){ if(lo<=s && s<=r){ const xj=(r-s)/vj, total=cs.baseCnt+cs.g[s]+xj; e.total=total;
+          if(!best||total<best.total) best={total, cs, s, xj, ci}; break; } }
+    });
+    if(!best) throw new Error("amount "+t+" cannot be built");
+    const cs=best.cs; let s=best.s; const y={};
+    for(let pos=cs.items.length-1;pos>=0;pos--){ const i=cs.items[pos], prev=cs.layers[pos], cur=cs.layers[pos+1];
+      for(let c=0;c<=cs.ym[i];c++){ const sh=c*this.v[i]; if(sh>s) break;
+        if(prev[s-sh]+c===cur[s]){ y[i]=c; s-=sh; break; } } }
+    const x=[]; const cnt=new Map();
+    for(let i=0;i<this.k;i++){ let n=cs.base[i]+(y[i]||0); if(i===cs.j) n=best.xj; x.push(n); if(n) cnt.set(this.v[i],n); }
+    return {per, best:best.ci, total:best.total, x, line: fmtCounts(cnt)};
+  }
+}
+function lineCount(line){ return line.split(" ").reduce((s,p)=>s+(+p.split("x")[0]),0); }
+</script>
+
+<script id="ui">
+"use strict";
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const C = {bg:"#1c1031", panel:"#22143a", line:"#3d2a63", line2:"#57408a", ink:"#f1e8ff", dim:"#a593c9",
+  gold:"#f6c945", goldD:"#a8781c", goldL:"#ffe9a3", purple:"#a46bff", mint:"#5fe0a0", red:"#ff6b7f", teal:"#4cc9f0", dark:"#2a1a00"};
+const PAL = ["#f6c945","#a46bff","#4cc9f0","#5fe0a0","#ff8f6b","#ff6b9e","#c9f04c"];
+const MONO = '"Martian Mono", ui-monospace, Menlo, monospace', PIX = '"Silkscreen", ui-monospace, monospace';
+const lerp=(a,b,t)=>a+(b-a)*t, clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const lines=s=>s.replace(/\n$/,"").split("\n");
+
+/* ---------- drawing helpers (vector, DPR-scaled) ---------- */
+function txt(ctx,s,x,y,o={}){
+  ctx.font=`${o.weight||400} ${o.size||12}px ${o.font||MONO}`; ctx.fillStyle=o.color||C.ink;
+  ctx.textAlign=o.align||"left"; ctx.textBaseline=o.base||"alphabetic"; ctx.fillText(s,x,y);
+}
+function fitTxt(ctx,s,x,y,maxW,o={}){ let size=o.size||12; ctx.font=`${o.weight||400} ${size}px ${o.font||MONO}`;
+  while(size>7 && ctx.measureText(s).width>maxW){ size-=0.5; ctx.font=`${o.weight||400} ${size}px ${o.font||MONO}`; }
+  txt(ctx,s,x,y,{...o,size}); }
+function pxRect(ctx,x,y,w,h,fill,stroke,n=4,lw=2){ // rectangle with pixel-notched corners
+  ctx.beginPath();
+  ctx.moveTo(x+n,y); ctx.lineTo(x+w-n,y); ctx.lineTo(x+w-n,y+n); ctx.lineTo(x+w,y+n); ctx.lineTo(x+w,y+h-n);
+  ctx.lineTo(x+w-n,y+h-n); ctx.lineTo(x+w-n,y+h); ctx.lineTo(x+n,y+h); ctx.lineTo(x+n,y+h-n); ctx.lineTo(x,y+h-n);
+  ctx.lineTo(x,y+n); ctx.lineTo(x+n,y+n); ctx.closePath();
+  if(fill){ ctx.fillStyle=fill; ctx.fill(); } if(stroke){ ctx.strokeStyle=stroke; ctx.lineWidth=lw; ctx.stroke(); }
+}
+function circ(ctx,x,y,r){ ctx.beginPath(); ctx.arc(x,y,Math.max(0,r),0,Math.PI*2); }
+function coin(ctx,x,y,r,label,o={}){
+  ctx.save(); ctx.globalAlpha=o.alpha??1;
+  if(o.ghost){ ctx.setLineDash([3,3]); circ(ctx,x,y,r); ctx.strokeStyle=o.ghostCol||C.line2; ctx.lineWidth=1.5; ctx.stroke(); ctx.setLineDash([]); }
+  else {
+    circ(ctx,x,y+r*0.12,r); ctx.fillStyle="#5c3d06"; ctx.fill();
+    circ(ctx,x,y,r); ctx.fillStyle=o.fill||C.gold; ctx.fill(); ctx.lineWidth=Math.max(1.5,r*0.09); ctx.strokeStyle=o.rim||C.goldD; ctx.stroke();
+    circ(ctx,x,y,r*0.72); ctx.lineWidth=1; ctx.strokeStyle="rgba(120,80,10,.55)"; ctx.stroke();
+    ctx.beginPath(); ctx.arc(x,y,r*0.84,Math.PI*1.1,Math.PI*1.45); ctx.strokeStyle="rgba(255,255,255,.75)"; ctx.lineWidth=Math.max(1.2,r*0.1); ctx.lineCap="round"; ctx.stroke(); ctx.lineCap="butt";
+  }
+  if(label!==undefined && label!==null){
+    const s=String(label); let size=Math.max(8,r*(s.length>2?0.62:0.8));
+    ctx.font=`600 ${size}px ${MONO}`; while(size>7 && ctx.measureText(s).width>r*1.6){ size-=0.5; ctx.font=`600 ${size}px ${MONO}`; }
+    ctx.fillStyle=o.ghost?(o.labelCol||C.dim):"#3a2500"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(s,x,y+0.5);
+  }
+  if(o.ring){ circ(ctx,x,y,r+4); ctx.strokeStyle=o.ring; ctx.lineWidth=3; ctx.globalAlpha=(o.alpha??1)*(o.ringAlpha??1); ctx.stroke(); }
+  ctx.restore();
+}
+function pointer(ctx,x,y,label,col=C.gold){ // downward triangle
+  ctx.beginPath(); ctx.moveTo(x-8,y-10); ctx.lineTo(x+8,y-10); ctx.lineTo(x,y); ctx.closePath(); ctx.fillStyle=col; ctx.fill();
+  if(label) txt(ctx,label,x,y-15,{font:PIX,size:11,color:col,align:"center"});
+}
+function partialLine(ctx,x1,y1,x2,y2,t){ ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(lerp(x1,x2,t),lerp(y1,y2,t)); ctx.stroke(); }
+function outList(ctx,x,y,w,h,title,rows,o={}){ // rows: [{a, b, hl, ok}]
+  pxRect(ctx,x,y,w,h,"#170c2b",C.line);
+  txt(ctx,title,x+10,y+18,{font:PIX,size:11,color:C.gold});
+  const lh=o.lh||18; const maxRows=Math.floor((h-30)/lh);
+  const start=Math.max(0,Math.min(rows.length-maxRows,(o.focus??rows.length-1)-maxRows+2));
+  for(let i=start;i<Math.min(rows.length,start+maxRows);i++){ const r=rows[i], yy=y+30+(i-start)*lh;
+    if(r.hl){ ctx.fillStyle="rgba(246,201,69,.16)"; ctx.fillRect(x+4,yy-2,w-8,lh); }
+    const colA=r.colA||C.ink;
+    if(r.b!==undefined){ fitTxt(ctx,r.a,x+10,yy+lh*0.62,w*0.52-14,{size:11.5,color:colA});
+      fitTxt(ctx,r.b,x+w*0.54,yy+lh*0.62,w*0.46-28,{size:11.5,color:C.dim}); }
+    else fitTxt(ctx,r.a,x+10,yy+lh*0.62,w-36,{size:11.5,color:colA});
+    if(r.ok!==undefined) txt(ctx,r.ok?"✓":"✗",x+w-14,yy+lh*0.62,{size:12,color:r.ok?C.mint:C.red,align:"center"});
+  }
+}
+
+/* ---------- generic step player ---------- */
+const players=[];
+class Player{
+  constructor(sec, viz){
+    this.sec=sec; this.viz=viz; this.canvas=sec.querySelector("canvas.viz"); this.ctx=this.canvas.getContext("2d");
+    this.wrap=sec.querySelector(".canvas-wrap"); this.cap=sec.querySelector(".caption");
+    this.speed=1; this.playing=false; this.visible=false; this.started=false; this.t=1; this.idx=0; this.prevIdx=0; this.tStart=0; this.raf=null;
+    this.sel=sec.querySelector("select.cur");
+    if(this.sel){ (viz.options||[]).forEach((o,i)=>{ const op=document.createElement("option"); op.value=i; op.textContent=o; this.sel.appendChild(op); });
+      this.sel.addEventListener("change",()=>{ this.load(); }); }
+    const ctr=sec.querySelector(".controls");
+    ctr.innerHTML=`<button data-a="restart" aria-label="Restart">⏮</button><button data-a="back" aria-label="Step back">◀ STEP</button>`+
+      `<button class="play" data-a="play">PLAY</button><button data-a="fwd" aria-label="Step forward">STEP ▶</button>`+
+      `<select data-a="speed" aria-label="Speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option><option value="8">8×</option></select>`+
+      `<span class="counter"></span>`;
+    this.btnPlay=ctr.querySelector('[data-a="play"]'); this.counter=ctr.querySelector(".counter");
+    ctr.addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; const a=b.dataset.a;
+      if(a==="play"){ if(this.idx>=this.steps.length-1 && !this.playing) this.go(0,false); this.setPlaying(!this.playing); }
+      if(a==="restart"){ this.setPlaying(false); this.go(0,false); }
+      if(a==="back"){ this.setPlaying(false); this.go(this.idx-1,false); }
+      if(a==="fwd"){ this.setPlaying(false); this.go(this.idx+1,true); } });
+    ctr.querySelector('[data-a="speed"]').addEventListener("change",e=>{ this.speed=+e.target.value; });
+    new ResizeObserver(()=>this.resize()).observe(this.wrap);
+    new IntersectionObserver(es=>{ for(const e of es){ this.visible=e.isIntersecting;
+        if(this.visible && !this.started){ this.started=true; if(!REDUCED) this.setPlaying(true); }
+        if(this.visible) this.kick(); } },{threshold:0.25}).observe(this.canvas);
+    this.load(); players.push(this);
+  }
+  opt(){ return this.sel? +this.sel.value : 0; }
+  load(){ this.steps=this.viz.build(this.opt()); this.idx=0; this.prevIdx=0; this.t=1; this.resize(); this.update(); }
+  resize(){ const w=this.wrap.clientWidth; if(!w) return; const h=Math.round(this.viz.height(w, this)); const dpr=window.devicePixelRatio||1;
+    this.w=w; this.h=h; this.dpr=dpr; this.canvas.style.height=h+"px"; this.canvas.width=Math.round(w*dpr); this.canvas.height=Math.round(h*dpr); this.render(); }
+  setPlaying(p){ this.playing=p; this.btnPlay.textContent=p?"PAUSE":"PLAY"; this.tStart=performance.now(); if(p && this.t>=1) this.tStart-=this.tween(); this.kick(); }
+  dur(){ return (this.steps[this.idx].hold||1)*1150/this.speed; }
+  tween(){ return Math.min(520/this.speed, 900); }
+  go(i, animate){ i=clamp(i,0,this.steps.length-1); if(i===this.idx){ this.render(); return; }
+    this.prevIdx=this.idx; this.idx=i; this.tStart=performance.now(); this.t=(animate && !REDUCED)?0:1; this.update(); this.kick(); }
+  update(){ const s=this.steps[this.idx]; this.cap.innerHTML=s.cap||""; this.counter.textContent=`step ${this.idx+1} / ${this.steps.length}`; }
+  kick(){ if(!this.raf) this.raf=requestAnimationFrame(n=>this.loop(n)); }
+  loop(now){ this.raf=null;
+    if(this.t<1) this.t=clamp((now-this.tStart)/this.tween(),0,1);
+    if(this.playing && this.visible && this.t>=1 && now-this.tStart>=this.dur()){
+      if(this.idx<this.steps.length-1) this.go(this.idx+1,true); else this.setPlaying(false); }
+    this.render();
+    if((this.playing && this.visible) || this.t<1) this.kick();
+  }
+  render(){ if(!this.w) return; const ctx=this.ctx; ctx.setTransform(this.dpr,0,0,this.dpr,0,0);
+    ctx.clearRect(0,0,this.w,this.h); ctx.fillStyle=C.bg; ctx.fillRect(0,0,this.w,this.h);
+    const cur=this.steps[this.idx], prev=this.steps[this.prevIdx];
+    this.viz.draw(ctx,this.w,this.h,cur,prev,ease(this.t),this); }
+}
+function matchNote(ok, n){ return ok?` <span class="ok">✓ all ${n} lines equal the expected output.</span>`:` <span class="bad">✗ differs from expected.</span>`; }
+
+/* =============== LEVEL 1 =============== */
+const viz1={
+  height:w=>w<600?330:300,
+  build(){
+    const curs=parseCoinsOnly(DATA.in1), exp=lines(DATA.out1).map(Number), steps=[], ans=[];
+    const L=Math.max(...curs.map(c=>Math.max(...c)))+1;
+    curs.forEach((coins,ci)=>{ const set=new Set(coins); let m=1;
+      steps.push({ci,m,st:"start",ans:[...ans],coins,L,cap:`Currency #${ci+1} has coins {${coins.join(", ")}}. Start counting at m = 1.`});
+      while(set.has(m)){ steps.push({ci,m,st:"hit",ans:[...ans],coins,L,cap:`m = ${m} is a coin, so it can be paid with one coin. Try m = ${m+1}.`}); m++; }
+      ans.push(m);
+      steps.push({ci,m,st:"found",ans:[...ans],coins,L,hold:1.6,cap:`m = ${m} is not a coin: currency #${ci+1} answers <b>${m}</b>.`});
+    });
+    const last=steps[steps.length-1]; const ok=ans.join()===exp.join();
+    last.cap+=` Output ${ans.join(" / ")}.`+matchNote(ok,ans.length); last.done=true; last.exp=exp;
+    return steps;
+  },
+  draw(ctx,w,h,s,p,t){
+    const pad=16, L=s.L, set=new Set(s.coins);
+    txt(ctx,`CURRENCY #${s.ci+1}`,pad,30,{font:PIX,size:14,color:C.gold});
+    fitTxt(ctx,`coins {${s.coins.join(", ")}}`,pad,50,w-2*pad,{size:12,color:C.dim});
+    const sp=(w-2*pad)/L, X=v=>pad+sp*(v-0.5), r=Math.min(sp*0.42,22), ly=Math.round(h*0.46);
+    ctx.strokeStyle=C.line2; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(pad,ly+r+6); ctx.lineTo(w-pad,ly+r+6); ctx.stroke();
+    for(let v=1;v<=L;v++){
+      if(set.has(v)) coin(ctx,X(v),ly,r,v); else coin(ctx,X(v),ly,r*0.8,v,{ghost:true});
+      ctx.fillStyle=C.line2; ctx.fillRect(X(v)-1,ly+r+3,2,7);
+    }
+    const same=p && p.ci===s.ci, mx=lerp(same?X(p.m):X(s.m),X(s.m),t);
+    pointer(ctx,mx,ly-r-8,"m="+s.m);
+    if(s.st==="hit") coin(ctx,X(s.m),ly,r,s.m,{ring:C.mint,ringAlpha:t});
+    if(s.st==="found"){ coin(ctx,X(s.m),ly,r*0.8,s.m,{ghost:true,ghostCol:C.red,labelCol:C.red,ring:C.red,ringAlpha:t});
+      txt(ctx,"NOT A COIN",X(s.m),ly+r+30,{font:PIX,size:11,color:C.red,align:clamp(X(s.m),70,w-70)===X(s.m)?"center":(X(s.m)<70?"left":"right")}); }
+    // answers
+    const n=3, bw=Math.min(170,(w-2*pad-(n-1)*10)/n), by=h-74;
+    txt(ctx,"OUTPUT",pad,by-10,{font:PIX,size:11,color:C.dim});
+    for(let i=0;i<n;i++){ const bx=pad+i*(bw+10), has=i<s.ans.length;
+      pxRect(ctx,bx,by,bw,56,i===s.ci?"#2c1b4b":"#170c2b",i===s.ci?C.gold:C.line);
+      txt(ctx,`#${i+1}`,bx+10,by+22,{font:PIX,size:11,color:C.dim});
+      txt(ctx,has?String(s.ans[i]):"·",bx+10,by+45,{size:18,weight:600,color:has?C.gold:C.line2});
+      if(s.done){ const ok=s.ans[i]===s.exp[i]; txt(ctx,`exp ${s.exp[i]} ${ok?"✓":"✗"}`,bx+bw-10,by+45,{size:11,color:ok?C.mint:C.red,align:"right"}); }
+    }
+  }
+};
+
+/* =============== LEVEL 2 =============== */
+const viz2={
+  height:w=>w<640?470:320,
+  build(){
+    const curs=parseWithAmounts(DATA.in2,false), exp=lines(DATA.out2), steps=[], out=[];
+    curs.forEach((cu,ci)=>{ const coins=uniqSorted(cu.coins), set=new Set(coins);
+      cu.amounts.forEach((t,ai)=>{
+        steps.push({ci,ai,t,coins,xi:null,out:[...out],cap:`Currency #${ci+1}: pay <b>${t}</b> with exactly two coins. Scan coins from the smallest.`});
+        for(let xi=0;xi<coins.length;xi++){ const x=coins[xi], q=t-x, ok=set.has(q);
+          if(ok){ out.push(`${x} ${q}`);
+            steps.push({ci,ai,t,coins,xi,x,q,ok,out:[...out],hold:1.4,cap:`${x} + ${q} = ${t} and ${q} is a coin <span class="ok">✓</span> → output "${x} ${q}".`}); break; }
+          steps.push({ci,ai,t,coins,xi,x,q,ok,out:[...out],cap:`${x} + ${q} = ${t}, but ${q} is not a coin <span class="bad">✗</span> → try the next coin.`});
+        }
+      });
+    });
+    const last=steps[steps.length-1]; const ok=out.join("\n")===exp.join("\n");
+    last.cap+=matchNote(ok,out.length); last.done=true; steps.forEach(s=>s.exp=exp);
+    return steps;
+  },
+  draw(ctx,w,h,s,p,t){
+    const pad=16, wide=w>=640, vw=wide?Math.round(w*0.6):w;
+    txt(ctx,`CURRENCY #${s.ci+1}`,pad,30,{font:PIX,size:13,color:C.dim});
+    txt(ctx,`PAY ${s.t}`,pad,58,{font:PIX,size:22,color:C.gold});
+    const n=s.coins.length, sp=(vw-2*pad)/n, r=Math.min(sp*0.34,26), cy=136, X=i=>pad+sp*(i+0.5);
+    s.coins.forEach((c,i)=>coin(ctx,X(i),cy,r,c,{alpha:(s.xi!==null && i<s.xi && !(s.ok && s.coins.indexOf(s.q)===i))?0.45:1}));
+    if(s.xi!==null){
+      const sameAmt=p && p.ai===s.ai && p.ci===s.ci && p.xi!==null;
+      const px=lerp(sameAmt?X(p.xi):X(s.xi),X(s.xi),t);
+      pointer(ctx,px,cy-r-8,"x");
+      coin(ctx,X(s.xi),cy,r,s.x,{ring:C.gold});
+      const qi=s.coins.indexOf(s.q), ey=cy+r+70;
+      if(s.ok){
+        const x1=X(s.xi), x2=X(qi);
+        ctx.strokeStyle=C.mint; ctx.lineWidth=3;
+        if(qi===s.xi){ ctx.beginPath(); ctx.arc(x1,cy+r+14,12,Math.PI*1.2,Math.PI*1.2+Math.PI*2*t); ctx.stroke(); }
+        else { ctx.beginPath(); const N=40; for(let k=0;k<=N*t;k++){ const u=k/N, xx=lerp(x1,x2,u), yy=cy+r+8+Math.sin(u*Math.PI)*42; k?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy);} ctx.stroke(); }
+        coin(ctx,x2,cy,r,s.q,{ring:C.mint,ringAlpha:t});
+        txt(ctx,`${s.x} + ${s.q} = ${s.t}  ✓`,vw/2,ey+10,{size:16,weight:600,color:C.mint,align:"center"});
+      } else {
+        const gx=X(s.xi), gy=cy+r+44;
+        coin(ctx,gx,gy,r*0.75,s.q,{ghost:true,ghostCol:C.red,labelCol:C.red,alpha:t});
+        txt(ctx,`${s.x} + ${s.q} = ${s.t}  ✗ ${s.q} is not a coin`,vw/2,ey+22,{size:13,color:C.red,align:"center"});
+      }
+    } else txt(ctx,"scan coins left → right",vw/2,cy+r+60,{size:13,color:C.dim,align:"center"});
+    const ox=wide?vw+8:pad, oy=wide?pad:262, ow=wide?w-vw-8-pad:w-2*pad, oh=wide?h-2*pad:h-262-pad;
+    const rows=s.exp.map((e,i)=>({a:i<s.out.length?s.out[i]:"·",b:"exp "+e,hl:i===s.out.length-(s.ok?1:0)&&!s.done,ok:s.done?s.out[i]===e:undefined,colA:i<s.out.length?C.ink:C.line2}));
+    outList(ctx,ox,oy,ow,oh,"OUTPUT  vs  EXPECTED",rows,{focus:s.out.length,lh:Math.min(22,(oh-32)/rows.length)});
+  }
+};
+
+/* =============== LEVEL 3 =============== */
+const viz3={
+  options:parseCoinsOnly(DATA.in3).map((c,i)=>`currency #${i+1} {${c.join(",")}}`),
+  height:w=>w>=700?470:(w-32)+60+18*12+50,
+  build(ci){
+    const coinsRaw=parseCoinsOnly(DATA.in3)[ci], T=table3(coinsRaw,100), exp=lines(DATA.out3).slice(ci*100,ci*100+100), out=[];
+    const steps=[];
+    for(let a=1;a<=100;a++){ out.push(fmtCounts(walk(T.last,a)));
+      const cand=T.coins.filter(c=>c<=a).map(c=>`${c}→dp[${a-c}]+1=${T.dp[a-c]+1}`);
+      steps.push({a,T,out,exp,cap:`a = ${a}: ${cand.join(", ")} ⇒ dp[${a}] = <b>${T.dp[a]}</b>, first best coin ${T.last[a]}. Walk back ${a} → ${a-T.last[a]} → … gives "${out[a-1]}".`});
+    }
+    const ok=out.every((l,i)=>l===exp[i]);
+    steps.push({a:100,T,out,exp,done:true,hold:2,cap:`Table complete: 100 lines for currency #${ci+1}.`+matchNote(ok,100)});
+    return steps;
+  },
+  draw(ctx,w,h,s,p,t){
+    const pad=16, wide=w>=700, G=wide?Math.min(Math.round(w*0.52),h-70):w-2*pad, cell=G/10, gx=pad, gy=pad+6;
+    const T=s.T, ci=c=>T.coins.indexOf(c), cc=a=>{const r=Math.floor((a-1)/10), c=(a-1)%10; return [gx+c*cell+cell/2, gy+r*cell+cell/2];};
+    for(let a=1;a<=100;a++){ const [x,y]=cc(a), x0=x-cell/2+1.5, y0=y-cell/2+1.5, cw=cell-3;
+      const filled=a<s.a || (a===s.a), alpha=a===s.a&&!s.done?t:1;
+      if(filled){ ctx.save(); ctx.globalAlpha=0.25+0.6*alpha; pxRect(ctx,x0,y0,cw,cw,PAL[ci(T.last[a])%PAL.length],null,3); ctx.restore();
+        txt(ctx,String(T.dp[a]),x,y+1,{size:Math.max(9,cell*0.34),weight:600,color:"#1a0e2c",align:"center",base:"middle"}); }
+      else pxRect(ctx,x0,y0,cw,cw,"#190e2d",C.line,3,1);
+      if(cell>=30) txt(ctx,String(a),x0+4,y0+10,{size:Math.max(7,cell*0.19),color:filled?"rgba(26,14,44,.7)":C.line2});
+    }
+    // origin "0"
+    // candidate arrows into the current cell
+    if(!s.done){ const [tx,ty]=cc(s.a);
+      T.coins.filter(c=>c<=s.a).forEach(c=>{ const src=s.a-c; const [sx,sy]=src?cc(src):[gx-6,gy-2]; const best=c===T.last[s.a];
+        ctx.strokeStyle=best?C.goldL:"rgba(241,232,255,.45)"; ctx.lineWidth=best?3:1.5; partialLine(ctx,sx,sy,tx,ty,t);
+        if(best){ circ(ctx,sx,sy,4); ctx.fillStyle=C.goldL; ctx.fill(); } });
+      pxRect(ctx,tx-cell/2,ty-cell/2,cell,cell,null,C.gold,4,3);
+    }
+    // backtrack chain dots
+    let a=s.a; ctx.fillStyle=C.mint; while(a){ const [x,y]=cc(a); ctx.fillRect(x+cell*0.22,y-cell*0.36,Math.max(4,cell*0.13),Math.max(4,cell*0.13)); a-=T.last[a]; }
+    // legend
+    const ly=gy+G+18; let lx=gx; txt(ctx,"LAST COIN:",lx,ly+4,{font:PIX,size:10,color:C.dim}); lx+=86;
+    T.coins.forEach((c,i)=>{ pxRect(ctx,lx,ly-6,14,14,PAL[i%PAL.length],null,2); txt(ctx,String(c),lx+19,ly+5,{size:11,color:C.ink}); lx+=19+ctx.measureText(String(c)).width+14; });
+    txt(ctx,"■ walk-back",lx,ly+5,{size:10,color:C.mint});
+    const ox=wide?gx+G+16:pad, oy=wide?pad:ly+22, ow=wide?w-ox-pad:w-2*pad, oh=wide?h-2*pad:h-oy-pad;
+    const rows=s.out.slice(0,s.a).map((l,i)=>({a:`${String(i+1).padStart(3," ")}: ${l}`, hl:i===s.a-1&&!s.done, ok:s.done?l===s.exp[i]:undefined}));
+    outList(ctx,ox,oy,ow,oh,s.done?"OUTPUT  ✓ = EXPECTED":"OUTPUT LINES",rows,{focus:s.a-1});
+  }
+};
+
+/* =============== LEVEL 4 =============== */
+const viz4={
+  options:parseWithAmounts(DATA.in4,false).map((c,i)=>`currency #${i+1} {${c.coins.join(",")}}`),
+  height:(w,pl)=>{ if(w>=720) return 480; const M=pl&&pl.steps?pl.steps[0].T.m:14; const cell=(w-32)/M; return 16+cell*(M+1)+30+240; },
+  build(ci){
+    const cu=parseWithAmounts(DATA.in4,false)[ci], T=table4(cu.coins), M=T.m, exp=lines(DATA.out4).slice(ci*cu.amounts.length,(ci+1)*cu.amounts.length);
+    const steps=[], out=[], base={T,amounts:cu.amounts,exp};
+    for(let r=0;r<=M;r++) steps.push({...base,ph:"fill",row:r,out:[...out],cap:`Row ${r}: amounts ${r*M}–${r*M+M-1}. dp[a] = 1 + min dp[a − c], coins tried ascending. Each column is one residue mod ${M}, the colour is the coin that won.`});
+    cu.amounts.forEach((A,ai)=>{ const R=construct4(T,A);
+      steps.push({...base,ph:"reduce",ai,A,R,h:0,out:[...out],hold:1.5,cap: R.k?`${A} ≥ M² + M = ${T.size}. Above M² an optimum always holds a ${M}, so peel off k = ${R.k} coins of ${M} → remainder <b>${R.path[0]}</b> lands in the last row.`:`${A} < M² + M = ${T.size}: read it straight from the table.`});
+      for(let hh=1;hh<R.path.length;hh++) steps.push({...base,ph:"walk",ai,A,R,h:hh,out:[...out],hold:0.6,cap:`At ${R.path[hh-1]} the table says coin ${R.path[hh-1]-R.path[hh]} → ${R.path[hh]}.`});
+      out.push(R.line);
+      steps.push({...base,ph:"line",ai,A,R,h:R.path.length-1,out:[...out],hold:1.3,cap:`${A} = <b>${R.line}</b> (${lineCount(R.line)} coins).`});
+    });
+    const ok=out.every((l,i)=>l===exp[i]); const last=steps[steps.length-1]; last.done=true; last.cap+=matchNote(ok,out.length);
+    return steps;
+  },
+  draw(ctx,w,h,s,p,t){
+    const pad=16, wide=w>=720, T=s.T, M=T.m, rows=M+1;
+    const cell=wide?Math.min((w*0.5-pad)/M,(h-2*pad-26)/rows):(w-2*pad)/M, gx=pad, gy=pad, G=cell*M;
+    const ci=c=>T.coins.indexOf(c), pos=a=>[gx+(a%M)*cell+cell/2, gy+Math.floor(a/M)*cell+cell/2];
+    const fillRow=s.ph==="fill"?s.row:rows;
+    for(let a=0;a<T.size;a++){ const r=Math.floor(a/M), [x,y]=pos(a), x0=x-cell/2+1, cw=cell-2;
+      if(r<=fillRow){ const al=(s.ph==="fill"&&r===s.row)?t:1;
+        ctx.save(); ctx.globalAlpha=0.2+0.65*al; pxRect(ctx,x0,y-cell/2+1,cw,cw,a?PAL[ci(T.last[a])%PAL.length]:C.line2,null,cell>14?3:1); ctx.restore();
+        if(cell>=17) txt(ctx,String(T.dp[a]),x,y+1,{size:Math.max(8,cell*0.4),weight:600,color:"#1a0e2c",align:"center",base:"middle"}); }
+      else pxRect(ctx,x0,y-cell/2+1,cw,cw,"#190e2d",C.line,cell>14?3:1,1);
+    }
+    // landing zone (last row = [M², M²+M))
+    const lzY=gy+M*cell; ctx.setLineDash([5,4]); pxRect(ctx,gx-2,lzY-2,G+4,cell+4,null,C.gold,3,2); ctx.setLineDash([]);
+    txt(ctx,`LANDING ZONE [${M*M}, ${M*M+M})`,gx,lzY+cell+16,{font:PIX,size:10,color:C.gold});
+    // walk path
+    if(s.ph!=="fill"){ const P=s.R.path; ctx.strokeStyle=C.mint; ctx.lineWidth=2.5;
+      for(let k=1;k<=s.h;k++){ const [x1,y1]=pos(P[k-1]), [x2,y2]=pos(P[k]); partialLine(ctx,x1,y1,x2,y2,(k===s.h&&s.ph==="walk")?t:1); }
+      for(let k=0;k<=s.h;k++){ const [x,y]=pos(P[k]); circ(ctx,x,y,Math.max(2.5,cell*0.16)); ctx.fillStyle=k===s.h?C.goldL:C.mint; ctx.fill(); }
+      const [hx,hy]=pos(P[s.h]); pxRect(ctx,hx-cell/2,hy-cell/2,cell,cell,null,C.gold,3,2.5);
+    }
+    // right / bottom panel
+    const px0=wide?gx+G+24:pad, py0=wide?pad:lzY+cell+30, pw=wide?w-px0-pad:w-2*pad;
+    if(s.ph!=="fill"){
+      txt(ctx,`AMOUNT ${s.A}`,px0,py0+16,{font:PIX,size:14,color:C.gold});
+      const bw=pw, by=py0+28, bh=22, peel=s.R.k*M/s.A, grow=s.ph==="reduce"?t:1;
+      pxRect(ctx,px0,by,bw,bh,"#170c2b",C.line,3);
+      if(s.R.k){ ctx.fillStyle=C.purple; ctx.fillRect(px0+2,by+2,(bw-4)*peel*grow,bh-4);
+        const segs=Math.min(s.R.k,Math.floor((bw-4)*peel/5)); ctx.fillStyle="rgba(20,10,36,.45)";
+        for(let i=1;i<segs;i++) ctx.fillRect(px0+2+(bw-4)*peel*grow*i/segs,by+2,1,bh-4); }
+      ctx.fillStyle=C.gold; const rw=Math.max(3,(bw-4)*(1-peel)); ctx.fillRect(px0+bw-2-rw,by+2,rw,bh-4);
+      fitTxt(ctx,s.R.k?`${s.R.k} × ${M} peeled  +  remainder ${s.R.path[0]}`:`remainder ${s.R.path[0]} (no peel)`,px0,by+bh+16,pw,{size:11.5,color:C.dim});
+      const used=new Map(); if(s.R.k) used.set(M,s.R.k); for(let k=1;k<=s.h;k++){ const c=s.R.path[k-1]-s.R.path[k]; used.set(c,(used.get(c)||0)+1); }
+      fitTxt(ctx,"coins so far: "+(fmtCounts(used)||"-"),px0,by+bh+36,pw,{size:12,weight:600,color:C.goldL});
+    } else txt(ctx,"BUILDING THE TABLE…",px0,py0+16,{font:PIX,size:13,color:C.gold});
+    const oy=py0+92, oh=(wide?h-pad:h-pad)-oy;
+    const rowsL=s.exp.map((e,i)=>({a:i<s.out.length?`${s.amounts[i]}: ${s.out[i]}`:`${s.amounts[i]}: ·`,b:e,colA:i<s.out.length?C.ink:C.line2,ok:s.done?s.out[i]===e:undefined,hl:i===s.ai&&!s.done&&s.ph!=="fill"}));
+    outList(ctx,px0,oy,pw,Math.max(80,oh),"OUTPUT  vs  EXPECTED",rowsL,{lh:Math.min(30,(Math.max(80,oh)-34)/rowsL.length)});
+  }
+};
+
+/* =============== LEVEL 5 =============== */
+const viz5={
+  options:parseWithAmounts(DATA.in5,true).map((c,i)=>`currency #${i+1}`),
+  height:w=>w>=720?470:640,
+  build(ci){
+    const cu=parseWithAmounts(DATA.in5,true)[ci], cur=new Currency5(cu.coins), A=cu.amounts.length;
+    const exp=lines(DATA.out5).slice(ci*A,(ci+1)*A), ours=lines(DATA.ours5).slice(ci*A,(ci+1)*A);
+    const steps=[], out=[], base={cur,amounts:cu.amounts,exp,ours};
+    const lab=j=>j===null?"none":`free ${cur.v[j]}`;
+    cu.amounts.forEach((T,ai)=>{ const d=cur.solve(T);
+      steps.push({...base,ph:"amount",ai,T,d,q:-1,out:[...out],cap:`Pay <b>${T}</b> from this vault (${cur.k} coin types, Vmax = ${cur.vmax}). Try every choice of the one "free" type, plus "none".`});
+      cur.cases.forEach((cs,q)=>{ const e=d.per[q], j=cs.j;
+        const desc=j===null?`Case none: every type stays within ${cur.vmax-1} of its full stock`:
+          `Case free = ${cur.v[j]}: `+(j<cur.k-1?`types above ${cur.v[j]} stay within ${cur.vmax-1} of full stock, `:"")+
+          (j>0?`types below use &lt; ${cur.v[j]} coins each, `:"no smaller types, ")+`${cur.v[j]} takes the rest`;
+        steps.push({...base,ph:"case",ai,T,d,q,out:[...out],cap:`${desc}. Knapsack over the bounded extras: ${e.size} sums → ${e.total===null?'<span class="bad">no fit</span>':`<b>${e.total}</b> coins`}.`}); });
+      steps.push({...base,ph:"pick",ai,T,d,q:cur.k,out:[...out],cap:`Best case: <b>${lab(cur.cases[d.best].j)}</b> with ${d.total} coins (first minimum wins ties).`});
+      out.push(d.line);
+      steps.push({...base,ph:"build",ai,T,d,q:cur.k,out:[...out],hold:1.4,cap:`Backtrack through the knapsack layers → <b>${d.line}</b>.`});
+    });
+    const okOurs=out.every((l,i)=>l===ours[i]), okCnt=out.every((l,i)=>lineCount(l)===lineCount(exp[i])), same=out.filter((l,i)=>l===exp[i]).length;
+    const last=steps[steps.length-1]; last.done=true;
+    last.cap+=` ${okOurs?'<span class="ok">✓ equals solution.py output.</span>':'<span class="bad">✗ differs from solution.py.</span>'} ${okCnt?`<span class="ok">✓ same coin count as the official answer on all ${A} lines</span>`:'<span class="bad">✗ coin count differs</span>'} (${same}/${A} identical text; the rest is an equally small mix).`;
+    return steps;
+  },
+  draw(ctx,w,h,s,p,t){
+    const pad=16, wide=w>=720, cur=s.cur, k=cur.k, d=s.d;
+    txt(ctx,`PAY ${s.T}`,pad,30,{font:PIX,size:18,color:C.gold});
+    const iw=wide?Math.round(w*0.56)-pad:w-2*pad, colW=iw/k, top=58, r=Math.min(colW*0.26,20), barTop=top+2*r+30, barH=wide?170:150;
+    const curCase=s.q>=0&&s.q<=k?cur.cases[Math.min(s.q,k)]:null, j=s.ph==="case"?curCase.j:(s.ph==="pick"||s.ph==="build")?cur.cases[d.best].j:undefined;
+    for(let i=0;i<k;i++){ const cx=pad+colW*(i+0.5);
+      let role=null, rc=C.line2;
+      if(j!==undefined){ if(j===null||i>j){role="≈FULL";rc=C.purple;} else if(i===j){role="FREE";rc=C.gold;} else {role="< "+cur.v[j];rc=C.teal;} }
+      const ra=s.ph==="case"&&(!p||p.q!==s.q)?t:1;
+      if(role){ ctx.save(); ctx.globalAlpha=ra; pxRect(ctx,cx-colW*0.42,top-22,colW*0.84,17,rc,null,2);
+        fitTxt(ctx,role,cx,top-9,colW*0.8,{font:PIX,size:10,color:"#1a0e2c",align:"center"}); ctx.restore(); }
+      coin(ctx,cx,top+r+6,r,cur.v[i],{ring:role==="FREE"?C.gold:null});
+      const bx=cx-colW*0.22, bwid=colW*0.44;
+      pxRect(ctx,bx,barTop,bwid,barH,"#170c2b",role?rc:C.line,3,2);
+      if(s.ph==="build"){ const f=cur.u[i]?d.x[i]/cur.u[i]:0, fh=(d.x[i]>0?Math.max(3,(barH-6)*f):0)*t;
+        ctx.fillStyle=PAL[i%PAL.length]; ctx.fillRect(bx+3,barTop+barH-3-fh,bwid-6,fh); }
+      fitTxt(ctx,s.ph==="build"?`${d.x[i]}`:"",cx,barTop+barH+16,colW-4,{size:11,weight:600,color:C.goldL,align:"center"});
+      fitTxt(ctx,`/ ${cur.u[i]}`,cx,barTop+barH+31,colW-4,{size:10,color:C.dim,align:"center"});
+    }
+    // scoreboard
+    const sx=wide?pad+iw+24:pad, sy=wide?44:barTop+barH+50, sw=wide?w-sx-pad:w-2*pad, rh=wide?24:20;
+    txt(ctx,"CASES  (coins used)",sx,sy,{font:PIX,size:11,color:C.dim});
+    const feas=d.per.filter(e=>e.total!==null).map(e=>e.total), mx=Math.max(...feas), mn=Math.min(...feas);
+    const labW=Math.min(80,sw*0.26);
+    cur.cases.forEach((cs,q)=>{ const yy=sy+10+q*rh, e=d.per[q], shown=s.ph!=="amount"&&q<=s.q;
+      const label=cs.j===null?"none":`free ${cur.v[cs.j]}`;
+      txt(ctx,label,sx,yy+rh*0.62,{size:11,color:shown?C.ink:C.line2});
+      if(!shown) return;
+      const g=(s.ph==="case"&&q===s.q&&(!p||p.q!==s.q))?t:1, bw=sw-labW-70;
+      if(e.total===null){ txt(ctx,"✗ no fit",sx+labW,yy+rh*0.62,{size:11,color:C.red}); return; }
+      const isBest=(s.ph==="pick"||s.ph==="build")&&q===d.best;
+      const frac=mx===mn?1:0.25+0.75*(e.total-mn)/(mx-mn);
+      ctx.fillStyle=isBest?C.gold:"rgba(164,107,255,.75)"; ctx.fillRect(sx+labW,yy+3,bw*frac*g,rh-7);
+      fitTxt(ctx,(isBest?"★ ":"")+e.total,sx+labW+bw*frac*g+6,yy+rh*0.62,66,{size:11,weight:600,color:isBest?C.goldL:C.ink});
+    });
+    // output
+    const oy=wide?sy+10+(k+1)*rh+16:sy+10+(k+1)*rh+12, oh=h-pad-oy, ow=sw;
+    const rows=s.exp.map((e,i)=>({a:i<s.out.length?`${s.out[i]} (${lineCount(s.out[i])})`:"·",b:`${e} (${lineCount(e)})`,colA:i<s.out.length?C.ink:C.line2,
+      ok:s.done?lineCount(s.out[i])===lineCount(e):undefined,hl:i===s.ai&&!s.done&&s.ph==="build"}));
+    outList(ctx,sx,oy,ow,Math.max(70,oh),"OURS  vs  OFFICIAL (count)",rows,{lh:Math.min(26,(Math.max(70,oh)-34)/rows.length)});
+  }
+};
+
+/* ---------- hero: floating coins, crisp at any DPR ---------- */
+function hero(){
+  const cv=document.getElementById("heroCoins"), ctx=cv.getContext("2d"); let W=0,H=0,dpr=1;
+  const vals=[1,2,6,9,14,3,4,7,5,8,11,20,18,16,19];
+  const coins=vals.map((v,i)=>({v, x:(i*0.37)%1, y:((i*0.61)%1), r:16+((i*7)%5)*5, ph:i*0.9, sp:0.25+((i*3)%4)*0.08}));
+  function size(){ const b=cv.getBoundingClientRect(); dpr=window.devicePixelRatio||1; W=b.width; H=b.height; cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); }
+  function frame(ms){ const tt=ms/1000; ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
+    coins.forEach(c=>{ const x=20+c.x*(W-40), y=24+c.y*(H-48)+Math.sin(tt*c.sp+c.ph)*10, sq=Math.abs(Math.cos(tt*c.sp*0.7+c.ph));
+      ctx.save(); ctx.translate(x,y); ctx.scale(Math.max(0.12,sq),1); coin(ctx,0,0,c.r,sq>0.45?c.v:null); ctx.restore(); });
+    if(!REDUCED) requestAnimationFrame(frame); }
+  size(); new ResizeObserver(()=>{ size(); if(REDUCED) frame(0); }).observe(cv); requestAnimationFrame(frame);
+}
+
+/* ---------- boot ---------- */
+function boot(){
+  document.querySelectorAll("pre[data-src]").forEach(el=>{ el.textContent=DATA[el.dataset.src]; });
+  hero();
+  const vz={1:viz1,2:viz2,3:viz3,4:viz4,5:viz5};
+  document.querySelectorAll("section.level").forEach(sec=>new Player(sec,vz[sec.dataset.level]));
+  // level 4 canvas height depends on the chosen currency: resize after load
+  players.forEach(pl=>pl.resize());
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>players.forEach(pl=>pl.render()));
+  const links=[...document.querySelectorAll("nav.levels a")];
+  const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) links.forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id)); }),{rootMargin:"-45% 0px -50% 0px"});
+  document.querySelectorAll("section.level").forEach(s=>io.observe(s));
+}
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+   {} : 121/200 (60.5%) as CYAN 53/100, as MAGENTA 68/100
+base 60.5
+   {"w_win": 1.5} : 120/200 (60.0%) as CYAN 52/100, as MAGENTA 68/100
+   {"w_win": 5} : 122/200 (61.0%) as CYAN 53/100, as MAGENTA 69/100
+   {"w_thr": 0} : 112/200 (56.0%) as CYAN 40/100, as MAGENTA 72/100
+   {"w_thr": 3} : 127/200 (63.5%) as CYAN 57/100, as MAGENTA 70/100
+ACCEPT w_thr 3 -> 63.5
+   {"w_thr": 3, "w_kmove": 0} : 120/200 (60.0%) as CYAN 49/100, as MAGENTA 71/100
+   {"w_thr": 3, "w_kmove": 8} : 125/200 (62.5%) as CYAN 56/100, as MAGENTA 69/100
+   {"w_thr": 3, "use_a2": 0} : 104/200 (52.0%) as CYAN 43/100, as MAGENTA 61/100
+FINAL {"w_thr": 3} 63.5

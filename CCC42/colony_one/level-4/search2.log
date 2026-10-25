@@ -1,0 +1,7 @@
+{"move_ring": 2.0} -> vs random 79/80, vs L3 62/80
+{"move_ring": 4.0} -> vs random 77/80, vs L3 56/80
+{"move_ring": 2.0, "kernel_ring": 1.0} -> vs random 77/80, vs L3 61/80
+{"move_ring": 2.0, "kernel_ring": 4.0} -> vs random 80/80, vs L3 62/80
+{"move_ring": 2.0, "enemy_ring": 0.5} -> vs random 77/80, vs L3 61/80
+{"move_ring": 2.0, "piece_ring": 0.3} -> vs random 79/80, vs L3 60/80
+{"move_ring": 2.0, "temp": 2.0} -> vs random 80/80, vs L3 60/80

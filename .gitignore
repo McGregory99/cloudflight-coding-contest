@@ -1,0 +1,24 @@
+# Environments and caches
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+
+# Regenerable training data and partial runs
+*.npz
+*.pt
+CCC42/colony_one/level-4/plan_c/data/
+
+# Inputs too large for GitHub (download them again from the contest)
+training/CCC41_migratory_birds/level-5/in_level-5_1-main.txt
+training/CCC41_migratory_birds/level-6/all_data_from_level_5.in
+
+# Saved third-party web page, not part of the solution
+CCC24/level5/data/level5/*YouTube*
+
+# Nano Fabricator native build artefacts
+CCC42/nano_fabricator/challenge/level-6/mb/mb
+CCC42/nano_fabricator/challenge/level-6/mb/raw_*
+CCC42/nano_fabricator/challenge/level-6/mb/mb2_bin

@@ -1,0 +1,25 @@
+# CYAN vs MAGENTA
+# SCENE bbb07676-7676-7676-7670-767600076bbb
+  1. CYAN     PI  B4 -> C4  MOVE
+  2. CYAN     PI  C4 -> D4  MOVE
+  3. MAGENTA  PI  G5 -> G3  MOVE
+  4. MAGENTA  IC  G7 -> F7  MOVE
+  5. CYAN     EX  D2 -> E4  MOVE
+  6. CYAN     EX  E4 -> G3  MOVE   xPI
+  7. MAGENTA  EX  E7 -> F5  MOVE
+  8. MAGENTA  EX  F5 -> G3  MOVE   xEX
+  9. CYAN     PI  D4 -> D5  MOVE
+ 10. CYAN     PI  D5 -> F7  MOVE   xIC
+ 11. MAGENTA  DE  F8 -> F7  SHOOT  xPI
+ 12. MAGENTA  KE  H8 -> G7  MOVE
+ 13. CYAN     IC  B2 -> D4  MOVE
+ 14. CYAN     IC  D4 -> D5  MOVE
+ 15. MAGENTA  DE  F8 -> F5  MOVE
+ 16. MAGENTA  DE  F5 -> D5  MOVE   xIC
+ 17. CYAN     DE  C1 -> C4  MOVE
+ 18. CYAN     DE  C4 -> D5  SHOOT  xDE
+ 19. MAGENTA  EX  G3 -> H5  MOVE
+ 20. MAGENTA  KE  G7 -> F6  MOVE
+ 21. CYAN     DE  C4 -> C6  MOVE
+ 22. CYAN     DE  C6 -> F6  MOVE   xKE
+---- *** CYAN WINS ***

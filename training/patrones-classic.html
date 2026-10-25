@@ -1,0 +1,1350 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patrones Classic CCC</title>
+<meta name="description" content="Guía animada de los patrones algorítmicos que comparten los retos Classic del Cloudflight Coding Contest.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c1020; --bg2:#10162b; --stage:#0f1428; --panel:#161d36; --panel2:#1d2646; --line:#2b365e; --line2:#44528c;
+  --text:#efe6d0; --muted:#a3acc8; --dim:#5d6890;
+  --red:#ff5d4f; --orange:#ff9f43; --yellow:#ffd23f; --green:#5fd68a; --cyan:#4cc9f0; --lilac:#b48cff; --pink:#ff7ab6;
+  --grass1:#2e7a49; --grass2:#25653c; --dark1:#26315a; --dark2:#3c4c84;
+  --f-pix:'Press Start 2P', ui-monospace, monospace;
+  --f-sk:'Silkscreen', ui-monospace, monospace;
+  --f-body:'Atkinson Hyperlegible', system-ui, sans-serif;
+  --f-code:'JetBrains Mono', ui-monospace, monospace;
+  --shadow:6px 6px 0 #04060d;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}.stairs div{opacity:1;transform:none}}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:17px;line-height:1.62;overflow-x:hidden;
+  background-image:radial-gradient(rgba(255,255,255,.045) 1px,transparent 1.2px);background-size:16px 16px}
+a{color:var(--cyan)}
+code,kbd{font-family:var(--f-code);font-size:.86em;background:var(--bg2);border:1px solid var(--line);padding:1px 5px;color:var(--text)}
+b,strong{color:#fff6dc}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+
+/* nav */
+nav.top{position:sticky;top:0;z-index:20;background:rgba(12,16,32,.94);border-bottom:3px solid var(--line2);backdrop-filter:blur(4px)}
+nav.top .wrap{display:flex;align-items:center;gap:10px;height:54px}
+nav.top .brand{font-family:var(--f-pix);font-size:10px;color:var(--yellow);white-space:nowrap;text-decoration:none}
+nav.top ol{list-style:none;margin:0;padding:0;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+nav.top ol::-webkit-scrollbar{display:none}
+nav.top a.lk{display:block;font-family:var(--f-sk);font-size:12px;color:var(--muted);text-decoration:none;padding:5px 8px;border:2px solid transparent;white-space:nowrap}
+nav.top a.lk:hover{color:var(--text);border-color:var(--line2)}
+nav.top a.lk.on{color:var(--bg);background:var(--yellow);border-color:var(--yellow)}
+
+/* hero */
+header.hero{padding:56px 0 28px;position:relative}
+.kicker{font-family:var(--f-sk);font-size:13px;letter-spacing:.16em;color:var(--cyan);margin:0 0 16px}
+h1{font-family:var(--f-pix);font-weight:400;font-size:clamp(22px,5.4vw,46px);line-height:1.3;margin:0 0 22px;text-shadow:4px 4px 0 #04060d}
+h1 em{font-style:normal;color:var(--yellow)}
+.hero-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:end}
+.howto{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.howto li{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:3px solid var(--line2);box-shadow:var(--shadow);padding:10px 14px}
+.howto .n{font-family:var(--f-pix);font-size:11px;color:var(--bg);background:var(--yellow);padding:6px 7px;flex:none;margin-top:2px}
+.stairs{display:flex;flex-direction:column-reverse;gap:5px;font-family:var(--f-sk);font-size:12px}
+.stairs div{height:28px;display:flex;align-items:center;padding:0 10px;color:var(--bg);border:3px solid #04060d;box-shadow:4px 4px 0 #04060d;
+  opacity:0;transform:translateX(-14px);animation:rung .5s steps(5) forwards}
+@keyframes rung{to{opacity:1;transform:none}}
+.stairs .t1{background:var(--green)}.stairs .t2{background:var(--cyan)}.stairs .t3{background:var(--yellow)}.stairs .t4{background:var(--orange)}.stairs .t5{background:var(--red);color:var(--text)}
+
+/* index cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin:28px 0 8px}
+.card{display:block;text-decoration:none;color:var(--text);background:var(--panel);border:3px solid var(--line2);box-shadow:var(--shadow);padding:12px 14px;transition:transform .12s steps(2),border-color .12s}
+.card:hover{transform:translate(-2px,-2px);border-color:var(--yellow)}
+.card .no{font-family:var(--f-pix);font-size:10px;color:var(--yellow)}
+.card .tt{display:block;font-family:var(--f-sk);font-size:14px;margin:8px 0 4px}
+.card .ds{display:block;font-size:14px;color:var(--muted);line-height:1.45}
+
+/* sections */
+section.pat{padding:48px 0 24px;border-top:3px dashed var(--line)}
+.sh{display:flex;gap:14px;align-items:center;margin-bottom:14px}
+.badge{flex:none;font-family:var(--f-pix);font-size:14px;color:var(--bg);background:var(--yellow);border:3px solid #04060d;box-shadow:4px 4px 0 #04060d;padding:10px 9px}
+h2{font-family:var(--f-pix);font-weight:400;font-size:clamp(14px,3vw,21px);line-height:1.6;margin:0}
+.sub{font-family:var(--f-sk);font-size:12px;color:var(--muted);margin:2px 0 0;letter-spacing:.04em}
+h3{font-family:var(--f-sk);font-weight:700;font-size:15px;letter-spacing:.06em;color:var(--cyan);margin:26px 0 8px}
+.prose{max-width:720px}
+.prose p{margin:0 0 12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.box{background:var(--panel);border:3px solid var(--line2);box-shadow:var(--shadow);padding:14px 16px}
+.box h4{font-family:var(--f-sk);font-size:13px;color:var(--yellow);margin:0 0 6px;letter-spacing:.06em}
+.box p,.box li{font-size:15.5px}
+.box ul{margin:0;padding-left:18px}
+.key{border-left:6px solid var(--yellow);background:var(--panel2);padding:10px 14px;margin:14px 0;max-width:760px}
+.key b{color:var(--yellow)}
+
+/* tabs / toggles */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 10px}
+.tabs button,.pill{font-family:var(--f-sk);font-size:12px;background:var(--bg2);color:var(--muted);border:2px solid var(--line2);padding:6px 10px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--cyan);color:var(--bg);border-color:var(--cyan)}
+.tabs button:hover{color:var(--text)}
+.opts{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0;font-family:var(--f-sk);font-size:12px;color:var(--muted)}
+.opts select{font-family:var(--f-sk);font-size:12px;background:var(--bg2);color:var(--text);border:2px solid var(--line2);padding:4px 6px}
+
+/* animation player */
+.anim{margin:12px 0 6px;background:var(--panel);border:3px solid var(--line2);box-shadow:var(--shadow)}
+.anim .stage{background:var(--stage);border-bottom:3px solid var(--line2)}
+.anim canvas{display:block;width:100%}
+.anim .cap{margin:0;padding:12px 14px;min-height:78px;font-size:15.5px;line-height:1.5;border-bottom:3px solid var(--line2);background:var(--panel2)}
+.anim .cap code{font-size:.84em}
+.ctrl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px}
+.ctrl button{width:40px;height:36px;display:grid;place-items:center;background:var(--bg2);border:2px solid var(--line2);color:var(--text);cursor:pointer;padding:0}
+.ctrl button:hover{border-color:var(--yellow)}
+.ctrl button.primary{background:var(--yellow);border-color:var(--yellow);color:var(--bg)}
+.ctrl button:focus-visible,.tabs button:focus-visible,.pill:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.ctrl svg{width:16px;height:16px;fill:currentColor;shape-rendering:crispEdges}
+.ctrl .spd{display:flex;align-items:center;gap:4px;font-family:var(--f-sk);font-size:11px;color:var(--muted)}
+.ctrl select{font-family:var(--f-sk);font-size:12px;background:var(--bg2);color:var(--text);border:2px solid var(--line2);height:36px;padding:0 4px}
+.ctrl .scrub{flex:1;min-width:90px;accent-color:var(--yellow)}
+.ctrl .cnt{font-family:var(--f-sk);font-size:11px;color:var(--muted);min-width:52px;text-align:right}
+
+/* traps */
+.traps{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-top:14px}
+.trap{background:var(--panel);border:3px solid var(--line2);box-shadow:var(--shadow);padding:0}
+.trap summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;gap:10px;align-items:center;font-family:var(--f-sk);font-size:13px}
+.trap summary::-webkit-details-marker{display:none}
+.trap summary .ic{flex:none;width:26px;height:26px;display:grid;place-items:center;background:var(--red);color:var(--text);font-family:var(--f-pix);font-size:10px;border:2px solid #04060d}
+.trap[open] summary{border-bottom:2px dashed var(--line2)}
+.trap .bd{padding:12px 14px}
+.trap .bd p{font-size:15px;margin:0 0 10px}
+.mini{background:var(--stage);border:2px solid var(--line);padding:10px;font-family:var(--f-code);font-size:13px;line-height:1.5;overflow:hidden}
+.mini .hl{background:var(--yellow);color:var(--bg)}
+.mini .bad{color:var(--red)}.mini .ok{color:var(--green)}.mini .mu{color:var(--dim)}
+.mini pre{margin:0;font:inherit;white-space:pre}
+.mini svg{display:block;max-width:100%;height:auto}
+.mini.row{display:flex;gap:10px;flex-wrap:wrap}
+.mini.row>div{flex:1;min-width:110px}
+.lbl{font-family:var(--f-sk);font-size:10px;color:var(--muted);display:block;margin-bottom:3px}
+
+/* checklist + map */
+.steps{counter-reset:s;list-style:none;padding:0;margin:14px 0;display:grid;gap:8px;max-width:820px}
+.steps li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:3px solid var(--line2);padding:10px 12px}
+.steps li::before{content:counter(s,decimal-leading-zero);font-family:var(--f-pix);font-size:10px;color:var(--bg);background:var(--cyan);padding:6px;flex:none;margin-top:2px}
+.steps label{display:flex;gap:10px;cursor:pointer;flex:1}
+.steps input{accent-color:var(--green);width:18px;height:18px;flex:none;margin-top:3px}
+.steps input:checked+span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--green)}
+table.map{width:100%;border-collapse:collapse;margin-top:14px;font-size:15px;background:var(--panel);border:3px solid var(--line2);box-shadow:var(--shadow)}
+table.map th{font-family:var(--f-sk);font-size:12px;font-weight:400;color:var(--yellow);text-align:left;background:var(--panel2);padding:10px;border-bottom:3px solid var(--line2)}
+table.map td{padding:10px;border-bottom:2px solid var(--line);vertical-align:top}
+table.map td:first-child{color:#fff6dc}
+table.map td:last-child{font-family:var(--f-sk);font-size:12px;color:var(--cyan)}
+@media (max-width:640px){
+  table.map,table.map tbody,table.map tr,table.map td{display:block;width:100%}
+  table.map thead{display:none}
+  table.map tr{border-bottom:3px solid var(--line2);padding:6px 0}
+  table.map td{border:0;padding:4px 12px}
+  table.map td::before{content:attr(data-h);display:block;font-family:var(--f-sk);font-size:10px;color:var(--muted)}
+}
+details.school{background:var(--panel);border:3px solid var(--line2);box-shadow:var(--shadow);max-width:820px}
+details.school summary{cursor:pointer;padding:14px 16px;font-family:var(--f-sk);font-size:14px;color:var(--lilac)}
+details.school ul{margin:0;padding:0 18px 16px 36px}
+details.school li{margin-bottom:8px}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-family:var(--f-sk);font-size:12px;color:var(--muted);margin:8px 0}
+.legend i{display:inline-block;width:12px;height:12px;border:2px solid #04060d;vertical-align:-2px;margin-right:5px}
+.stress{display:grid;gap:10px;margin-top:10px}
+.stress .bar{display:flex;align-items:center;gap:8px;font-family:var(--f-sk);font-size:12px}
+.stress .bar span:first-child{width:76px;color:var(--muted);flex:none}
+.stress .bar .b{height:14px;background:var(--green);border:2px solid #04060d;min-width:2px;transition:width .2s steps(4)}
+.stress .bar .b.r{background:var(--red)}
+.stress .stat{font-family:var(--f-code);font-size:14px}
+footer{padding:40px 0 60px;color:var(--muted);font-size:14px;border-top:3px dashed var(--line);margin-top:40px}
+
+@media (max-width:760px){
+  .hero-grid,.two{grid-template-columns:1fr}
+  header.hero{padding-top:36px}
+  .anim .cap{font-size:15px}
+}
+@media (max-width:420px){
+  body{font-size:16px}
+  .ctrl button{width:36px}
+  .ctrl .spd span{display:none}
+}
+</style>
+</head>
+<body>
+<nav class="top" aria-label="Secciones">
+  <div class="wrap">
+    <a class="brand" href="#inicio">CCC·CLASSIC</a>
+    <ol>
+      <li><a class="lk" href="#escalera">01 Escalera</a></li>
+      <li><a class="lk" href="#evaluador">02 Evaluador</a></li>
+      <li><a class="lk" href="#torneo">03 Torneo</a></li>
+      <li><a class="lk" href="#hamilton">04 Hamilton</a></li>
+      <li><a class="lk" href="#territorio">05 Territorio</a></li>
+      <li><a class="lk" href="#nave">06 Nave</a></li>
+      <li><a class="lk" href="#heuristica">07 Heurística</a></li>
+      <li><a class="lk" href="#trampas">08 Trampas</a></li>
+      <li><a class="lk" href="#ataque">09 Checklist</a></li>
+      <li><a class="lk" href="#school">10 School</a></li>
+    </ol>
+  </div>
+</nav>
+
+<header class="hero" id="inicio">
+  <div class="wrap">
+    <p class="kicker">GUÍA DE ESTUDIO · CLOUDFLIGHT CODING CONTEST</p>
+    <h1>Los patrones del track <em>Classic</em></h1>
+    <div class="hero-grid">
+      <div>
+        <p class="sub" style="margin-bottom:12px">CÓMO SE VE UN RETO CLASSIC</p>
+        <ol class="howto">
+          <li><span class="n">1</span><span>Una <b>escalera de 7–8 niveles</b> sobre la misma historia: cada nivel reutiliza el código del anterior y cambia una regla.</span></li>
+          <li><span class="n">2</span><span><b>L1–L2 son triviales</b> (contar, simular una ronda, una fórmula); desde el L3 hay que <b>construir</b> una respuesta.</span></li>
+          <li><span class="n">3</span><span>El <b>evaluador valida</b> tu salida contra las reglas: no la compara con el ejemplo. Varias respuestas son correctas.</span></li>
+        </ol>
+      </div>
+      <div class="stairs" aria-hidden="true">
+        <div class="t1" style="width:44%;animation-delay:.05s">L1 contar</div>
+        <div class="t1" style="width:52%;animation-delay:.15s">L2 simular</div>
+        <div class="t2" style="width:60%;animation-delay:.25s">L3 construir</div>
+        <div class="t3" style="width:68%;animation-delay:.35s">L4 + checker</div>
+        <div class="t3" style="width:76%;animation-delay:.45s">L5 otra regla</div>
+        <div class="t4" style="width:86%;animation-delay:.55s">L6 optimizar</div>
+        <div class="t5" style="width:100%;animation-delay:.65s">L7 adversario</div>
+      </div>
+    </div>
+    <div class="cards">
+      <a class="card" href="#escalera"><span class="no">01</span><span class="tt">La escalera</span><span class="ds">Cada nivel reutiliza helpers del anterior.</span></a>
+      <a class="card" href="#evaluador"><span class="no">02</span><span class="tt">Valida, no compara</span><span class="ds">Escribe primero el checker y mútalo.</span></a>
+      <a class="card" href="#torneo"><span class="no">03</span><span class="tt">Torneo</span><span class="ds">Vectores de conteo y DP de conjuntos (Rock Paper Scissors).</span></a>
+      <a class="card" href="#hamilton"><span class="no">04</span><span class="tt">Hamilton en cuadrícula</span><span class="ds">Paridad, flujo máximo y giros 2×2 (Lawn Mower).</span></a>
+      <a class="card" href="#territorio"><span class="no">05</span><span class="tt">Territorio</span><span class="ds">“No tocarse” = “no solaparse” (Room Planner).</span></a>
+      <a class="card" href="#nave"><span class="no">06</span><span class="tt">Autómata + A*</span><span class="ds">Ritmos, tabla exacta y búsqueda con poda (Spaceship).</span></a>
+      <a class="card" href="#heuristica"><span class="no">07</span><span class="tt">Reintentos y estrés</span><span class="ds">Cuando el algoritmo no está demostrado.</span></a>
+      <a class="card" href="#trampas"><span class="no">08</span><span class="tt">Trampas</span><span class="ds">Lo que el enunciado esconde.</span></a>
+      <a class="card" href="#ataque"><span class="no">09</span><span class="tt">Checklist + mapa</span><span class="ds">10 pasos y forma → técnica.</span></a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section class="pat" id="escalera">
+  <div class="sh"><span class="badge">01</span><div><h2>La escalera de niveles</h2><p class="sub">CADA PELDAÑO REUTILIZA EL ANTERIOR</p></div></div>
+  <div class="prose">
+    <p>Un reto Classic no son siete problemas: es <b>un problema que crece</b>. L1 y L2 son casi siempre cálculo directo con salida única (contar letras, simular una ronda, aplicar una fórmula) y se comprueban byte a byte con el ejemplo. En el L3 llega el salto: hay que <b>construir</b> algo que cumpla reglas, y a partir de ahí cada nivel añade una restricción al mismo motor.</p>
+    <p>Consecuencia práctica: escribe los helpers de L1–L2 como funciones limpias, porque vas a llamarlas desde el checker del L3 y del L7.</p>
+  </div>
+  <div class="tabs" role="group" aria-label="Reto" id="ladderTabs">
+    <button type="button" data-k="rps" aria-pressed="true">Rock Paper Scissors</button>
+    <button type="button" data-k="lawn" aria-pressed="false">Lawn Mower</button>
+    <button type="button" data-k="room" aria-pressed="false">Room Planner</button>
+    <button type="button" data-k="ship" aria-pressed="false">Spaceship</button>
+  </div>
+  <div id="animLadder"></div>
+</section>
+
+<section class="pat" id="evaluador">
+  <div class="sh"><span class="badge">02</span><div><h2>El evaluador valida, no compara</h2><p class="sub">ESCRIBE PRIMERO EL CHECKER</p></div></div>
+  <div class="prose">
+    <p>Cuando el enunciado dice <i>“there may be multiple correct solutions”</i>, el evaluador ejecuta las reglas sobre tu salida. Tu respuesta casi nunca coincidirá con el ejemplo, y no pasa nada. Lo que sí necesitas es tu propio <b>checker</b>: un programa independiente del solver que re-simula las reglas sobre cada salida.</p>
+    <p>Y un checker que nunca falla no prueba nada: haz un <b>mutation test</b> (estropea un carácter de una salida buena) y comprueba que la rechaza.</p>
+  </div>
+  <div id="animChecker"></div>
+  <div class="key"><b>Regla:</b> desde el L3, el orden es <code>check.py</code> → mutación rechazada → solver. Salida distinta del ejemplo + checker verde = respuesta válida (confirmado en Magic Money L5 y en los tres Classic).</div>
+</section>
+
+<section class="pat" id="torneo">
+  <div class="sh"><span class="badge">03</span><div><h2>Torneo / bracket</h2><p class="sub">ROCK PAPER SCISSORS · CCC37</p></div></div>
+  <div class="prose">
+    <p>Eliminatoria: los luchadores adyacentes se enfrentan y el ganador sube. En L3–L5 te dan cuántos hay de cada estilo y tú eliges el orden para que gane una <b style="color:var(--yellow)">S</b> (tijera).</p>
+  </div>
+  <h3>(a) Solo importa el multiconjunto → búsqueda sobre vectores de conteo</h3>
+  <div class="prose">
+    <p>Como decides el orden de todas las parejas, una ronda queda descrita por <b>cuántas parejas de cada tipo</b> formas (RR, RP, RS, PP, PS, SS). El estado es el vector <code>(R, P, S)</code>, no la cadena: el espacio pasa de <i>M!</i> órdenes a unos pocos vectores. Búsqueda en profundidad por rondas, probando emparejamientos en orden heurístico, con <b>memo de estados fallidos</b>. Al final se materializa la cadena sacando luchadores de “cubos” por estilo y concatenando parejas.</p>
+  </div>
+  <div class="tabs" role="group" aria-label="Vector inicial" id="rpsTabs">
+    <button type="button" data-v="4,2,2" aria-pressed="true">4R 2P 2S</button>
+    <button type="button" data-v="2,1,5" aria-pressed="false">2R 1P 5S</button>
+    <button type="button" data-v="2,3,3" aria-pressed="false">2R 3P 3S</button>
+  </div>
+  <div class="legend"><span><i style="background:var(--red)"></i>R piedra</span><span><i style="background:var(--cyan)"></i>P papel</span><span><i style="background:var(--yellow)"></i>S tijera</span><span><i style="background:var(--lilac)"></i>Y Spock</span><span><i style="background:var(--green)"></i>L lagarto</span></div>
+  <div id="animRps"></div>
+  <h3>(b) Hojas fijas + huecos → DP con el conjunto de ganadores posibles</h3>
+  <div class="two">
+    <div class="prose">
+      <p>En L6 algunas hojas son <code>X</code> (las eliges tú) y en L7 aparecen <code>Z</code> (las elige un adversario). Para cada nodo guardas los <b>conjuntos de ganadores posibles</b> como bitmask de 5 bits, de abajo arriba: <code>ganadores(nodo) = ⋃ gana(a, b)</code> para <i>a</i> del hijo izquierdo y <i>b</i> del derecho.</p>
+      <p>Un conjunto más pequeño nunca es peor, así que solo se guardan los <b>minimales</b> (antichain). Una <code>Z</code> es simplemente la hoja con el conjunto completo: <b>existe X, para todo Z</b>. La raíz debe ofrecer exactamente <code>{S}</code>; se reconstruye de arriba abajo.</p>
+    </div>
+    <div class="box">
+      <h4>QUIÉN GANA A QUIÉN (5 ESTILOS)</h4>
+      <svg viewBox="0 0 220 190" width="100%" style="max-width:300px;display:block;margin:0 auto" role="img" aria-label="Pentágono de victorias: S gana a P y L; P gana a R e Y; R gana a L y S; L gana a Y y P; Y gana a S y R">
+        <defs><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#a3acc8"/></marker></defs>
+        <g id="pent" stroke="#a3acc8" stroke-width="1.6" fill="none" marker-end="url(#ar)"></g>
+        <g id="pentN" font-family="Silkscreen, monospace" font-size="13" text-anchor="middle"></g>
+      </svg>
+      <p style="margin:6px 0 0;font-size:14px;color:var(--muted)">Flecha = “gana a”. La cita del enunciado es la fuente fiable; el diagrama se malinterpreta fácil.</p>
+    </div>
+  </div>
+  <div id="animSet"></div>
+</section>
+
+<section class="pat" id="hamilton">
+  <div class="sh"><span class="badge">04</span><div><h2>Camino / ciclo hamiltoniano en cuadrícula</h2><p class="sub">ROBOTIC LAWN MOWER · CCC39</p></div></div>
+  <div class="prose">
+    <p>Cortar todo el césped pisando cada celda libre una sola vez es un camino (L4–L5) o ciclo (L6–L7) hamiltoniano. En general es NP-difícil, pero en una cuadrícula hay tres ideas que lo hacen manejable:</p>
+  </div>
+  <div class="two" style="margin:10px 0 6px">
+    <div class="box"><h4>1 · PARIDAD DE COLORES</h4><p style="margin:0">Colorea como un tablero de ajedrez. Cada paso cambia de color, así que un ciclo necesita tantas oscuras como claras, y un camino solo deja una de diferencia (con los dos extremos en el color mayoritario). Esto decide <b>dónde pueden estar los extremos</b> antes de buscar nada.</p></div>
+    <div class="box"><h4>2 · FLUJO → GRADO 2</h4><p style="margin:0">Pide grado 2 a cada celda (1 en los extremos). Fuente → oscuras (cap. = grado) → claras vecinas (cap. 1) → sumidero. El flujo máximo da un <b>2-factor</b>: un conjunto de ciclos disjuntos que cubren todo.</p></div>
+    <div class="box"><h4>3 · GIROS 2×2</h4><p style="margin:0">Si en un cuadrado 2×2 hay dos aristas paralelas de <b>ciclos distintos</b>, cámbialas por las otras dos: los grados no cambian y los dos ciclos se funden en uno.</p></div>
+    <div class="box"><h4>SALIDA</h4><p style="margin:0">Recorre el ciclo y escribe <code>W D S A</code>. N celdas = N−1 movimientos (el de cierre no se escribe) y <b>no se da la casilla de inicio</b>: el checker la infiere.</p></div>
+  </div>
+  <div class="opts"><button type="button" class="pill" id="lawnSeed">Otra semilla del flujo</button><span id="lawnSeedLbl"></span></div>
+  <div id="animLawn"></div>
+</section>
+
+<section class="pat" id="territorio">
+  <div class="sh"><span class="badge">05</span><div><h2>Empaquetado con “territorio”</h2><p class="sub">ROOM PLANNER · CCC40</p></div></div>
+  <div class="two">
+    <div class="prose">
+      <p>Escritorios rectos de 1×L que <b>no pueden tocarse</b> (ni en diagonal), pero sí tocar la pared. “No tocarse” es incómodo; “no solaparse” es fácil.</p>
+      <p>El truco: cada escritorio se queda un <b>territorio de 2×(L+1)</b>: él mismo, una celda de hueco al final y una fila (o columna) de hueco al lado. Dos escritorios no se tocan ⇔ sus territorios no se solapan, siempre que empaquetes en una caja de <b>(x+1)×(y+1)</b>: los huecos del borde derecho e inferior pueden salirse de la sala.</p>
+      <p>Después, <b>DP guillotina</b> sobre todos los subrectángulos (corte horizontal, corte vertical o bloque homogéneo) y, para cajas pequeñas, el corte de <b>molinete</b> (5 bloques alrededor de un centro) que la guillotina no puede generar.</p>
+    </div>
+    <div class="box">
+      <h4>UN TERRITORIO (L = 3)</h4>
+      <svg viewBox="0 0 200 92" width="100%" style="max-width:320px;display:block;margin:4px auto" role="img" aria-label="Territorio de 2 por 4: el escritorio de 3 celdas, una celda de hueco al final y una fila de hueco debajo">
+        <g stroke="#04060d" stroke-width="2">
+          <rect x="10" y="10" width="40" height="34" fill="#ff9f43"/><rect x="50" y="10" width="40" height="34" fill="#ff9f43"/><rect x="90" y="10" width="40" height="34" fill="#ff9f43"/>
+          <rect x="130" y="10" width="40" height="34" fill="#1d2646"/>
+          <rect x="10" y="44" width="40" height="34" fill="#1d2646"/><rect x="50" y="44" width="40" height="34" fill="#1d2646"/><rect x="90" y="44" width="40" height="34" fill="#1d2646"/><rect x="130" y="44" width="40" height="34" fill="#1d2646"/>
+        </g>
+        <rect x="9" y="9" width="162" height="70" fill="none" stroke="#4cc9f0" stroke-width="3" stroke-dasharray="6 4"/>
+        <text x="70" y="32" font-family="Silkscreen, monospace" font-size="11" fill="#0c1020" text-anchor="middle">ESCRITORIO</text>
+        <text x="150" y="32" font-family="Silkscreen, monospace" font-size="10" fill="#a3acc8" text-anchor="middle">+1</text>
+        <text x="90" y="66" font-family="Silkscreen, monospace" font-size="10" fill="#a3acc8" text-anchor="middle">FILA DE HUECO</text>
+      </svg>
+      <p style="margin:6px 0 0;font-size:14px;color:var(--muted)">Cota superior: ⌊(x+1)(y+1) / (2(L+1))⌋ territorios.</p>
+    </div>
+  </div>
+  <div class="opts" id="roomOpts">
+    <label>Ancho x <select id="roomX"></select></label>
+    <label>Alto y <select id="roomY"></select></label>
+    <label>L <select id="roomL"></select></label>
+    <span class="tabs" role="group" aria-label="Vista" id="roomView" style="margin:0">
+      <button type="button" data-v="terr" aria-pressed="true">Territorios</button>
+      <button type="button" data-v="desk" aria-pressed="false">Escritorios</button>
+    </span>
+  </div>
+  <div id="animRoom"></div>
+</section>
+
+<section class="pat" id="nave">
+  <div class="sh"><span class="badge">06</span><div><h2>Autómata de ritmo + A* con poda</h2><p class="sub">SPACESHIP · CCC41</p></div></div>
+  <div class="prose">
+    <p>La nave se mueve con <b>ritmos</b>: un bloque de ritmo <code>p</code> dura <code>max(1,|p|)</code> ticks y avanza una celda en su <b>último</b> tick. Los ritmos cambian de uno en uno por la cadena <code>−1 ↔ −2 ↔ … ↔ −5 ↔ 0 ↔ 5 ↔ … ↔ 1</code>: para frenar desde 1 hay que pasar por 2, 3, 4, 5 y 0.</p>
+  </div>
+  <div class="key"><b>Primero, el sandbox.</b> El reto trae un visualizador HTML (<code>sandbox-level-N.html</code>): es el código del propio evaluador. Léelo antes que el PDF para las reglas finas (cuándo cambia la posición, colisión en el tick 0, cómo se rellena el eje más corto) y porta su simulación como <code>check.py</code>.</div>
+  <h3>(a) Cada eje es un autómata; la tabla H es exacta</h3>
+  <div class="prose">
+    <p>Estado de un eje tras un tick = <code>(ritmo, ticks que quedan del bloque)</code>: solo 31 estados. Un <b>BFS inverso</b> desde “en la estación, ritmo 0” rellena <code>H[estado][distancia]</code> = ticks mínimos para terminar. Bajar por la tabla (cada tick, un vecino con H−1) da una secuencia óptima. Y como <b>los dos ejes son independientes</b>, el óptimo 2D sin obstáculos es <code>max(H<sub>x</sub>, H<sub>y</sub>)</code>: el eje corto se rellena con ceros.</p>
+  </div>
+  <div class="tabs" role="group" aria-label="Distancia" id="shipTabs">
+    <button type="button" data-d="6" aria-pressed="true">d = 6</button>
+    <button type="button" data-d="10" aria-pressed="false">d = 10</button>
+    <button type="button" data-d="4" aria-pressed="false">d = 4</button>
+    <button type="button" data-d="-7" aria-pressed="false">d = −7</button>
+  </div>
+  <div id="animAxis"></div>
+  <h3>(b) Asteroides → A* ponderado sobre (x, y, estadoX, estadoY)</h3>
+  <div class="prose">
+    <p>Con asteroides los ejes ya no son independientes. Cada nodo es un tick: <code>(x, y, estadoX, estadoY)</code>. Cada asteroide prohíbe un cuadrado 5×5 de posiciones. La heurística es una cota inferior: <code>h = max(H<sub>x</sub>, H<sub>y</sub>, GD)</code>, donde GD es la distancia de rey (BFS) por celdas libres. Con ella se <b>poda</b> todo nodo con <code>g + 1 + h &gt; límite</code>: nunca llegaría a tiempo. El peso solo cambia el orden de exploración; pesos grandes son peligrosos (colas de cientos de millones de expansiones), así que peso ≈ 2 y un presupuesto de expansiones.</p>
+  </div>
+  <div class="tabs" role="group" aria-label="Peso de A*" id="astarTabs">
+    <button type="button" data-w="1" aria-pressed="false">peso 1</button>
+    <button type="button" data-w="2" aria-pressed="true">peso 2</button>
+    <button type="button" data-w="4" aria-pressed="false">peso 4</button>
+  </div>
+  <div class="legend"><span><i style="background:var(--red)"></i>asteroide</span><span><i style="background:#3a2238"></i>zona prohibida (radio 2)</span><span><i style="background:var(--cyan)"></i>celdas expandidas</span><span><i style="background:var(--yellow)"></i>ruta</span></div>
+  <div id="animAstar"></div>
+  <div class="two" style="margin-top:16px">
+    <div class="box"><h4>LABERINTOS DENSOS (L7)</h4><p style="margin:0">Hasta 5000 asteroides: la ruta real mide 1,5–2× la distancia recta. La <b>ventana</b> de búsqueda (caja inicio–meta + margen) debe crecer con los rodeos (20 → 60 → 150 → 400). Con millones de nodos, Python no llega: el núcleo de la búsqueda va en <b>C vía ctypes</b> (compilado al arrancar) y los casos en paralelo.</p></div>
+    <div class="box"><h4>ASTEROIDES MÓVILES (L8)</h4><p style="margin:0">El mapa cambia cada tick, así que llegar antes ya no domina: el <b>tiempo entra en la clave</b> del nodo. Posición del asteroide tras t ticks = <code>p0 + sign(v)·⌊t/|v|⌋</code>; celdas bloqueadas por tick, en caché. Ojo: empiezan a moverse en el tick 1, mientras la nave aún cumple su primer 0.</p></div>
+  </div>
+</section>
+
+<section class="pat" id="heuristica">
+  <div class="sh"><span class="badge">07</span><div><h2>Heurística + reintentos + estrés</h2><p class="sub">CUANDO EL ALGORITMO NO ESTÁ DEMOSTRADO</p></div></div>
+  <div class="prose">
+    <p>La búsqueda por conteos, los giros 2×2 y el molinete no están demostrados: funcionan en todos los inputs, pero un caso raro podría atascarlos. La defensa es barata: <b>semilla aleatoria + reintentos</b> (otro flujo, otro orden) y un <b>test de estrés</b> sobre instancias aleatorias que sabes factibles por fuerza bruta.</p>
+    <p>Abajo, el mismo <code>lawn.py</code> en un césped con pasillos estrechos y un límite de iteraciones reducido para la demo: se atasca, reinicia y lo consigue.</p>
+  </div>
+  <div id="animRestart"></div>
+  <h3>Test de estrés en vivo</h3>
+  <div class="prose"><p>Genera céspedes de 6×5 a 7×6 con 4–8 árboles al azar, se queda solo con los que tienen ciclo hamiltoniano (fuerza bruta) y ejecuta el solver con <b>una sola pasada de giros</b> por intento (el límite real es 60; con él casi nunca falla). La única diferencia entre los dos botones son los reintentos. El checker independiente valida cada salida.</p></div>
+  <div class="opts"><button type="button" class="pill" id="stressOff">Sin reintentos (1 intento)</button><button type="button" class="pill" id="stressOn">Con reintentos (hasta 50 semillas)</button></div>
+  <div class="box stress" id="stressBox" aria-live="polite"><div class="stat">Pulsa un botón para lanzar 120 casos.</div></div>
+  <div class="two" style="margin-top:16px">
+    <div class="box"><h4>CHECKLIST DE HEURÍSTICA</h4><ul>
+      <li>Semilla fija para reproducir; semillas nuevas en cada reintento.</li>
+      <li>Primero el orden heurístico, luego perturbaciones aleatorias.</li>
+      <li>Memo de estados fallidos para no repetir trabajo.</li>
+      <li>Presupuesto por intento (iteraciones, expansiones) y escalado.</li>
+      <li><code>assert</code> con el checker antes de escribir la salida.</li>
+    </ul></div>
+    <div class="box"><h4>ESTRÉS</h4><ul>
+      <li>Instancias pequeñas + fuerza bruta = verdad conocida.</li>
+      <li>Exhaustivo para M=8 en RPS (los 213 vectores factibles en L5).</li>
+      <li>Aleatorio hasta el tamaño real (M=4096) para tiempos.</li>
+      <li>Dilo en las notas: “no demostrado, validado en estrés”.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section class="pat" id="trampas">
+  <div class="sh"><span class="badge">08</span><div><h2>Trampas del enunciado</h2><p class="sub">LAS QUE YA NOS HAN MORDIDO</p></div></div>
+  <div class="traps" id="trapList"></div>
+</section>
+
+<section class="pat" id="ataque">
+  <div class="sh"><span class="badge">09</span><div><h2>Cómo atacar un reto nuevo</h2><p class="sub">CHECKLIST DE 10 PASOS + MAPA DE TÉCNICAS</p></div></div>
+  <ol class="steps" id="steps"></ol>
+  <h3>Mapa de técnicas</h3>
+  <table class="map" id="techMap"><thead><tr><th>Forma del problema</th><th>Técnica</th><th>Dónde la usamos</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section class="pat" id="school">
+  <div class="sh"><span class="badge">10</span><div><h2>Y en School</h2><p class="sub">TRES IDEAS QUE TAMBIÉN VALEN AQUÍ</p></div></div>
+  <details class="school">
+    <summary>Abrir las notas de School</summary>
+    <ul>
+      <li><b>Argumento de intercambio con inventario limitado</b> (Magic Money L5): demuestra que una solución óptima usa como mucho cierta cantidad de cada moneda grande; el espacio colapsa a una mochila acotada pequeña. Valídalo contra fuerza bruta en miles de casos aleatorios.</li>
+      <li><b>Corte mínimo como corte de vértices</b>: para “cuántas celdas bloquear para separar A de B”, divide cada celda en entrada → salida con capacidad 1; el flujo máximo es el mínimo de vértices a cortar.</li>
+      <li><b>Conjunto dominante conexo (heurística)</b>: para cubrir un grafo con nodos que se vean entre sí, crece un árbol eligiendo con avidez el vecino que domina más nodos nuevos y luego poda los que sobran.</li>
+    </ul>
+  </details>
+</section>
+
+</main>
+<footer><div class="wrap">Construido a partir de las NOTES.md y solution.py de CCC37 Rock Paper Scissors, CCC39 Robotic Lawn Mower, CCC40 Room Planner y CCC41 Spaceship. Todas las animaciones ejecutan el algoritmo real (portado a JavaScript) sobre ejemplos pequeños.</div></footer>
+<script>
+"use strict";
+/*ALGO-START*/
+// ---------- utilidades ----------
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffle(arr,rng){for(let i=arr.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));const t=arr[i];arr[i]=arr[j];arr[j]=t;}return arr;}
+
+// ---------- Rock Paper Scissors ----------
+const BEATS3={R:'S',P:'R',S:'P'};
+const BEATS5={S:'PL',P:'RY',R:'LS',L:'YP',Y:'SR'};
+function rpsWinner(a,b,beats){return (a===b||beats[a].includes(b))?a:b;}
+function simulateBracket(str,beats){
+  const rounds=[str.split('')];
+  while(rounds[rounds.length-1].length>1){
+    const cur=rounds[rounds.length-1],nx=[];
+    for(let i=0;i<cur.length;i+=2)nx.push(rpsWinner(cur[i],cur[i+1],beats));
+    rounds.push(nx);
+  }
+  return rounds;
+}
+// Búsqueda sobre vectores de conteo (3 estilos, campeón S). Exhaustiva en orden heurístico + memo de fallos.
+const ST3='RPS';
+const PAIRS3=[[0,0],[0,1],[0,2],[1,1],[1,2],[2,2]];
+function win3(a,b){return ST3.indexOf(rpsWinner(ST3[a],ST3[b],BEATS3));}
+function matchingsOf(cnt){
+  const out=[];const c=cnt.slice();const x=new Array(PAIRS3.length).fill(0);
+  (function rec(i){
+    if(i===PAIRS3.length){if(c.every(v=>v===0))out.push(x.slice());return;}
+    const [a,b]=PAIRS3[i];
+    const mx=a===b?Math.floor(c[a]/2):Math.min(c[a],c[b]);
+    for(let k=mx;k>=0;k--){
+      if(a===b)c[a]-=2*k;else{c[a]-=k;c[b]-=k;}
+      x[i]=k;rec(i+1);
+      if(a===b)c[a]+=2*k;else{c[a]+=k;c[b]+=k;}
+    }
+    x[i]=0;
+  })(0);
+  return out;
+}
+function nextCounts(m){const n=[0,0,0];m.forEach((k,i)=>{if(k){const [a,b]=PAIRS3[i];n[win3(a,b)]+=k;}});return n;}
+// heurística "proteger S": primero los emparejamientos que dejan más S vivas, luego menos R
+function rpsScore(m){const n=nextCounts(m);return [-n[2],n[0]];}
+function rpsCountSearch(cnt){
+  const events=[];const failed=new Set();let nodeId=0;
+  function dfs(state,depth,parent){
+    const id=nodeId++;
+    const total=state[0]+state[1]+state[2];
+    events.push({t:'visit',id,parent,depth,state:state.slice()});
+    if(total===1){const ok=state[2]===1;events.push({t:ok?'goal':'dead',id,why:ok?'queda una S':'el campeón no es S'});return ok?[]:null;}
+    if(state[2]===0){events.push({t:'dead',id,why:'no queda ninguna S'});return null;}
+    const key=state.join(',');
+    if(failed.has(key)){events.push({t:'memo',id});return null;}
+    const ms=matchingsOf(state).sort((p,q)=>{const a=rpsScore(p),b=rpsScore(q);return a[0]-b[0]||a[1]-b[1];});
+    for(const m of ms){
+      const nx=nextCounts(m);
+      events.push({t:'try',id,match:m.slice(),next:nx});
+      const sub=dfs(nx,depth+1,id);
+      if(sub){events.push({t:'ok',id});return [m].concat(sub);}
+    }
+    failed.add(key);events.push({t:'fail',id});
+    return null;
+  }
+  const plan=dfs(cnt.slice(),0,-1);
+  return {plan,events};
+}
+function rpsMaterialize(cnt,plan){
+  let buckets=[0,1,2].map(i=>Array(cnt[i]).fill(ST3[i]));
+  for(const m of plan){
+    const nb=[[],[],[]];
+    m.forEach((k,i)=>{const [a,b]=PAIRS3[i];for(let j=0;j<k;j++){const u=buckets[a].pop(),v=buckets[b].pop();nb[win3(a,b)].push(u+v);}});
+    buckets=nb;
+  }
+  return buckets.map(b=>b.join('')).join('');
+}
+// DP de conjuntos de ganadores (5 estilos, X libre, Z adversario)
+const ST5='RPSYL';const FULL5=31;const SMASK=1<<2;
+const WIN5=[];for(let i=0;i<5;i++){WIN5.push([]);for(let j=0;j<5;j++)WIN5[i].push(ST5.indexOf(rpsWinner(ST5[i],ST5[j],BEATS5)));}
+const COMB=[];for(let a=0;a<32;a++){COMB.push(new Array(32).fill(0));for(let b=1;b<32&&a>0;b++){let r=0;for(let i=0;i<5;i++)if(a>>i&1)for(let j=0;j<5;j++)if(b>>j&1)r|=1<<WIN5[i][j];COMB[a][b]=r;}}
+function popc(m){let c=0;while(m){c+=m&1;m>>=1;}return c;}
+function pruneMasks(opts){
+  const masks=[...opts.keys()].sort((a,b)=>popc(a)-popc(b));const kept=new Map();
+  for(const m of masks){let dom=false;for(const k of kept.keys())if((k&m)===k){dom=true;break;}if(!dom)kept.set(m,opts.get(m));}
+  return kept;
+}
+function leafOptions(c){
+  if(c==='X'){const o=new Map();for(const ch of 'SRPYL')o.set(1<<ST5.indexOf(ch),ch);return o;}
+  if(c==='Z')return new Map([[FULL5,'Z']]);
+  return new Map([[1<<ST5.indexOf(c),c]]);
+}
+function setDP(s){
+  let level=[...s].map(leafOptions);const history=[level];
+  while(level.length>1){const nx=[];for(let i=0;i<level.length;i+=2){const L=level[i],R=level[i+1];const o=new Map();for(const a of L.keys())for(const b of R.keys()){const r=COMB[a][b];if(!o.has(r))o.set(r,[a,b]);}const pr=pruneMasks(o);pr.raw=o.size;nx.push(pr);}level=nx;history.push(level);}
+  if(!history[history.length-1][0].has(SMASK))return {history,ok:false};
+  const chosen=[[SMASK]];let want=[SMASK];
+  for(let d=history.length-1;d>0;d--){const nodes=history[d];const nw=[];want.forEach((m,i)=>{const [a,b]=nodes[i].get(m);nw.push(a,b);});want=nw;chosen.unshift(want);}
+  const out=want.map((m,i)=>history[0][i].get(m)).join('');
+  return {history,chosen,out,ok:true};
+}
+function allZFillings(str){ // devuelve lista de campeones para todos los rellenos de Z
+  const zs=[];[...str].forEach((c,i)=>{if(c==='Z')zs.push(i);});
+  const res=[];const total=Math.pow(5,zs.length);
+  for(let k=0;k<total;k++){const a=[...str];let t=k;for(const i of zs){a[i]=ST5[t%5];t=Math.floor(t/5);}const r=simulateBracket(a.join(''),BEATS5);res.push({fill:a.join(''),champ:r[r.length-1][0]});}
+  return res;
+}
+
+// ---------- Lawn Mower ----------
+function lawnGraph(w,h,grid){
+  const nodes=[];const key=new Map();
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(grid[y][x]==='.'){const v={x,y,c:(x+y)&1,i:nodes.length};nodes.push(v);key.set(x+','+y,v);}
+  const nbrs=nodes.map(v=>[[1,0],[-1,0],[0,1],[0,-1]].map(([dx,dy])=>key.get((v.x+dx)+','+(v.y+dy))).filter(Boolean).map(u=>u.i));
+  const blocks=[];
+  for(let y=0;y<h-1;y++)for(let x=0;x<w-1;x++){const q=[[x,y],[x+1,y],[x,y+1],[x+1,y+1]].map(([a,b])=>key.get(a+','+b));if(q.every(Boolean))blocks.push(q.map(v=>v.i));}
+  return {nodes,nbrs,blocks,key};
+}
+function edgeList(adj){const e=[];adj.forEach((s,v)=>s.forEach(u=>{if(v<u)e.push([v,u]);}));return e;}
+// Dinic: grados deseados; registra el conjunto de aristas tras cada aumento
+function flowTwoFactor(G,deg,rng,trace){
+  const {nodes,nbrs}=G;const N=nodes.length+2;const g=Array.from({length:N},()=>[]);const to=[],cap=[];
+  const add=(u,v,c)=>{g[u].push(to.length);to.push(v);cap.push(c);g[v].push(to.length);to.push(u);cap.push(0);};
+  let need=0,needW=0;
+  for(const v of nodes){const i=v.i+2;if(v.c){add(0,i,deg[v.i]);need+=deg[v.i];const ns=shuffle(nbrs[v.i].slice(),rng);for(const u of ns)add(i,u+2,1);}else{add(i,1,deg[v.i]);needW+=deg[v.i];}}
+  if(need!==needW)return null;
+  const snapshot=()=>{const adj=nodes.map(()=>new Set());for(const v of nodes)if(v.c)for(const e of g[v.i+2])if(e%2===0&&to[e]>=2&&cap[e]===0){const u=to[e]-2;adj[v.i].add(u);adj[u].add(v.i);}return adj;};
+  let flow=0;
+  for(;;){
+    const lvl=new Array(N).fill(-1);lvl[0]=0;const q=[0];
+    for(let h=0;h<q.length;h++){const u=q[h];for(const e of g[u])if(cap[e]&&lvl[to[e]]<0){lvl[to[e]]=lvl[u]+1;q.push(to[e]);}}
+    if(lvl[1]<0)break;
+    const it=new Array(N).fill(0);
+    const dfs=(u,f)=>{if(u===1)return f;while(it[u]<g[u].length){const e=g[u][it[u]];const v=to[e];if(cap[e]&&lvl[v]===lvl[u]+1){const r=dfs(v,Math.min(f,cap[e]));if(r){cap[e]-=r;cap[e^1]+=r;return r;}}it[u]++;}return 0;};
+    for(;;){const f=dfs(0,1e9);if(!f)break;flow+=f;if(trace)trace.push(snapshot());}
+  }
+  if(flow!==need)return null;
+  return snapshot();
+}
+function components(adj){const comp=new Array(adj.length).fill(-1);const members=[];for(let v=0;v<adj.length;v++){if(comp[v]>=0)continue;const c=members.length;comp[v]=c;const st=[v],m=[v];while(st.length){const u=st.pop();for(const z of adj[u])if(comp[z]<0){comp[z]=c;st.push(z);m.push(z);}}members.push(m);}return {comp,members};}
+function cloneAdj(adj){return adj.map(s=>new Set(s));}
+// fusión con giros 2x2; ev recibe eventos {t:'flip'|'perturb'|'stuck', adj, block, ...}
+function mergeCycles(adj,blocks,rng,maxIters,ev){
+  let {comp,members}=components(adj);let alive=new Map(members.map((m,i)=>[i,m]));
+  const tryFlip=(a,b,c,d,needDiff)=>{for(const [p,q,r,s] of [[a,b,c,d],[a,c,b,d]]){if(adj[p].has(q)&&adj[r].has(s)&&!adj[p].has(r)&&!adj[q].has(s)&&(!needDiff||comp[p]!==comp[r])){return [p,q,r,s];}}return null;};
+  const apply=([p,q,r,s])=>{adj[p].delete(q);adj[q].delete(p);adj[r].delete(s);adj[s].delete(r);adj[p].add(r);adj[r].add(p);adj[q].add(s);adj[s].add(q);};
+  for(let it=0;it<maxIters;it++){
+    if(alive.size===1)break;
+    shuffle(blocks,rng);
+    for(const [a,b,c,d] of blocks){
+      if(alive.size===1)break;
+      const f=tryFlip(a,b,c,d,true);
+      if(f){
+        apply(f);
+        let cp=comp[f[0]],cr=comp[f[2]];if(alive.get(cp).length<alive.get(cr).length){const t=cp;cp=cr;cr=t;}
+        for(const v of alive.get(cr))comp[v]=cp;alive.get(cp).push(...alive.get(cr));alive.delete(cr);
+        if(ev)ev({t:'flip',flip:f,block:[a,b,c,d],adj:cloneAdj(adj),ncomp:alive.size});
+      }
+    }
+    if(alive.size===1)break;
+    if(it===maxIters-1)break;
+    const k=1+Math.floor(blocks.length/50);const done=[];
+    for(let j=0;j<k;j++){const [a,b,c,d]=blocks[Math.floor(rng()*blocks.length)];const f=tryFlip(a,b,c,d,false);if(f){apply(f);done.push(f);}}
+    ({comp,members}=components(adj));alive=new Map(members.map((m,i)=>[i,m]));
+    if(ev)ev({t:'perturb',flips:done,adj:cloneAdj(adj),ncomp:alive.size});
+  }
+  return alive.size===1;
+}
+function walkCycle(adj,start,n){const order=[start];let prev=-1,cur=start;for(let i=0;i<n-1;i++){const nx=[...adj[cur]].filter(u=>u!==prev);const u=nx[0];order.push(u);prev=cur;cur=u;}return order;}
+function movesOf(G,order){const D={'0,-1':'W','1,0':'D','0,1':'S','-1,0':'A'};let s='';for(let i=1;i<order.length;i++){const a=G.nodes[order[i-1]],b=G.nodes[order[i]];s+=D[(b.x-a.x)+','+(b.y-a.y)];}return s;}
+// modo ciclo completo con reintentos; onTry(t, data) para trazar
+function solveLawnCycle(w,h,grid,seed,tries,maxIters,onTry){
+  const G=lawnGraph(w,h,grid);const rng=mulberry32(seed);
+  const nb=G.nodes.filter(v=>v.c).length,nw=G.nodes.length-nb;
+  if(nb!==nw)return {ok:false,G,reason:'parity'};
+  for(let t=0;t<tries;t++){
+    const deg=G.nodes.map(()=>2);const trace=[];const evs=[];
+    const adj=flowTwoFactor(G,deg,rng,onTry?trace:null);
+    if(!adj){if(onTry)onTry(t,{flowTrace:trace,adj:null,evs,ok:false});continue;}
+    const start=cloneAdj(adj);
+    const ok=mergeCycles(adj,G.blocks.slice(),rng,maxIters,onTry?(e=>evs.push(e)):null);
+    if(onTry)onTry(t,{flowTrace:trace,adj:start,evs,ok,final:ok?adj:null});
+    if(ok){const order=walkCycle(adj,0,G.nodes.length);return {ok:true,G,adj,order,moves:movesOf(G,order),tries:t+1};}
+  }
+  return {ok:false,G,reason:'tries',tries};
+}
+// comprobador independiente (L3/L6): sin celda inicial, prueba desplazamientos
+function checkLawnPath(w,h,grid,moves,cycle,trace){
+  const D={W:[0,-1],D:[1,0],S:[0,1],A:[-1,0]};let x=0,y=0;const rel=[[0,0]];
+  for(const m of moves){const d=D[m];if(!d)return {ok:false,why:'movimiento desconocido'};x+=d[0];y+=d[1];rel.push([x,y]);}
+  const free=[];for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++)if(grid[yy][xx]==='.')free.push([xx,yy]);
+  if(rel.length!==free.length)return {ok:false,why:'visita '+rel.length+' celdas, hay '+free.length+' libres',rel};
+  const seen=new Set(rel.map(p=>p+''));if(seen.size!==rel.length){const f=new Set();let at=0;for(;at<rel.length;at++){const k=rel[at]+'';if(f.has(k))break;f.add(k);}return {ok:false,why:'repite una celda (paso '+at+')',repeatAt:at,rel};}
+  let best=null;
+  for(const [sx,sy] of free){
+    let ok=true,k=0;for(const [dx,dy] of rel){const X=sx+dx,Y=sy+dy;if(X<0||Y<0||X>=w||Y>=h||grid[Y][X]!=='.'){ok=false;break;}k++;}
+    if(trace)trace.push({start:[sx,sy],badAt:ok?-1:k});
+    if(ok){best=[sx,sy];break;}
+  }
+  if(!best)return {ok:false,why:'ningún punto de partida encaja (sale del césped o pisa un árbol)',rel};
+  if(cycle){const [lx,ly]=rel[rel.length-1];if(Math.abs(lx)+Math.abs(ly)!==1)return {ok:false,why:'el final no es vecino del inicio'};}
+  return {ok:true,start:best,rel};
+}
+// fuerza bruta: ¿existe ciclo hamiltoniano? (solo cuadrículas pequeñas)
+function hasHamCycle(w,h,grid){
+  const G=lawnGraph(w,h,grid);const n=G.nodes.length;if(n<4)return false;
+  const nb=G.nodes.filter(v=>v.c).length;if(nb*2!==n)return false;
+  if(G.nbrs.some(a=>a.length<2))return false;
+  const vis=new Uint8Array(n);vis[0]=1;let budget=2e6;
+  const rec=(u,k)=>{if(--budget<0)return false;if(k===n)return G.nbrs[u].includes(0);for(const v of G.nbrs[u])if(!vis[v]){vis[v]=1;if(rec(v,k+1))return true;vis[v]=0;}return false;};
+  return rec(0,1);
+}
+
+// ---------- Room Planner ----------
+const PW_MAX=22,PW_CENTER=6;
+function roomBuild(P,Q,m){
+  const f=Array.from({length:P+1},()=>new Array(Q+1).fill(0));const ch=Array.from({length:P+1},()=>new Array(Q+1).fill(null));
+  for(let p=1;p<=P;p++)for(let q=1;q<=Q;q++){
+    const hb=Math.floor(p/2)*Math.floor(q/m),vb=Math.floor(p/m)*Math.floor(q/2);
+    let best,c;if(hb>=vb){best=hb;c=['h'];}else{best=vb;c=['v'];}
+    for(let a=1;a<=Math.floor(p/2);a++){const v=f[a][q]+f[p-a][q];if(v>best){best=v;c=['r',a];}}
+    for(let b=1;b<=Math.floor(q/2);b++){const v=f[p][b]+f[p][q-b];if(v>best){best=v;c=['c',b];}}
+    if(p<=PW_MAX&&q<=PW_MAX&&best<Math.floor(p*q/(2*m))){
+      for(let hh=1;hh<=Math.min(PW_CENTER,p-2);hh++)for(let ww=1;ww<=Math.min(PW_CENTER,q-2);ww++){const fc=f[hh][ww];
+        for(let a=1;a<p-hh;a++){const c2=a+hh;for(let d=1;d<q-ww;d++){const b=d+ww;const v=f[a][b]+f[c2][q-b]+f[p-c2][q-d]+f[p-a][d]+fc;if(v>best){best=v;c=['p',a,c2,b,d];}}}}
+    }
+    f[p][q]=best;ch[p][q]=c;
+  }
+  return {f,ch};
+}
+// recorrido con pila como en la solución; devuelve eventos de caja y territorios
+function roomPlace(ch,p,q,m){
+  const res=[],ev=[];const stack=[[p,q,0,0]];
+  while(stack.length){
+    const [P,Q,r0,c0]=stack.pop();if(P<=0||Q<=0)continue;const c=ch[P][Q];if(!c)continue;
+    ev.push({t:'box',p:P,q:Q,r0,c0,c});
+    if(c[0]==='h'){for(let i=0;i<Math.floor(P/2);i++)for(let j=0;j<Math.floor(Q/m);j++){const T={r:r0+2*i,c:c0+m*j,hor:true};res.push(T);ev.push({t:'terr',T});}}
+    else if(c[0]==='v'){for(let i=0;i<Math.floor(P/m);i++)for(let j=0;j<Math.floor(Q/2);j++){const T={r:r0+m*i,c:c0+2*j,hor:false};res.push(T);ev.push({t:'terr',T});}}
+    else if(c[0]==='p'){const [,a,c2,b,d]=c;stack.push([a,b,r0,c0],[c2,Q-b,r0,c0+b],[P-c2,Q-d,r0+c2,c0+d],[P-a,d,r0+a,c0],[c2-a,b-d,r0+a,c0+d]);}
+    else if(c[0]==='r'){const a=c[1];stack.push([a,Q,r0,c0],[P-a,Q,r0+a,c0]);}
+    else{const b=c[1];stack.push([P,b,r0,c0],[P,Q-b,r0,c0+b]);}
+  }
+  return {terrs:res,ev};
+}
+function roomRender(terrs,x,y,L){const g=Array.from({length:y},()=>new Array(x).fill('.'));for(const {r,c,hor} of terrs)for(let k=0;k<L;k++){if(hor)g[r][c+k]='X';else g[r+k][c]='X';}return g;}
+function roomCheck(g,L){ // componentes 8-conexas rectas de longitud L
+  const y=g.length,x=g[0].length;const seen=g.map(r=>r.map(()=>false));let count=0;
+  for(let i=0;i<y;i++)for(let j=0;j<x;j++){if(g[i][j]!=='X'||seen[i][j])continue;count++;const st=[[i,j]],cells=[];seen[i][j]=true;
+    while(st.length){const [a,b]=st.pop();cells.push([a,b]);for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const A=a+da,B=b+db;if(A>=0&&B>=0&&A<y&&B<x&&g[A][B]==='X'&&!seen[A][B]){seen[A][B]=true;st.push([A,B]);}}}
+    const rows=new Set(cells.map(c=>c[0])),cols=new Set(cells.map(c=>c[1]));
+    if(cells.length!==L||(rows.size!==1&&cols.size!==1))return {ok:false,count,why:'componente que no es un escritorio recto de '+L};}
+  return {ok:true,count};
+}
+
+// ---------- Spaceship ----------
+const SH_STATES=[],SH_IDX=new Map();
+for(let p=-5;p<=5;p++)for(let r=0;r<Math.max(1,Math.abs(p));r++){SH_IDX.set(p+','+r,SH_STATES.length);SH_STATES.push([p,r]);}
+const SH_S0=SH_IDX.get('0,0');
+const sgn=v=>(v>0)-(v<0);
+function shValid(p){if(p===0)return [-5,0,5];const s=sgn(p),a=Math.abs(p);const n=[a+1,a,a-1].filter(b=>b>=1&&b<=5).map(b=>s*b);if(a===5)n.push(0);return n;}
+const SH_NXT=SH_STATES.map(([p,r])=>{if(r>0)return [[SH_IDX.get(p+','+(r-1)),r-1===0?sgn(p):0]];return shValid(p).map(q=>{const b=Math.max(1,Math.abs(q));return [SH_IDX.get(q+','+(b-1)),b===1?sgn(q):0];});});
+function shBuildH(R){ // H[s][d+R] = ticks mínimos para terminar (d=0, en reposo) — BFS inverso
+  const W=2*R+1,n=SH_STATES.length;const rev=Array.from({length:n*W},()=>[]);
+  for(let s=0;s<n;s++)for(let d=-R;d<=R;d++){const u=s*W+d+R;for(const [s2,dp] of SH_NXT[s]){const d2=d-dp;if(d2>=-R&&d2<=R)rev[s2*W+d2+R].push(u);}}
+  const INF=1e9;const dist=new Array(n*W).fill(INF);const st=SH_S0*W+R;dist[st]=0;const q=[st];
+  for(let h=0;h<q.length;h++){const v=q[h];for(const u of rev[v])if(dist[u]===INF){dist[u]=dist[v]+1;q.push(u);}}
+  const H=[];for(let s=0;s<n;s++)H.push(dist.slice(s*W,(s+1)*W));return H;
+}
+function shGreedyAxis(goal,H,R){let s=SH_S0,d=goal;const sts=[s];while(H[s][d+R]>0){for(const [s2,dp] of SH_NXT[s]){if(H[s2][d-dp+R]===H[s][d+R]-1){s=s2;d-=dp;sts.push(s);break;}}}return sts;}
+function shAxisBlocks(sts){const p=[0];for(let i=1;i<sts.length;i++)if(SH_STATES[sts[i-1]][1]===0)p.push(SH_STATES[sts[i]][0]);return p;}
+function shSimAxis(paces){ // posiciones tick a tick (la posición cambia en el ÚLTIMO tick del bloque)
+  const pos=[0];let x=0;for(const p of paces){const b=Math.max(1,Math.abs(p));for(let k=0;k<b;k++){if(k===b-1)x+=sgn(p);pos.push(x);}}return pos;}
+function shCheck(gx,gy,T,asts,xs,ys){
+  const ok=a=>a.length>0&&a[0]===0&&a[a.length-1]===0&&a.every((p,i)=>i===0||shValid(a[i-1]).includes(p));
+  if(!ok(xs)||!ok(ys))return {ok:false,why:'progresión de ritmos ilegal'};
+  const px=shSimAxis(xs),py=shSimAxis(ys);const n=Math.max(px.length,py.length);
+  while(px.length<n)px.push(px[px.length-1]);while(py.length<n)py.push(py[py.length-1]);
+  if(n-1>T)return {ok:false,why:'se pasa del límite'};
+  if(px[n-1]!==gx||py[n-1]!==gy)return {ok:false,why:'no acaba en la estación'};
+  for(let t=0;t<n;t++)for(const [ax,ay] of asts)if(Math.abs(px[t]-ax)<=2&&Math.abs(py[t]-ay)<=2)return {ok:false,why:'colisión en el tick '+t};
+  return {ok:true,time:n-1,px,py};
+}
+// A* ponderado sobre (x,y,estadoX,estadoY); asteroides fijos; poda g+1+h > T
+function shSolve(gx,gy,T,asts,H,R,margin,w,trace,budget){
+  const xlo=Math.min(0,gx)-margin,xhi=Math.max(0,gx)+margin,ylo=Math.min(0,gy)-margin,yhi=Math.max(0,gy)+margin;
+  const Wd=xhi-xlo+1,Hh=yhi-ylo+1;const blk=new Uint8Array(Wd*Hh);
+  for(const [ax,ay] of asts)for(let y=ay-2;y<=ay+2;y++)for(let x=ax-2;x<=ax+2;x++)if(x>=xlo&&x<=xhi&&y>=ylo&&y<=yhi)blk[(x-xlo)+(y-ylo)*Wd]=1;
+  const cell=(x,y)=>(x-xlo)+(y-ylo)*Wd;
+  if(blk[cell(0,0)])return null;
+  // BFS de rey sobre celdas libres desde la meta (cota inferior)
+  const GD=new Array(Wd*Hh).fill(-1);let last=0;
+  if(!blk[cell(gx,gy)]){let q=[cell(gx,gy)];GD[q[0]]=0;let d=0;while(q.length){d++;const nq=[];for(const c of q){const cx=c%Wd,cy=(c-cx)/Wd;for(let yy=cy-1;yy<=cy+1;yy++)for(let xx=cx-1;xx<=cx+1;xx++){if(xx<0||yy<0||xx>=Wd||yy>=Hh)continue;const k=xx+yy*Wd;if(GD[k]<0&&!blk[k]){GD[k]=d;nq.push(k);}}}q=nq;}last=d;}
+  for(let i=0;i<GD.length;i++)if(GD[i]<0)GD[i]=last;
+  const h0=Math.max(H[SH_S0][gx+R],H[SH_S0][gy+R],GD[cell(0,0)]);
+  if(1+h0>T)return null;
+  // montículo binario
+  const heap=[];const push=e=>{heap.push(e);let i=heap.length-1;while(i>0){const p=(i-1)>>1;if(less(heap[i],heap[p])){[heap[i],heap[p]]=[heap[p],heap[i]];i=p;}else break;}};
+  const less=(a,b)=>a[0]<b[0]||(a[0]===b[0]&&a[1]<b[1]);
+  const pop=()=>{const top=heap[0];const e=heap.pop();if(heap.length){heap[0]=e;let i=0;for(;;){const l=2*i+1,r=l+1;let m=i;if(l<heap.length&&less(heap[l],heap[m]))m=l;if(r<heap.length&&less(heap[r],heap[m]))m=r;if(m===i)break;[heap[i],heap[m]]=[heap[m],heap[i]];i=m;}}return top;};
+  const NS=SH_STATES.length;const key=(x,y,sx,sy)=>((cell(x,y)*NS+sx)*NS+sy);
+  const best=new Map(),parent=new Map();const k0=key(0,0,SH_S0,SH_S0);best.set(k0,1);
+  push([1+w*h0,-1,0,0,SH_S0,SH_S0]);let exp=0;
+  while(heap.length){
+    const [f,ng,x,y,sx,sy]=pop();const g=-ng;const kk=key(x,y,sx,sy);
+    if(best.get(kk)<g)continue;
+    exp++;if(trace)trace.push([x,y,g]);if(budget&&exp>budget)return {fail:'budget',exp};
+    const g1=g+1;
+    for(const [sx2,dx] of SH_NXT[sx]){const x2=x+dx;if(x2<xlo||x2>xhi)continue;const hx=H[sx2][gx-x2+R];if(g1+hx>T)continue;
+      for(const [sy2,dy] of SH_NXT[sy]){const y2=y+dy;if(y2<ylo||y2>yhi)continue;const hy=H[sy2][gy-y2+R];let h=Math.max(hx,hy);if(g1+h>T)continue;
+        const c2=cell(x2,y2);if(blk[c2])continue;const hg=GD[c2];if(g1+hg>T)continue;if(hg>h)h=hg;
+        const k2=key(x2,y2,sx2,sy2);if((best.has(k2)?best.get(k2):1e9)<=g1)continue;best.set(k2,g1);parent.set(k2,[kk,x,y,sx,sy]);
+        if(x2===gx&&y2===gy&&sx2===SH_S0&&sy2===SH_S0){
+          const xsS=[sx2],ysS=[sy2],cells=[[x2,y2]];let cur=k2;while(parent.has(cur)){const [pk,px,py,psx,psy]=parent.get(cur);xsS.push(psx);ysS.push(psy);cells.push([px,py]);cur=pk;}
+          xsS.reverse();ysS.reverse();cells.reverse();
+          return {xs:shAxisBlocks(xsS),ys:shAxisBlocks(ysS),exp,cells,win:{xlo,xhi,ylo,yhi},blk,GD};
+        }
+        push([g1+w*h,-g1,x2,y2,sx2,sy2]);}}
+  }
+  return {fail:'empty',exp,win:{xlo,xhi,ylo,yhi},blk};
+}
+/*ALGO-END*/
+
+// =================== UI ===================
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const CS=getComputedStyle(document.documentElement);
+const cv=n=>CS.getPropertyValue('--'+n).trim();
+const COL={stage:cv('stage'),panel:cv('panel'),panel2:cv('panel2'),line:cv('line'),line2:cv('line2'),text:cv('text'),muted:cv('muted'),dim:cv('dim'),
+  red:cv('red'),orange:cv('orange'),yellow:cv('yellow'),green:cv('green'),cyan:cv('cyan'),lilac:cv('lilac'),pink:cv('pink'),
+  grass1:cv('grass1'),grass2:cv('grass2'),dark1:cv('dark1'),dark2:cv('dark2'),ink:'#04060d'};
+const SCOL={R:COL.red,P:COL.cyan,S:COL.yellow,Y:COL.lilac,L:COL.green,X:COL.dim,Z:COL.pink};
+const FPX='Silkscreen, monospace',FMO='"JetBrains Mono", monospace';
+const COMPC=[COL.cyan,COL.orange,COL.pink,COL.lilac,COL.green,COL.red,COL.yellow];
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+function txt(ctx,s,x,y,o={}){ctx.font=`${o.weight||''} ${o.size||11}px ${o.font||FPX}`;ctx.fillStyle=o.color||COL.text;ctx.textAlign=o.align||'left';ctx.textBaseline=o.base||'middle';ctx.fillText(s,x,y);}
+function fitSize(ctx,s,maxW,size,font=FPX,min=7){let z=size;for(;z>min;z--){ctx.font=`${z}px ${font}`;if(ctx.measureText(s).width<=maxW)break;}return z;}
+function rect(ctx,x,y,w,h,fill,stroke,lw=2){if(fill){ctx.fillStyle=fill;ctx.fillRect(x,y,w,h);}if(stroke){ctx.lineWidth=lw;ctx.strokeStyle=stroke;ctx.strokeRect(x+lw/2,y+lw/2,w-lw,h-lw);}}
+function seg(ctx,x1,y1,x2,y2,color,w=2,dash){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=w;ctx.lineCap='round';ctx.setLineDash(dash||[]);ctx.stroke();ctx.setLineDash([]);}
+function alpha(ctx,a,fn){ctx.save();ctx.globalAlpha*=Math.max(0,Math.min(1,a));fn();ctx.restore();}
+function chip(ctx,ch,x,y,s,o={}){ // casilla de estilo con letra
+  rect(ctx,x,y,s,s,SCOL[ch]||COL.dim,COL.ink,Math.max(1.5,s/14));
+  if(s>=11)txt(ctx,ch,x+s/2,y+s/2+.5,{size:Math.round(s*.58),font:FMO,weight:'700',color:COL.ink,align:'center'});
+  if(o.ring)rect(ctx,x-3,y-3,s+6,s+6,null,o.ring,2);
+}
+function badge(ctx,s,x,y,color,o={}){ctx.font=`${o.size||10}px ${FPX}`;const w=ctx.measureText(s).width+12,h=(o.size||10)+10;const X=o.align==='right'?x-w:o.align==='center'?x-w/2:x;rect(ctx,X,y,w,h,color,COL.ink,2);txt(ctx,s,X+w/2,y+h/2+.5,{size:o.size||10,color:o.fg||COL.ink,align:'center'});return w;}
+
+// ---------- reproductor ----------
+const IC={rs:'<svg viewBox="0 0 8 8"><rect x="1" y="1" width="1.4" height="6"/><polygon points="7,1 2.6,4 7,7"/></svg>',bk:'<svg viewBox="0 0 8 8"><polygon points="6,1 1.6,4 6,7"/></svg>',
+  pl:'<svg viewBox="0 0 8 8"><polygon points="2,1 7,4 2,7"/></svg>',pa:'<svg viewBox="0 0 8 8"><rect x="1.6" y="1" width="1.8" height="6"/><rect x="4.6" y="1" width="1.8" height="6"/></svg>',
+  fw:'<svg viewBox="0 0 8 8"><polygon points="2,1 6.4,4 2,7"/></svg>'};
+const BASE=1250;const PLAYERS=[];
+function Player(host,opts){
+  const P={frames:[],i:0,t:1,playing:false,speed:1,el:0,last:0,raf:0,W:320,H:240,started:false,resume:false,...opts};
+  host.classList.add('anim');
+  host.innerHTML=`<div class="stage"><canvas></canvas></div><p class="cap" aria-live="polite"></p>
+  <div class="ctrl"><button type="button" class="b-rs" aria-label="Volver al inicio">${IC.rs}</button><button type="button" class="b-bk" aria-label="Paso anterior">${IC.bk}</button>
+  <button type="button" class="b-pl primary" aria-label="Reproducir">${IC.pl}</button><button type="button" class="b-fw" aria-label="Paso siguiente">${IC.fw}</button>
+  <label class="spd"><span>VEL.</span><select aria-label="Velocidad"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
+  <input class="scrub" type="range" min="0" max="0" value="0" aria-label="Paso de la animación"><span class="cnt"></span></div>`;
+  const canvas=$('canvas',host),cap=$('.cap',host),bPl=$('.b-pl',host),scrub=$('.scrub',host),cnt=$('.cnt',host),stage=$('.stage',host);
+  P.ui=()=>{const n=P.frames.length;scrub.max=Math.max(0,n-1);scrub.value=P.i;cnt.textContent=(P.i+1)+'/'+n;
+    const f=P.frames[P.i];cap.innerHTML=f?f.cap:'';bPl.innerHTML=P.playing?IC.pa:IC.pl;bPl.setAttribute('aria-label',P.playing?'Pausa':'Reproducir');};
+  P.render=()=>{const d=window.devicePixelRatio||1;const ctx=P.ctx;ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,P.W,P.H);ctx.fillStyle=COL.stage;ctx.fillRect(0,0,P.W,P.H);
+    if(P.frames.length)P.draw(ctx,P.W,P.H,P.frames,P.i,RM?1:ease(P.t),P);};
+  P.resize=()=>{const W=Math.max(260,stage.clientWidth);const H=Math.round(P.height(W,P));const d=window.devicePixelRatio||1;
+    P.W=W;P.H=H;canvas.width=Math.round(W*d);canvas.height=Math.round(H*d);canvas.style.height=H+'px';P.ctx=canvas.getContext('2d');P.render();};
+  const tick=now=>{const dt=Math.min(64,now-P.last);P.last=now;const f=P.frames[P.i];const total=BASE*((f&&f.dur)||1)/P.speed;
+    if(P.t<1)P.t=RM?1:Math.min(1,P.t+dt/(Math.min(total,1400/P.speed)*0.6));
+    if(P.playing){P.el+=dt;if(P.el>=total){if(P.i<P.frames.length-1){P.i++;P.t=RM?1:0;P.el=0;P.ui();}else{P.playing=false;P.ui();}}}
+    P.render();P.raf=(P.playing||P.t<1)?requestAnimationFrame(tick):0;};
+  P.kick=()=>{if(!P.raf){P.last=performance.now();P.raf=requestAnimationFrame(tick);}};
+  P.go=(i,tween)=>{P.i=Math.max(0,Math.min(P.frames.length-1,i));P.t=(tween&&!RM)?0:1;P.el=0;P.ui();P.render();P.kick();};
+  P.play=()=>{if(P.i>=P.frames.length-1)P.go(0,true);P.playing=true;P.started=true;P.el=0;P.ui();P.kick();};
+  P.pause=()=>{P.playing=false;P.ui();};
+  P.setFrames=(fr)=>{P.frames=fr;P.i=0;P.t=1;P.el=0;P.ui();P.resize();};
+  $('.b-rs',host).onclick=()=>{P.go(0,false);};
+  $('.b-bk',host).onclick=()=>{P.pause();P.go(P.i-1,false);};
+  $('.b-fw',host).onclick=()=>{P.pause();P.go(P.i+1,true);};
+  bPl.onclick=()=>{P.playing?P.pause():P.play();P.resume=false;};
+  $('select',host).onchange=e=>{P.speed=+e.target.value;};
+  scrub.oninput=()=>{P.pause();P.go(+scrub.value,false);};
+  new ResizeObserver(()=>P.resize()).observe(stage);
+  P.host=host;PLAYERS.push(P);
+  if(opts.frames)P.setFrames(opts.frames);
+  return P;
+}
+const io=new IntersectionObserver(es=>{for(const e of es){const P=PLAYERS.find(p=>p.host===e.target);if(!P)continue;
+  if(e.isIntersecting){if(!RM&&(!P.started||P.resume)){P.resume=false;P.play();}}
+  else if(P.playing){P.pause();P.resume=true;}}},{threshold:.35});
+function watch(P){io.observe(P.host);}
+function tabs(groupId,onPick){const g=document.getElementById(groupId);g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));onPick(b.dataset);});}
+
+// =================== 01 · Escalera ===================
+const LADDER={
+ rps:{helpers:{winner:'winner(a,b)',ronda:'simular ronda',check:'checker (simula)',conteos:'búsqueda conteos',tabla5:'tabla 5 estilos',dpset:'DP de conjuntos'},
+  levels:[['Un combate',['winner']],['Dos rondas',['winner','ronda']],['Sin R en 2 rondas',['ronda','check','conteos']],['Campeón S',['ronda','check','conteos']],['5 estilos',['check','conteos','tabla5']],['Rellenar X',['check','tabla5','dpset']],['Z adversario',['check','tabla5','dpset']]]},
+ lawn:{helpers:{contar:'contar letras',simxy:'simular x/y',offset:'probar inicios',check:'checker (L3)',lawnpy:'lawn.py flujo+giros',ciclo:'modo ciclo',reint:'reintentos'},
+  levels:[['Contar WDSA',['contar']],['Caja mínima',['simxy']],['Validar camino',['simxy','offset','check']],['Camino, 1 árbol',['check','lawnpy']],['Árbol en borde',['check','lawnpy']],['Ciclo, 1 árbol',['check','lawnpy','ciclo']],['Ciclo, n árboles',['check','lawnpy','ciclo','reint']]]},
+ room:{helpers:{formula:'área / 3',filas:'filas de mesas',check:'checker',guill:'DP guillotina',terr:'territorio 2×(L+1)',pin:'molinete 5 bloques',valor:'valor = longitud'},
+  levels:[['Área / 3',['formula']],['Llenar filas',['filas','check']],['x libre',['check','guill']],['Sin tocarse',['check','guill','terr','pin']],['Mesas 1×2',['check','guill','terr','pin']],['L de 1 a 7',['check','guill','terr','pin']],['L mezcladas',['check','guill','terr','pin','valor']]]},
+ ship:{helpers:{suma:'suma de ritmos',tick:'max(1,|p|)',auto:'autómata ritmo',H:'tabla H (BFS inv.)',astar:'A* + poda',ventana:'ventana + C',tkey:'tiempo en clave'},
+  levels:[['Suma ritmos',['suma']],['Ritmo 0 y < 0',['tick']],['1D óptimo',['tick','auto','H']],['2D = max 1D',['auto','H']],['1 asteroide',['auto','H','astar']],['Límite corto',['auto','H','astar']],['Laberinto',['auto','H','astar','ventana']],['Asteroides móviles',['auto','H','astar','tkey']]]}
+};
+function ladderCaps(k){
+  const w=(a,b)=>rpsWinner(a,b,BEATS3);
+  if(k==='rps'){const s='RSPPSRRS';const r=simulateBracket(s,BEATS3);return [
+    `<b>L1 · un combate.</b> Tabla de quién gana: <code>winner(R,S) = ${w('R','S')}</code>, <code>winner(S,P) = ${w('S','P')}</code>, empate → el mismo estilo. Esta función vive hasta el L7.`,
+    `<b>L2 · dos rondas.</b> Simular reutilizando <code>winner</code>: <code>${s}</code> → <code>${r[1].join('')}</code> → <code>${r[2].join('')}</code>. Salida única: se compara byte a byte.`,
+    `<b>L3 · el salto.</b> Ya no simulas: <b>construyes</b> el orden de la primera ronda (ninguna R tras dos rondas). Varias respuestas válidas → nace el checker, que reutiliza la simulación del L2.`,
+    `<b>L4 · campeón S.</b> El mismo motor de búsqueda por conteos, ahora sobre todas las rondas. Solo cambia la condición final.`,
+    `<b>L5 · 5 estilos.</b> Spock y lagarto: la búsqueda no cambia, solo la tabla de victorias (15 tipos de pareja).`,
+    `<b>L6 · rellenar las X.</b> Hojas fijas + huecos libres: los conteos ya no sirven. Motor nuevo: DP de abajo arriba con el conjunto de ganadores posibles.`,
+    `<b>L7 · Z del adversario.</b> La misma DP: una Z es la hoja con conjunto completo {R,P,S,Y,L}. Un cambio de una línea.`,
+    `<b>Resumen.</b> Dos motores para siete niveles: búsqueda por conteos (L3–L5) y DP de conjuntos (L6–L7). El checker nace en el L3 y llega hasta el final.`];}
+  if(k==='lawn'){const p='DDSSAAWWD';const c=ch=>[...p].filter(x=>x===ch).length;let x=0,y=0,a=0,b=0,A=0,B=0;for(const m of p){if(m==='W')y--;if(m==='S')y++;if(m==='D')x++;if(m==='A')x--;a=Math.min(a,x);A=Math.max(A,x);b=Math.min(b,y);B=Math.max(B,y);}
+    return [`<b>L1 · contar.</b> Para <code>${p}</code>: W=${c('W')} D=${c('D')} S=${c('S')} A=${c('A')}. Ojo: el orden de salida es W D S A, no alfabético.`,
+    `<b>L2 · caja mínima.</b> Simular x/y: <code>${p}</code> ocupa ${A-a+1}×${B-b+1} celdas. Celdas = movimientos + 1 en cada eje.`,
+    `<b>L3 · validar.</b> El camino no trae casilla de inicio: se infiere probando desplazamientos. Este validador es ya el checker de L4–L7.`,
+    `<b>L4 · construir un camino.</b> Paridad de colores + flujo máximo + giros 2×2, todo en <code>lawn.py</code>.`,
+    `<b>L5 · árbol en el borde.</b> El mismo <code>lawn.py</code> sin tocar: el método no supone dónde está el árbol.`,
+    `<b>L6 · ciclo.</b> Modo ciclo: grado 2 en todas las celdas. El checker añade “el final es vecino del inicio”.`,
+    `<b>L7 · varios árboles.</b> Pasillos de ancho 1 donde no caben giros: reintentos con semillas nuevas como red de seguridad.`,
+    `<b>Resumen.</b> L4–L7 comparten un solo archivo (<code>lawn.py</code>); el validador del L3 es el checker de todos.`];}
+  if(k==='room')return [`<b>L1 · fórmula.</b> x divisible por 3: una sala 6×4 cabe ${6*4/3} escritorios = área / 3.`,
+    `<b>L2 · llenar filas.</b> Cada fila, x/3 escritorios horizontales numerados. Cualquier numeración vale → checker.`,
+    `<b>L3 · x libre.</b> x ya no es múltiplo de 3: DP guillotina sobre todos los subrectángulos (4×4 → 5 escritorios).`,
+    `<b>L4 · sin tocarse.</b> Diagonales incluidas → territorio: empaquetar bloques 2×4 en la caja (x+1)×(y+1), con la misma DP + molinete.`,
+    `<b>L5 · escritorios 1×2.</b> L=2: el molinete se vuelve imprescindible (6×6 → 8; la guillotina sola da 7).`,
+    `<b>L6 · L de 1 a 7.</b> Una tabla de DP por cada L, en caché.`,
+    `<b>L7 · longitudes mezcladas.</b> Un bloque 2×m vale m−1 celdas: la misma DP maximiza valor en vez de cantidad.`,
+    `<b>Resumen.</b> El territorio convierte “no tocarse” en “no solaparse”; desde el L4 todo es la misma DP.`];
+  return [`<b>L1 · sumar.</b> Tiempo = suma de ritmos: <code>5 4 3</code> → ${5+4+3}.`,
+    `<b>L2 · ritmo 0 y negativo.</b> Un 0 no es gratis: cuesta 1 tick. Tiempo de un bloque = <code>max(1,|p|)</code>, la unidad de todos los niveles.`,
+    `<b>L3 · 1D óptimo.</b> Autómata (ritmo, ticks restantes) + tabla exacta H por BFS inverso. Bajar por H da la secuencia óptima.`,
+    `<b>L4 · 2D.</b> Ejes independientes: óptimo = max de los dos óptimos 1D. Mismo código.`,
+    `<b>L5 · un asteroide.</b> A* ponderado sobre (x, y, estadoX, estadoY) con h = max(Hx, Hy, distancia de rey) y poda por límite.`,
+    `<b>L6 · límite corto.</b> El mismo solver: la poda garantiza que solo devuelve planes que caben.`,
+    `<b>L7 · laberinto.</b> Ventana que crece con los rodeos y núcleo en C vía ctypes: millones de expansiones.`,
+    `<b>L8 · asteroides móviles.</b> El tiempo entra en la clave del nodo; mapa bloqueado por tick, en caché.`,
+    `<b>Resumen.</b> El autómata y H del L3 llegan hasta el L8; A* aparece en el L5 y solo cambia su clave.`];
+}
+let ladderKey='rps';
+function ladderFrames(k){const L=LADDER[k];const caps=ladderCaps(k);const fr=L.levels.map((lv,i)=>({k:i,cap:caps[i]}));fr.push({k:L.levels.length-1,all:true,cap:caps[caps.length-1]});return fr;}
+function drawLadder(ctx,W,H,frames,i,t){
+  const L=LADDER[ladderKey];const f=frames[i];const n=L.levels.length;const keys=Object.keys(L.helpers);
+  const intro={};L.levels.forEach((lv,k)=>lv[1].forEach(h=>{if(intro[h]===undefined)intro[h]=k;}));
+  const pad=12,lw=Math.min(W*0.47,300),top=14,bot=H-12,gap=(bot-top)/n;
+  rect(ctx,pad+4,top,5,bot-top,COL.line2);rect(ctx,pad+lw-9,top,5,bot-top,COL.line2);
+  const ry=k=>bot-(k+.5)*gap;
+  for(let k=0;k<n;k++){const y=ry(k),h=Math.min(30,gap*.68);const cur=k===f.k&&!f.all,done=k<f.k||f.all;
+    const fill=cur?COL.yellow:done?COL.dark2:COL.panel;const X=pad,Wd=lw;
+    if(cur)alpha(ctx,1,()=>rect(ctx,X-2*t,y-h/2-2*t,Wd+4*t,h+4*t,fill,COL.ink,3));else rect(ctx,X,y-h/2,Wd,h,fill,COL.ink,3);
+    const label=`L${k+1} ${L.levels[k][0]}`;const z=fitSize(ctx,label,Wd-16,11);
+    txt(ctx,label,X+8,y+1,{size:z,color:cur?COL.ink:done?COL.text:COL.dim});}
+  const hx=pad+lw+22,hw=W-hx-pad;const nh=keys.length;const hg=Math.min(40,(H-24)/nh);const hh=Math.min(28,hg-8);const hy0=(H-nh*hg)/2;
+  const used=f.all?keys:L.levels[f.k][1];
+  keys.forEach((key,j)=>{const y=hy0+j*hg+(hg-hh)/2;const vis=intro[key]<=f.k;if(!vis){rect(ctx,hx,y,hw,hh,null,COL.line,2);return;}
+    const isNew=intro[key]===f.k&&!f.all;const on=used.includes(key);
+    const a=isNew?t:1;
+    alpha(ctx,a,()=>{rect(ctx,hx,y,hw,hh,on?(isNew?COL.yellow:COL.cyan):COL.panel2,COL.ink,3);
+      const z=fitSize(ctx,L.helpers[key],hw-(isNew?58:14),11);txt(ctx,L.helpers[key],hx+7,y+hh/2+1,{size:z,color:on?COL.ink:COL.muted});
+      if(isNew&&hw>90)txt(ctx,'NUEVO',hx+hw-6,y+hh/2+1,{size:8,color:COL.ink,align:'right'});});
+    if(on&&!f.all){const y1=ry(f.k),y2=y+hh/2;alpha(ctx,t,()=>{ctx.beginPath();ctx.moveTo(pad+lw,y1);ctx.bezierCurveTo(pad+lw+16,y1,hx-16,y2,hx,y2);ctx.strokeStyle=isNew?COL.yellow:COL.cyan;ctx.lineWidth=2.5;ctx.stroke();});}
+  });
+}
+const ladderP=Player($('#animLadder'),{height:W=>W<520?360:330,draw:drawLadder,frames:ladderFrames('rps')});
+watch(ladderP);
+tabs('ladderTabs',d=>{ladderKey=d.k;ladderP.pause();ladderP.setFrames(ladderFrames(d.k));ladderP.play();});
+
+// =================== 02 · Checker ===================
+const CK={w:4,h:4,grid:['....','..X.','....','....']};
+function hamPathFrom(G,start,dirs){const n=G.nodes.length;const vis=new Uint8Array(n);const path=[start];vis[start]=1;
+  const rec=u=>{if(path.length===n)return true;const v=G.nodes[u];for(const [dx,dy] of dirs){const w=G.key.get((v.x+dx)+','+(v.y+dy));if(w&&!vis[w.i]){vis[w.i]=1;path.push(w.i);if(rec(w.i))return true;path.pop();vis[w.i]=0;}}return false;};
+  return rec(start)?path.slice():null;}
+function checkerFrames(){
+  const {w,h,grid}=CK;const G=lawnGraph(w,h,grid);
+  const A=hamPathFrom(G,G.key.get('0,0').i,[[1,0],[0,1],[-1,0],[0,-1]]);
+  const B=hamPathFrom(G,G.key.get('3,3').i,[[0,-1],[-1,0],[0,1],[1,0]]);
+  const exp=movesOf(G,A),ours=movesOf(G,B);
+  const rot={W:'D',D:'S',S:'A',A:'W'};let mut=null,mi=-1,mres=null;
+  for(let k=Math.floor(ours.length/2);k<ours.length&&!mut;k++){const m=ours.slice(0,k)+rot[ours[k]]+ours.slice(k+1);const r=checkLawnPath(w,h,grid,m,false);if(!r.ok){mut=m;mi=k;mres=r;}}
+  const diff=[...exp].filter((c,i)=>c!==ours[i]).length;
+  const tr=[];const res=checkLawnPath(w,h,grid,ours,false,tr);const resA=checkLawnPath(w,h,grid,exp,false);
+  const mtr=[];const mres2=checkLawnPath(w,h,grid,mut,false,mtr);
+  const fr=[];const base={exp,ours,mut,mi};
+  fr.push({...base,show:['exp','ours'],cap:`Mismo césped 4×4 con un árbol, dos salidas: la del <b>ejemplo</b> y la <b>nuestra</b>. Las dos son caminos de ${exp.length} movimientos por las ${G.nodes.length} celdas libres.`});
+  fr.push({...base,show:['exp','ours'],diff:true,dur:1.8,cap:`<b>Diff byte a byte:</b> ${diff} de ${exp.length} caracteres no coinciden → un juez por diff diría <b style="color:var(--red)">INCORRECTO</b>. Pero el enunciado admite varias respuestas.`});
+  fr.push({...base,show:['exp','ours'],diff:true,cap:`<b>Checker, paso 1:</b> ${ours.length+1} celdas visitadas = ${G.nodes.length} libres y ninguna repetida (en coordenadas relativas). Falta saber <b>dónde empieza</b>: el camino no lo dice.`});
+  tr.forEach((t,j)=>{const ok=t.badAt<0;fr.push({...base,show:['exp','ours'],path:'ours',start:t.start,badAt:t.badAt,full:ok,dur:ok?2.2:.7,
+    cap:ok?`<b>Inicio (${t.start}):</b> todo el recorrido cae en celdas libres. <b style="color:var(--green)">VÁLIDO ✓</b> aunque no coincide con el ejemplo.`
+      :`<b>Probar inicio (${t.start}):</b> en el paso ${t.badAt} ${(()=>{const [dx,dy]=res.rel[t.badAt];const X=t.start[0]+dx,Y=t.start[1]+dy;return (X<0||Y<0||X>=w||Y>=h)?'se sale del césped':'pisa el árbol';})()}. Siguiente.`});});
+  fr.push({...base,show:['exp','ours'],path:'exp',start:resA.start,badAt:-1,full:true,cap:`La salida del ejemplo también pasa el mismo checker (inicio en ${resA.start}). <b>Dos salidas distintas, las dos válidas.</b>`});
+  fr.push({...base,show:['exp','ours','mut'],cap:`<b>Mutation test:</b> giramos un solo carácter de nuestra salida (posición ${mi+1}: <code>${ours[mi]}</code> → <code>${mut[mi]}</code>). Un buen checker <b>tiene</b> que rechazarla.`});
+  if(mres2.repeatAt!==undefined){fr.push({...base,show:['exp','ours','mut'],path:'mut',start:B&&[G.nodes[B[0]].x,G.nodes[B[0]].y],upto:mres2.repeatAt,repeat:true,dur:1.8,cap:`<b>Checker:</b> ${esc(mres2.why)} → <b style="color:var(--red)">RECHAZADA ✗</b>. El checker no es decorativo: detecta un solo carácter malo.`});}
+  else{mtr.slice(0,4).forEach(t=>fr.push({...base,show:['exp','ours','mut'],path:'mut',start:t.start,badAt:t.badAt,dur:.7,cap:`<b>Inicio (${t.start}):</b> falla en el paso ${t.badAt}.`}));
+    fr.push({...base,show:['exp','ours','mut'],cap:`<b>Checker:</b> ${esc(mres2.why)} → <b style="color:var(--red)">RECHAZADA ✗</b>.`});}
+  fr.push({...base,show:['exp','ours','mut'],verdict:true,cap:`Así trabaja el evaluador: <b>valida reglas</b>. Tu checker debe aceptar las dos primeras y rechazar la mutada; solo entonces te fías de él para los inputs grandes.`});
+  fr.G=G;fr.okOurs=res.ok;fr.okExp=resA.ok;fr.okMut=!mres2.ok;return fr;
+}
+function drawLawnBase(ctx,x0,y0,cs,w,h,grid,o={}){
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const X=x0+x*cs,Y=y0+y*cs;
+    if(grid[y][x]==='X'){rect(ctx,X,Y,cs,cs,'#173a24');drawTree(ctx,X,Y,cs);continue;}
+    let c=((x+y)&1)?COL.grass2:COL.grass1;
+    if(o.chess){const d=((x+y)&1)?COL.dark1:COL.dark2;c=o.chess>=1?d:c;if(o.chess>0&&o.chess<1){alpha(ctx,1,()=>rect(ctx,X,Y,cs,cs,c));alpha(ctx,o.chess,()=>rect(ctx,X,Y,cs,cs,d));continue;}}
+    rect(ctx,X,Y,cs,cs,c);}
+  ctx.strokeStyle='rgba(4,6,13,.55)';ctx.lineWidth=1;for(let x=0;x<=w;x++){ctx.beginPath();ctx.moveTo(x0+x*cs,y0);ctx.lineTo(x0+x*cs,y0+h*cs);ctx.stroke();}
+  for(let y=0;y<=h;y++){ctx.beginPath();ctx.moveTo(x0,y0+y*cs);ctx.lineTo(x0+w*cs,y0+y*cs);ctx.stroke();}
+  rect(ctx,x0-3,y0-3,w*cs+6,h*cs+6,null,COL.ink,3);
+}
+function drawTree(ctx,X,Y,cs){const u=cs/8;rect(ctx,X+3.5*u,Y+5*u,u,2.2*u,'#7a4a26');rect(ctx,X+2*u,Y+2.4*u,4*u,2.8*u,'#2f9e5a');rect(ctx,X+2.8*u,Y+1.2*u,2.4*u,1.4*u,'#3fbf6c');rect(ctx,X+3*u,Y+3*u,u*.9,u*.9,'#7fe39d');}
+function cc(x0,y0,cs,x,y){return [x0+(x+.5)*cs,y0+(y+.5)*cs];}
+function drawStr(ctx,label,s,x,y,cw,color,o={}){txt(ctx,label,x,y-11,{size:9,color:COL.muted});
+  for(let i=0;i<s.length;i++){let fill=COL.panel2,fg=COL.text;if(o.cmp){const p=o.reveal===undefined?1:o.reveal;if(i/s.length<=p){const same=s[i]===o.cmp[i];fill=same?'#1f4a33':'#5a1f24';fg=same?COL.green:COL.red;}}
+    if(o.mark===i){fill=COL.yellow;fg=COL.ink;}
+    rect(ctx,x+i*cw,y,cw-2,cw+2,fill,null);txt(ctx,s[i],x+i*cw+(cw-2)/2,y+(cw+2)/2+1,{size:Math.min(13,cw*.8),font:FMO,weight:'700',color:o.colorAll||fg,align:'center'});}
+  if(o.color)rect(ctx,x-5,y,3,cw+2,o.color);}
+function drawChecker(ctx,W,H,frames,i,t){
+  const f=frames[i];const {w,h,grid}=CK;const narrow=W<560;
+  const strW=Math.max(f.exp.length,14);const cw=Math.min(20,Math.floor(((narrow?W:W*.52)-28)/strW));
+  const cs=narrow?Math.min(46,Math.floor((W-40)/(w+2))):Math.min(52,Math.floor((H-40)/(h+2)));
+  const lx=narrow?(W-(w+2)*cs)/2+cs:24+cs,ly=narrow?14+cs:(H-(h+2)*cs)/2+cs;
+  // zona exterior punteada
+  rect(ctx,lx-cs,ly-cs,(w+2)*cs,(h+2)*cs,'#0b0f1e');ctx.strokeStyle=COL.line;ctx.setLineDash([3,4]);ctx.lineWidth=1;ctx.strokeRect(lx-cs+.5,ly-cs+.5,(w+2)*cs-1,(h+2)*cs-1);ctx.setLineDash([]);
+  txt(ctx,'FUERA',lx-cs+4,ly-cs+8,{size:8,color:COL.dim});
+  drawLawnBase(ctx,lx,ly,cs,w,h,grid);
+  if(f.path){const s=f.path==='exp'?f.exp:f.path==='ours'?f.ours:f.mut;const D={W:[0,-1],D:[1,0],S:[0,1],A:[-1,0]};const pts=[[0,0]];for(const m of s){const d=D[m];const p=pts[pts.length-1];pts.push([p[0]+d[0],p[1]+d[1]]);}
+    const st=f.start||[0,0];let upto=f.badAt>=0?f.badAt:(f.upto!==undefined?f.upto:pts.length-1);const prog=f.full||f.repeat?t:1;const last=Math.max(0,Math.round(upto*prog));
+    const color=f.path==='exp'?COL.cyan:f.path==='ours'?COL.yellow:COL.pink;
+    ctx.save();ctx.beginPath();ctx.rect(lx-cs,ly-cs,(w+2)*cs,(h+2)*cs);ctx.clip();
+    ctx.beginPath();for(let k=0;k<=last;k++){const [X,Y]=cc(lx,ly,cs,st[0]+pts[k][0],st[1]+pts[k][1]);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}
+    ctx.strokeStyle=color;ctx.lineWidth=Math.max(3,cs*.16);ctx.lineJoin='round';ctx.lineCap='round';ctx.globalAlpha=f.full||f.repeat?1:.75;ctx.stroke();ctx.globalAlpha=1;
+    const [sx,sy]=cc(lx,ly,cs,st[0],st[1]);rect(ctx,sx-cs*.2,sy-cs*.2,cs*.4,cs*.4,COL.text,COL.ink,2);
+    if(f.badAt>=0){const [X,Y]=cc(lx,ly,cs,st[0]+pts[f.badAt][0],st[1]+pts[f.badAt][1]);const r=cs*.3;seg(ctx,X-r,Y-r,X+r,Y+r,COL.red,4);seg(ctx,X-r,Y+r,X+r,Y-r,COL.red,4);}
+    if(f.repeat&&t>.95){const [X,Y]=cc(lx,ly,cs,st[0]+pts[f.upto][0],st[1]+pts[f.upto][1]);ctx.beginPath();ctx.arc(X,Y,cs*.38,0,7);ctx.strokeStyle=COL.red;ctx.lineWidth=4;ctx.stroke();}
+    ctx.restore();}
+  // cadenas
+  const sx=narrow?Math.max(12,(W-strW*cw)/2):W*.46,sy=narrow?ly+(h+1)*cs+30:Math.max(40,(H-3*(cw+34))/2+12);
+  const rows=[['ESPERADO (EJEMPLO)',f.exp,COL.cyan,{}],['NUESTRO',f.ours,COL.yellow,f.diff?{cmp:f.exp,reveal:i===1?t:1}:{}]];
+  if(f.show.includes('mut'))rows.push(['MUTADO',f.mut,COL.pink,{mark:f.mi}]);
+  rows.forEach((r,k)=>drawStr(ctx,r[0],r[1],sx,sy+k*(cw+30),cw,null,{...r[3],color:r[2]}));
+  if(f.diff&&(i>1||t>.98)){badge(ctx,'DIFF ✗',sx+strW*cw,sy+(cw+30)-26,COL.red,{fg:COL.text,align:'right',size:9});}
+  if(f.verdict){const by=sy+3*(cw+30)+(narrow?0:6);let x=sx;x+=badge(ctx,'EJEMPLO ✓',x,by,COL.green)+6;x+=badge(ctx,'NUESTRO ✓',x,by,COL.green)+6;if(x+90>W)x=sx,badge(ctx,'MUTADO ✗',x,by+26,COL.red,{fg:COL.text});else badge(ctx,'MUTADO ✗',x,by,COL.red,{fg:COL.text});}
+}
+const checkerP=Player($('#animChecker'),{height:W=>{if(W<560){const cs=Math.min(46,Math.floor((W-40)/6));return 14+6*cs+3*(Math.min(20,Math.floor((W-28)/14))+30)+44;}return 340;},draw:drawChecker,frames:checkerFrames()});
+watch(checkerP);
+
+// =================== 03a · Conteos ===================
+const PNAME=['RR','RP','RS','PP','PS','SS'];
+function matchLabel(m){return m.map((k,i)=>k?PNAME[i]+'×'+k:'').filter(Boolean);}
+function rpsFrames(v){
+  const {plan,events}=rpsCountSearch(v);const nodes=new Map();const fr=[];let colCount=[0,0,0,0,0,0];
+  const snap=()=>[...nodes.values()].map(n=>({...n}));const pending=new Map();
+  const vs=s=>`R${s[0]} P${s[1]} S${s[2]}`;
+  for(let e=0;e<events.length;e++){const ev=events[e];
+    if(ev.t==='try'){pending.set(ev.id,ev.match);continue;}
+    if(ev.t==='visit'){const row=colCount[ev.depth]++;const m=ev.parent>=0?pending.get(ev.parent):null;nodes.set(ev.id,{id:ev.id,parent:ev.parent,depth:ev.depth,row,state:ev.state,match:m,st:'active'});
+      if(ev.parent>=0)nodes.get(ev.parent).st='open';
+      fr.push({nodes:snap(),cur:ev.id,cap:ev.parent<0?`Estado inicial <b>${vs(ev.state)}</b>: ${ev.state[0]+ev.state[1]+ev.state[2]} luchadores, ${Math.log2(ev.state[0]+ev.state[1]+ev.state[2])} rondas. La heurística prueba primero los emparejamientos que <b>dejan más S vivas</b>.`
+        :`Ronda ${ev.depth}: emparejar <b>${matchLabel(m).join(' · ')}</b> → <b>${vs(ev.state)}</b>.`});continue;}
+    const n=nodes.get(ev.id);
+    if(ev.t==='dead'){n.st='dead';fr.push({nodes:snap(),cur:ev.id,cap:`<b style="color:var(--red)">Callejón:</b> ${ev.why}. Vuelta atrás.`});}
+    else if(ev.t==='goal'){n.st='goal';fr.push({nodes:snap(),cur:ev.id,cap:`<b style="color:var(--green)">Objetivo:</b> queda un solo luchador y es una S.`});}
+    else if(ev.t==='memo'){n.st='memo';fr.push({nodes:snap(),cur:ev.id,cap:`Estado ya fallado antes (<b>memo</b>): no se vuelve a explorar.`});}
+    else if(ev.t==='fail'){n.st='fail';const msg=`<b style="color:var(--red)">${vs(n.state)} agotado:</b> ningún emparejamiento funciona. Se guarda en el memo de fallos y se retrocede.`;fr.push({nodes:snap(),cur:ev.id,cap:msg});}
+    else if(ev.t==='ok'){n.st='ok';if(events[e+1]&&events[e+1].t==='ok')continue;
+      fr.push({nodes:snap(),cur:ev.id,cap:`<b>Plan encontrado.</b> La lección: “proteger S” como primera idea falla (las R se comen a las S); emparejar <b>P contra R</b> en la ronda 1 era la clave. La búsqueda lo descubre sola.`});}
+  }
+  const str=rpsMaterialize(v,plan);const rounds=simulateBracket(str,BEATS3);const last=snap();
+  fr.push({nodes:last,brk:{str,rounds,show:0},cap:`<b>Materializar:</b> cubos por estilo; cada pareja del plan se concatena (izquierda+derecha) y pasa a ser un nodo del estilo ganador. Resultado: <code>${str}</code>.`});
+  for(let r=1;r<rounds.length;r++)fr.push({nodes:last,brk:{str,rounds,show:r},cap:r<rounds.length-1?`Checker: simular la ronda ${r} → <code>${rounds[r].join('')}</code>.`:`Ronda final → campeón <b style="color:var(--yellow)">${rounds[r][0]}</b> ${rounds[r][0]==='S'?'✓':'✗'}. El orden es distinto del ejemplo, y es válido.`});
+  fr.champ=rounds[rounds.length-1][0];fr.maxRow=Math.max(...colCount);return fr;
+}
+function drawRps(ctx,W,H,frames,i,t){
+  const f=frames[i];const cols=4,pad=10;const cw=(W-2*pad)/cols;const bw=Math.min(118,cw-14);const nh=50,rowH=nh+16;const top=22;const rows=frames.maxRow||3;
+  for(let d=0;d<cols;d++)txt(ctx,d===0?'INICIO':'RONDA '+d,pad+d*cw+bw/2,10,{size:9,color:COL.muted,align:'center'});
+  const pos=n=>[pad+n.depth*cw,top+n.row*rowH];
+  const byId=new Map(f.nodes.map(n=>[n.id,n]));
+  for(const n of f.nodes){if(n.parent<0)continue;const p=byId.get(n.parent);const [x1,y1]=pos(p),[x2,y2]=pos(n);
+    const c=n.st==='ok'||n.st==='goal'?COL.green:n.st==='dead'||n.st==='fail'?COL.red:COL.line2;
+    const a=n.id===f.cur?t:1;alpha(ctx,a,()=>{ctx.beginPath();ctx.moveTo(x1+bw,y1+nh/2);ctx.bezierCurveTo(x1+bw+12,y1+nh/2,x2-12,y2+nh/2,x2,y2+nh/2);ctx.strokeStyle=c;ctx.lineWidth=2.5;ctx.stroke();});}
+  for(const n of f.nodes){const [x,y]=pos(n);const a=n.id===f.cur?Math.max(.15,t):1;
+    const border={active:COL.yellow,open:COL.line2,dead:COL.red,fail:COL.red,memo:COL.dim,goal:COL.green,ok:COL.green}[n.st];
+    alpha(ctx,a,()=>{rect(ctx,x,y,bw,nh,COL.panel2,border,n.id===f.cur?3:2);
+      const s=Math.max(6,Math.min(10,Math.floor((bw-10)/4)-2));const per=Math.max(1,Math.floor((bw-10)/(s+2)));let q=0;
+      'RPS'.split('').forEach((ch,k)=>{for(let j=0;j<n.state[k];j++){rect(ctx,x+6+(q%per)*(s+2),y+6+Math.floor(q/per)*(s+2),s,s,SCOL[ch],COL.ink,1.5);q++;}});
+      const lab=n.match?matchLabel(n.match):[];const line=lab.join(' ');const z=fitSize(ctx,line||'—',bw-10,9,FPX,6);
+      txt(ctx,line||`R${n.state[0]} P${n.state[1]} S${n.state[2]}`,x+5,y+nh-9,{size:z,color:COL.muted});
+      const mark={dead:'✗',fail:'✗',goal:'✓',ok:'✓',memo:'M'}[n.st];if(mark)txt(ctx,mark,x+bw-6,y+12,{size:12,font:FMO,weight:'700',color:border,align:'right'});});}
+  if(f.brk){const {str,rounds,show}=f.brk;const by=top+rows*rowH+14;const M=str.length;const sw=(W-2*pad)/M;const s=Math.min(26,sw-6);
+    txt(ctx,'BRACKET MATERIALIZADO',pad,by-6,{size:9,color:COL.muted});
+    for(let r=0;r<rounds.length;r++){if(r>show)break;const a=r===show&&show>0?t:1;const y=by+6+r*(s+12);const span=Math.pow(2,r);
+      alpha(ctx,a,()=>rounds[r].forEach((ch,j)=>{const cx=pad+(j*span+span/2)*sw;chip(ctx,ch,cx-s/2,y,s,{ring:r===rounds.length-1&&ch==='S'?COL.yellow:null});
+        if(r>0){const py=y-12+2;seg(ctx,cx-span*sw/4,py-2,cx+span*sw/4,py-2,COL.line2,2);}}));}}
+}
+const rpsP=Player($('#animRps'),{height:(W,P)=>22+((P.frames&&P.frames.maxRow)||3)*66+14+6+4*(Math.min(26,(W-20)/8-6)+12)+16,draw:drawRps,frames:rpsFrames([4,2,2])});
+watch(rpsP);
+tabs('rpsTabs',d=>{rpsP.pause();rpsP.setFrames(rpsFrames(d.v.split(',').map(Number)));rpsP.play();});
+
+// pentágono de victorias
+(function(){const g=$('#pent'),gn=$('#pentN');const order='SPRLY';const P={};const cx=110,cy=96,r=72;
+  [...order].forEach((c,k)=>{const a=-Math.PI/2+k*2*Math.PI/5;P[c]=[cx+r*Math.cos(a),cy+r*Math.sin(a)];});
+  let s='';for(const a of order)for(const b of BEATS5[a]){const [x1,y1]=P[a],[x2,y2]=P[b];const d=Math.hypot(x2-x1,y2-y1);const ux=(x2-x1)/d,uy=(y2-y1)/d;s+=`<line x1="${(x1+ux*16).toFixed(1)}" y1="${(y1+uy*16).toFixed(1)}" x2="${(x2-ux*18).toFixed(1)}" y2="${(y2-uy*18).toFixed(1)}"/>`;}
+  g.innerHTML=s;gn.innerHTML=[...order].map(c=>`<rect x="${P[c][0]-13}" y="${P[c][1]-13}" width="26" height="26" fill="${SCOL[c]}" stroke="#04060d" stroke-width="2"/><text x="${P[c][0]}" y="${P[c][1]+5}" fill="#04060d">${c}</text>`).join('');})();
+
+// =================== 03b · DP de conjuntos ===================
+const SET_IN='XRZSXPXZ';const SETD=setDP(SET_IN);
+const maskStr=m=>'{'+[...ST5].filter((c,i)=>m>>i&1).join(',')+'}';
+function setFrames(){
+  const d=SETD;const Hh=d.history;const fr=[];const L=Hh.length;
+  const vis=Hh.map((lv,k)=>lv.map(()=>k===0));const ch=Hh.map(lv=>lv.map(()=>null));
+  const snap=()=>({vis:vis.map(r=>r.slice()),ch:ch.map(r=>r.slice())});
+  fr.push({...snap(),cap:`Hojas <code>${SET_IN}</code>. Cada fila de 5 casillas es un conjunto de ganadores posibles (R P S Y L). Una <b>X</b> ofrece 5 opciones de un solo estilo; una <b>Z</b> es el conjunto completo (decide el adversario).`});
+  for(let k=1;k<L;k++)for(let j=0;j<Hh[k].length;j++){vis[k][j]=true;const node=Hh[k][j];
+    fr.push({...snap(),cur:[k,j],cap:`Nodo de la ronda ${k}: combinar ${Hh[k-1][2*j].size}×${Hh[k-1][2*j+1].size} pares de conjuntos → ${node.raw} distintos; quedan <b>${node.size} minimales</b> (un superconjunto nunca es mejor y se poda).`});}
+  const root=Hh[L-1][0];
+  fr.push({...snap(),cur:[L-1,0],root:true,cap:`Raíz: ${[...root.keys()].map(maskStr).join(' ')}. Contiene <b>{S}</b> → existe un relleno de X que hace ganar a S <b>para cualquier</b> Z.`});
+  for(let k=L-1;k>=0;k--){d.chosen[k].forEach((m,j)=>{ch[k][j]=m;});fr.push({...snap(),cap:k===L-1?'Reconstrucción de arriba abajo: en la raíz elegimos {S} y seguimos el puntero a los conjuntos de los hijos que lo producen.':k>0?`Ronda ${k}: los conjuntos elegidos ${d.chosen[k].map(maskStr).join(' ')}.`:`Hojas: cada X recibe el estilo de su conjunto elegido. Salida: <code>${d.out}</code> (las Z se quedan como Z).`});}
+  const all=allZFillings(d.out);const samples=[0,7,13,19,24].map(k=>all[k]);
+  samples.forEach((s,n)=>fr.push({...snap(),sim:s.fill,dur:1.1,cap:`Comprobación: el adversario pone Z = <code>${[...SET_IN].map((c,i)=>c==='Z'?s.fill[i]:'').join(', ')}</code> → torneo <code>${s.fill}</code> → gana <b style="color:var(--yellow)">${s.champ}</b>.`}));
+  const okAll=all.every(s=>s.champ==='S');
+  fr.push({...snap(),sim:samples[samples.length-1].fill,cap:`<b>${all.filter(s=>s.champ==='S').length}/${all.length}</b> rellenos posibles de las Z terminan con campeón S ${okAll?'✓':'✗'}. La DP es exacta porque las Z de subárboles distintos son independientes.`});
+  fr.ok=okAll&&d.ok;return fr;
+}
+function drawSet(ctx,W,H,frames,i,t){
+  const f=frames[i];const d=SETD;const Hh=d.history;const L=Hh.length;const pad=8;const leafW=(W-2*pad)/8;
+  const sq=Math.max(4,Math.min(9,Math.floor((leafW-8)/5)-1));const rowh=sq+3;const lvlH=(H-40)/L;
+  const cx=(k,j)=>pad+(j*Math.pow(2,k)+Math.pow(2,k)/2)*leafW;const cy=k=>H-34-k*lvlH-lvlH/2;
+  const sim=f.sim?simulateBracket(f.sim,BEATS5):null;
+  for(let k=1;k<L;k++)for(let j=0;j<Hh[k].length;j++){if(!f.vis[k][j])continue;const x=cx(k,j),y=cy(k)+18;
+    for(const c of [2*j,2*j+1]){const x2=cx(k-1,c),y2=cy(k-1)-18;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,(y+y2)/2);ctx.lineTo(x2,(y+y2)/2);ctx.lineTo(x2,y2);ctx.strokeStyle=f.cur&&f.cur[0]===k&&f.cur[1]===j?COL.yellow:COL.line2;ctx.lineWidth=2;ctx.stroke();}}
+  for(let k=0;k<L;k++)for(let j=0;j<Hh[k].length;j++){if(!f.vis[k][j])continue;const x=cx(k,j),y=cy(k);const node=Hh[k][j];
+    const isCur=f.cur&&f.cur[0]===k&&f.cur[1]===j;const a=isCur?t:1;
+    alpha(ctx,a,()=>{
+      if(sim){const s=Math.min(24,leafW-10);const c=sim[k][j];chip(ctx,c,x-s/2,y-s/2,s,{ring:k===L-1?COL.yellow:(k===0&&SET_IN[j]==='Z'?COL.pink:null)});return;}
+      const masks=[...node.keys()];const bw=5*(sq+1)+6,bh=masks.length*rowh+6;
+      rect(ctx,x-bw/2,y-bh/2,bw,bh,COL.panel2,isCur?COL.yellow:COL.line2,2);
+      masks.forEach((m,r)=>{const yy=y-bh/2+4+r*rowh;const chosen=f.ch[k][j]===m;
+        if(chosen)rect(ctx,x-bw/2+1,yy-1,bw-2,sq+2,COL.text);
+        for(let b=0;b<5;b++){const on=m>>b&1;rect(ctx,x-bw/2+3+b*(sq+1),yy,sq,sq,on?SCOL[ST5[b]]:'#0b0f1e',null);}});
+    });
+    if(k===0&&!sim){const lab=f.ch[0][j]!=null?(SET_IN[j]==='X'?d.out[j]:SET_IN[j]):SET_IN[j];const s=Math.min(20,leafW-14);chip(ctx,lab,x-s/2,H-26,s,{ring:SET_IN[j]==='X'&&f.ch[0][j]!=null?COL.text:null});}
+    if(k===0&&sim){txt(ctx,SET_IN[j],x,H-14,{size:10,color:SET_IN[j]==='Z'?COL.pink:COL.dim,align:'center'});}
+  }
+  if(f.root&&t>.9){badge(ctx,'{S} ✓',cx(L-1,0)+30,cy(L-1)-10,COL.green);}
+}
+const setP=Player($('#animSet'),{height:W=>W<520?330:300,draw:drawSet,frames:setFrames()});
+watch(setP);
+
+// =================== 04 · Hamilton ===================
+const LW={w:6,h:6,grid:['......','.X....','......','....X.','......','......']};
+let lawnSeed=2;
+function lawnFrames(seed,cfg,opts={}){
+  const {w,h,grid}=cfg;const tries=[];const r=solveLawnCycle(w,h,grid,seed,opts.tries||50,opts.iters||60,(t,d)=>tries.push(d));
+  const G=r.G;const nb=G.nodes.filter(v=>v.c).length,nw=G.nodes.length-nb;const fr=[];const n=G.nodes.length;
+  const E=adj=>edgeList(adj);const compOf=adj=>{const {comp,members}=components(adj);const ord=members.map((m,i)=>[Math.min(...m),i]).sort((a,b)=>a[0]-b[0]);const rk=new Map(ord.map(([_,i],k)=>[i,k]));return comp.map(c=>rk.get(c));};
+  const F=(o)=>fr.push({G,cfg,...o});
+  if(!opts.restartDemo){
+    F({chess:0,edges:[],cap:`Césped ${w}×${h} con 2 árboles: <b>${n} celdas libres</b>. Objetivo: un ciclo que pase por todas exactamente una vez.`});
+    F({chess:1,edges:[],counts:true,cap:`Colorea como un tablero: <b>${nb} oscuras y ${nw} claras</b>. Cada movimiento cambia de color, así que un ciclo alterna y necesita el mismo número de cada.`});
+    F({chess:1,edges:[],counts:true,cap:`Por eso con <b>un solo árbol</b> (35 celdas: 18/17) el ciclo es imposible: solo cabe un camino con los dos extremos en el color mayoritario (L4–L5). Aquí, 17/17: adelante.`});
+    F({chess:1,edges:[],cap:`Pedimos <b>grado 2</b> en cada celda con un flujo máximo: fuente → oscuras (capacidad 2) → claras vecinas (capacidad 1) → sumidero (capacidad 2). Cada unidad de flujo es una arista.`});
+  }
+  tries.forEach((d,ti)=>{
+    if(opts.restartDemo)F({chess:1,edges:[],tryNo:ti+1,cap:`<b>Intento ${ti+1}</b> (semilla del flujo nueva): flujo máximo para grado 2…`});
+    let prev=new Set();
+    const tr=opts.restartDemo?[d.flowTrace[d.flowTrace.length-1]]:d.flowTrace;
+    tr.forEach((adj,k)=>{const es=E(adj);const now=new Set(es.map(e=>e+''));const added=es.filter(e=>!prev.has(e+''));const removed=[...prev].filter(s=>!now.has(s)).map(s=>s.split(',').map(Number));prev=now;
+      if(opts.restartDemo)return;
+      F({chess:1,edges:es,added,removed,dur:.32,tryNo:ti+1,cap:`Flujo: aumento ${k+1}/${d.flowTrace.length}${removed.length?` (camino alternante: reubica ${removed.length} arista${removed.length>1?'s':''})`:''}. ${es.length} aristas elegidas.`});});
+    if(!d.adj){F({chess:1,edges:[],cap:'El flujo no satura: grados imposibles con estos extremos. Nuevo intento.'});return;}
+    let adj=d.adj;let comp=compOf(adj);let nc=Math.max(...comp)+1;
+    F({chess:1,edges:E(adj),comp,tryNo:ti+1,cap:`Flujo completo: todas las celdas con grado 2. Resultado: un <b>2-factor</b> de <b>${nc} ciclo${nc>1?'s':''} disjunto${nc>1?'s':''}</b> (cada color, un ciclo).`});
+    d.evs.forEach(e=>{
+      if(e.t==='flip'){const [p,q,r,s]=e.flip;const before=comp;const after=compOf(e.adj);
+        F({chess:1,edges:E(e.adj),comp:before,compAfter:after,flip:e.flip,block:e.block,tryNo:ti+1,dur:1.3,cap:`<b>Giro 2×2:</b> las aristas paralelas de ciclos distintos se cambian por las otras dos. Los grados siguen en 2 y los ciclos se funden: quedan <b>${e.ncomp}</b>.`});comp=after;}
+      else{const after=compOf(e.adj);F({chess:1,edges:E(e.adj),comp:after,perturb:e.flips,tryNo:ti+1,dur:1.2,cap:`<b>Ningún giro une dos ciclos distintos.</b> Se aplican ${e.flips.length} giro${e.flips.length!==1?'s':''} aleatorio${e.flips.length!==1?'s':''} (pueden partir ciclos) y se vuelve a intentar: quedan ${e.ncomp}.`});comp=after;}
+    });
+    if(!d.ok)F({chess:1,edges:E(d.evs.length?d.evs[d.evs.length-1].adj:adj),comp,stuck:true,tryNo:ti+1,dur:1.6,cap:`<b style="color:var(--red)">Atascado</b> tras el límite de iteraciones. No se insiste: <b>reinicio</b> con otra semilla (otro flujo inicial).`});
+  });
+  if(r.ok){const es=edgeList(r.adj);const ord=r.order;
+    F({chess:1,edges:es,comp:new Array(n).fill(0),cap:`<b>Un solo ciclo hamiltoniano</b>${opts.restartDemo?` en el intento ${r.tries}`:''}. Ahora se recorre desde cualquier celda y se escriben los movimientos.`});
+    const step=opts.restartDemo?Math.ceil(n/6):1;
+    for(let k=step;k<n;k+=step)F({chess:1,edges:es,comp:new Array(n).fill(0),walk:Math.min(k,n-1),order:ord,dur:opts.restartDemo?.6:.24,cap:`Recorrido: celda ${Math.min(k,n-1)+1}/${n} · <code>${r.moves.slice(0,Math.min(k,n-1))}</code>`});
+    const ck=checkLawnPath(w,h,grid,r.moves,true);
+    F({chess:1,edges:es,comp:new Array(n).fill(0),walk:n-1,order:ord,closed:true,cap:`Salida: <code>${r.moves}</code> (${r.moves.length} movimientos para ${n} celdas; el de cierre no se escribe). Checker: ${ck.ok?'<b style="color:var(--green)">✓ cubre todo, sin repetir, final vecino del inicio</b>':'✗ '+esc(ck.why)}.`});
+    fr.ok=ck.ok;}
+  else{F({chess:1,edges:[],cap:'Sin solución en los intentos permitidos.'});fr.ok=false;}
+  return fr;
+}
+function drawLawnFrame(ctx,W,H,frames,i,t){
+  const f=frames[i];const {w,h,grid}=f.cfg;const G=f.G;const cs=Math.floor(Math.min((W-24)/w,(H-(f.counts||f.tryNo?44:18))/h));const x0=(W-w*cs)/2,y0=f.counts||f.tryNo?32:10;
+  const prevChess=i>0?frames[i-1].chess:0;drawLawnBase(ctx,x0,y0,cs,w,h,grid,{chess:f.chess===prevChess?f.chess:lerp(prevChess,f.chess,t)});
+  if(f.counts){const nb=G.nodes.filter(v=>v.c).length;let x=x0;x+=badge(ctx,'OSCURAS '+nb,x,4,COL.dark2,{fg:COL.text})+8;badge(ctx,'CLARAS '+(G.nodes.length-nb),x,4,COL.dark1,{fg:COL.text});}
+  if(f.tryNo&&!f.counts)badge(ctx,'INTENTO '+f.tryNo,x0,4,f.stuck?COL.red:COL.cyan,{fg:f.stuck?COL.text:COL.ink});
+  const P=v=>cc(x0,y0,cs,G.nodes[v].x,G.nodes[v].y);
+  const lw=Math.max(3,cs*.18);
+  if(f.block){const b=f.block.map(P);const xs=b.map(p=>p[0]),ys=b.map(p=>p[1]);const X=Math.min(...xs)-cs*.5,Y=Math.min(...ys)-cs*.5;alpha(ctx,Math.min(1,t*2),()=>{rect(ctx,X,Y,cs*2,cs*2,'rgba(255,210,63,.18)',COL.yellow,3);});}
+  const newSet=new Set((f.added||[]).map(e=>e+''));
+  const flipNew=f.flip?new Set([[f.flip[0],f.flip[2]],[f.flip[1],f.flip[3]]].map(e=>e.slice().sort((a,b)=>a-b)+'')):null;
+  for(const [a,b] of f.edges){const [x1,y1]=P(a),[x2,y2]=P(b);let c=COL.text,al=1;
+    if(f.comp){const cm=(f.compAfter&&t>.6)?f.compAfter:f.comp;c=COMPC[cm[a]%COMPC.length];}
+    if(newSet.has([a,b]+'')){c=COL.yellow;al=t;}
+    if(flipNew&&flipNew.has([a,b]+'')){al=t;c=t>.6?c:COL.green;}
+    alpha(ctx,al,()=>seg(ctx,x1,y1,x2,y2,c,lw));}
+  for(const e of (f.removed||[])){const [x1,y1]=P(e[0]),[x2,y2]=P(e[1]);alpha(ctx,1-t,()=>seg(ctx,x1,y1,x2,y2,COL.red,lw,[4,4]));}
+  if(f.flip){const [p,q,r,s]=f.flip;for(const [a,b] of [[p,q],[r,s]]){const [x1,y1]=P(a),[x2,y2]=P(b);alpha(ctx,1-t,()=>seg(ctx,x1,y1,x2,y2,COL.red,lw+1,[5,4]));}}
+  for(const v of G.nodes){const [X,Y]=P(v.i);rect(ctx,X-lw*.6,Y-lw*.6,lw*1.2,lw*1.2,COL.ink);}
+  if(f.walk!==undefined){const ord=f.order;const prevW=(i>0&&frames[i-1].walk!==undefined)?frames[i-1].walk:0;const pos=f.closed?f.walk:lerp(prevW,f.walk,t);
+    ctx.beginPath();const k0=Math.floor(pos);for(let k=0;k<=k0;k++){const [X,Y]=P(ord[k]);k?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}
+    const fr2=pos-k0;let mx,my;if(k0+1<ord.length){const [a1,b1]=P(ord[k0]),[a2,b2]=P(ord[k0+1]);mx=lerp(a1,a2,fr2);my=lerp(b1,b2,fr2);ctx.lineTo(mx,my);}else{[mx,my]=P(ord[k0]);}
+    if(f.closed){const [X,Y]=P(ord[0]);ctx.lineTo(X,Y);}
+    ctx.strokeStyle=COL.yellow;ctx.lineWidth=lw+2;ctx.lineJoin='round';ctx.stroke();
+    const s=cs*.5;rect(ctx,mx-s/2,my-s/2,s,s,COL.red,COL.ink,2);rect(ctx,mx-s/2+s*.2,my-s/2+s*.18,s*.6,s*.25,COL.text);}
+}
+const lawnP=Player($('#animLawn'),{height:W=>Math.min(W,520)*0.86+40,draw:drawLawnFrame,frames:lawnFrames(lawnSeed,LW)});
+watch(lawnP);
+$('#lawnSeedLbl').textContent='semilla '+lawnSeed;
+$('#lawnSeed').onclick=()=>{lawnSeed=lawnSeed%97+1;$('#lawnSeedLbl').textContent='semilla '+lawnSeed;lawnP.pause();lawnP.setFrames(lawnFrames(lawnSeed,LW));lawnP.play();};
+
+// =================== 05 · Territorio ===================
+const RM_={x:6,y:6,L:2,view:'terr'};const roomCache=new Map();
+function roomTable(L){if(!roomCache.has(L))roomCache.set(L,roomBuild(13,13,L+1));return roomCache.get(L);}
+const CUTN={h:'bloque homogéneo (horizontales)',v:'bloque homogéneo (verticales)',r:'corte horizontal',c:'corte vertical',p:'MOLINETE: 5 bloques alrededor de un centro'};
+function roomFrames(){
+  const {x,y,L}=RM_;const m=L+1;const {f,ch}=roomTable(L);const P=y+1,Q=x+1;const {terrs,ev}=roomPlace(ch,P,Q,m);const bound=Math.floor(P*Q/(2*m));
+  const fr=[];const placed=[];const boxes=[];
+  fr.push({placed:[],boxes:[],noBox:true,cap:`Sala ${x}×${y}, escritorios de 1×${L} que no pueden tocarse (ni en diagonal). Pueden tocar la pared.`});
+  fr.push({placed:[],boxes:[],cap:`Caja de <b>${x+1}×${y+1}</b>: una columna y una fila extra (rayadas) donde pueden salirse los huecos. Cota: ⌊${Q}·${P} / ${2*m}⌋ = <b>${bound}</b> territorios de 2×${m}.`});
+  for(const e of ev){if(e.t==='box'){boxes.push(e);const c=e.c[0];if(c==='h'||c==='v'){const cnt=c==='h'?Math.floor(e.p/2)*Math.floor(e.q/m):Math.floor(e.p/m)*Math.floor(e.q/2);if(!cnt)continue;}
+      fr.push({placed:placed.slice(),boxes:boxes.slice(),cur:e,dur:.8,cap:`DP: subcaja ${e.q}×${e.p} → <b>${CUTN[e.c[0]]}</b> (valor ${f[e.p][e.q]}).`});}
+    else{placed.push(e.T);fr.push({placed:placed.slice(),boxes:boxes.slice(),newT:e.T,dur:.55,cap:`Territorio ${placed.length}: escritorio ${e.T.hor?'horizontal':'vertical'} + hueco al final + ${e.T.hor?'fila':'columna'} de hueco.`});}}
+  const g=roomRender(terrs,x,y,L);const ck=roomCheck(g,L);
+  fr.push({placed:placed.slice(),boxes:[],done:true,cap:`<b>${terrs.length} escritorios</b> (cota ${bound}). Checker: componentes 8-conexas rectas de longitud ${L}, cuenta = ${ck.count} → ${ck.ok&&ck.count===terrs.length?'<b style="color:var(--green)">✓ válido, nadie se toca</b>':'✗'}. Cambia a la vista <b>Escritorios</b> para ver la salida X/.`});
+  fr.ok=ck.ok&&ck.count===terrs.length;fr.k=terrs.length;return fr;
+}
+function drawRoom(ctx,W,H,frames,i,t){
+  const f=frames[i];const {x,y,L}=RM_;const m=L+1;const cs=Math.floor(Math.min((W-24)/(x+1),(H-20)/(y+1),56));const x0=Math.round((W-(x+1)*cs)/2),y0=10;
+  for(let r=0;r<=y;r++)for(let c=0;c<=x;c++){const X=x0+c*cs,Y=y0+r*cs;const out=r===y||c===x;
+    if(out){if(f.noBox)continue;rect(ctx,X,Y,cs,cs,'#0b0f1e');ctx.save();ctx.beginPath();ctx.rect(X,Y,cs,cs);ctx.clip();ctx.strokeStyle=COL.line;ctx.lineWidth=1.5;for(let k=-cs;k<cs;k+=7){ctx.beginPath();ctx.moveTo(X+k,Y+cs);ctx.lineTo(X+k+cs,Y);ctx.stroke();}ctx.restore();}
+    else rect(ctx,X,Y,cs,cs,((r+c)&1)?'#1a2240':'#1d2646');}
+  ctx.strokeStyle='rgba(4,6,13,.6)';ctx.lineWidth=1;for(let c=0;c<=x+1;c++){ctx.beginPath();ctx.moveTo(x0+c*cs,y0);ctx.lineTo(x0+c*cs,y0+(y+1)*cs);ctx.stroke();}for(let r=0;r<=y+1;r++){ctx.beginPath();ctx.moveTo(x0,y0+r*cs);ctx.lineTo(x0+(x+1)*cs,y0+r*cs);ctx.stroke();}
+  rect(ctx,x0-3,y0-3,x*cs+6,y*cs+6,null,COL.text,3);
+  const terrView=RM_.view==='terr';
+  if(terrView&&f.cur){const e=f.cur;alpha(ctx,t,()=>{ctx.setLineDash([6,4]);rect(ctx,x0+e.c0*cs+2,y0+e.r0*cs+2,e.q*cs-4,e.p*cs-4,'rgba(76,201,240,.08)',COL.cyan,2);ctx.setLineDash([]);
+    const lab=e.c[0]==='p'?'MOLINETE':e.c[0]==='h'||e.c[0]==='v'?'BLOQUE':'CORTE';badge(ctx,lab,x0+e.c0*cs+6,y0+e.r0*cs+6,e.c[0]==='p'?COL.pink:COL.cyan,{size:8});
+    if(e.c[0]==='r'){seg(ctx,x0+e.c0*cs,y0+(e.r0+e.c[1])*cs,x0+(e.c0+e.q)*cs,y0+(e.r0+e.c[1])*cs,COL.yellow,3);}
+    if(e.c[0]==='c'){seg(ctx,x0+(e.c0+e.c[1])*cs,y0+e.r0*cs,x0+(e.c0+e.c[1])*cs,y0+(e.r0+e.p)*cs,COL.yellow,3);}
+    if(e.c[0]==='p'){const [,a,c2,b,d]=e.c;const R0=e.r0,C0=e.c0;const L2=(r1,c1,r2,c2_)=>seg(ctx,x0+c1*cs,y0+r1*cs,x0+c2_*cs,y0+r2*cs,COL.pink,3);
+      L2(R0+a,C0,R0+a,C0+b);L2(R0,C0+b,R0+c2,C0+b);L2(R0+c2,C0+d,R0+c2,C0+e.q);L2(R0+a,C0+d,R0+e.p,C0+d);}});}
+  f.placed.forEach((T,k)=>{const isNew=f.newT===T;const a=isNew?t:1;const col=COMPC[k%COMPC.length];
+    const tr=T.hor?[T.r,T.c,2,m]:[T.r,T.c,m,2];
+    alpha(ctx,a,()=>{if(terrView){ctx.globalAlpha*=.28;rect(ctx,x0+tr[1]*cs+2,y0+tr[0]*cs+2,tr[3]*cs-4,tr[2]*cs-4,col);ctx.globalAlpha/=.28;rect(ctx,x0+tr[1]*cs+2,y0+tr[0]*cs+2,tr[3]*cs-4,tr[2]*cs-4,null,col,2);}
+      for(let j=0;j<L;j++){const rr=T.hor?T.r:T.r+j,c2=T.hor?T.c+j:T.c;const X=x0+c2*cs,Y=y0+rr*cs;rect(ctx,X+3,Y+3,cs-6,cs-6,COL.orange,COL.ink,2);rect(ctx,X+5,Y+5,cs-10,Math.max(2,cs*.14),'#ffc98a');}});});
+  if(!terrView)for(let r=0;r<y;r++)for(let c=0;c<x;c++){if(!f.placed.some(T=>T.hor?(r===T.r&&c>=T.c&&c<T.c+L):(c===T.c&&r>=T.r&&r<T.r+L)))txt(ctx,'.',x0+(c+.5)*cs,y0+(r+.5)*cs,{size:Math.min(16,cs*.5),font:FMO,color:COL.dim,align:'center'});}
+}
+const roomP=Player($('#animRoom'),{height:W=>{const {x,y}=RM_;const cs=Math.floor(Math.min((W-24)/(x+1),56));return Math.min((y+1)*cs+20,620);},draw:drawRoom,frames:roomFrames()});
+watch(roomP);
+(function(){const fill=(id,a,b,v)=>{const s=document.getElementById(id);for(let k=a;k<=b;k++)s.add(new Option(k,k,false,k===v));};fill('roomX',4,12,6);fill('roomY',4,10,6);fill('roomL',1,4,2);
+  const upd=()=>{RM_.x=+$('#roomX').value;RM_.y=+$('#roomY').value;RM_.L=+$('#roomL').value;roomP.pause();roomP.setFrames(roomFrames());roomP.play();};
+  ['roomX','roomY','roomL'].forEach(id=>document.getElementById(id).onchange=upd);
+  tabs('roomView',d=>{RM_.view=d.v;roomP.render();});})();
+
+// =================== 06 · Spaceship ===================
+const SHR=60;const SHH=shBuildH(SHR);
+function axisFrames(dist){
+  const sts=shGreedyAxis(dist,SHH,SHR);const paces=shAxisBlocks(sts);const pos=shSimAxis(paces);const fr=[];
+  sts.forEach((s,k)=>{const [p,r]=SH_STATES[s];const Hv=SHH[s][dist-pos[k+1]+SHR];
+    fr.push({dist,sts,pos,k,paces,dur:k===0?1.6:.5,cap:k===0?`Estación a <b>${dist}</b> celdas. Tick 1 es el 0 obligatorio. Desde ese estado (ritmo 0), la tabla exacta dice <b>H = ${Hv}</b> ticks como mínimo. Cada tick bajamos a un vecino con H−1.`
+      :k===sts.length-1?`Llegada en reposo tras <b>${k+1} ticks</b> (1 + H inicial): óptimo. Secuencia: <code>${paces.join(' ')}</code>.`
+      :`Tick ${k+1}: ritmo <b>${p}</b>, quedan ${r} tick${r!==1?'s':''} del bloque · posición ${pos[k+1]} · H = ${Hv}.${r===0&&Math.abs(p)>0?' El bloque termina: la nave avanza una celda.':''}`});});
+  fr.ok=pos[pos.length-1]===dist&&pos.length===sts.length+1&&sts.length-1===SHH[SH_S0][dist+SHR];return fr;
+}
+function drawAxis(ctx,W,H,frames,i,t){
+  const f=frames[i];const {dist,sts,k}=f;const pos=f.pos.slice(1);const pad=18;
+  // cadena de ritmos
+  const chain=[-1,-2,-3,-4,-5,0,5,4,3,2,1];const bw=Math.min(40,(W-2*pad)/11-4);const cx0=(W-11*(bw+4))/2;const [p,r]=SH_STATES[sts[k]];
+  txt(ctx,'CADENA DE RITMOS',pad,14,{size:9,color:COL.muted});
+  chain.forEach((c,j)=>{const x=cx0+j*(bw+4),y=26;const on=c===p;rect(ctx,x,y,bw,bw*.8,on?COL.yellow:COL.panel2,on?COL.ink:COL.line2,2);txt(ctx,String(c),x+bw/2,y+bw*.4+1,{size:Math.min(13,bw*.4),font:FMO,weight:'700',color:on?COL.ink:COL.text,align:'center'});
+    if(j<10)txt(ctx,'↔',x+bw+2,y+bw*.4,{size:8,font:FMO,color:COL.dim,align:'center'});});
+  // eje
+  const lo=Math.min(0,dist)-1,hi=Math.max(0,dist)+1;const n=hi-lo+1;const cw=(W-2*pad)/n;const ay=26+bw*.8+56;
+  for(let x=lo;x<=hi;x++){const X=pad+(x-lo)*cw;rect(ctx,X+1,ay,cw-2,cw*.7>34?34:cw*.7,x===dist?'#2a3a1f':COL.panel2,x===dist?COL.green:COL.line,2);
+    txt(ctx,String(x),X+cw/2,ay+(cw*.7>34?34:cw*.7)+12,{size:10,font:FMO,color:x===0||x===dist?COL.text:COL.dim,align:'center'});}
+  const prev=k>0?pos[k-1]:pos[0];const cur=lerp(prev,pos[k],t);const sx=pad+(cur-lo+.5)*cw;const sh=Math.min(34,cw*.7);
+  ctx.save();ctx.translate(sx,ay+sh/2);ctx.scale(dist<0?-1:1,1);const s=Math.min(14,cw*.38);ctx.beginPath();ctx.moveTo(s,0);ctx.lineTo(-s*.8,-s*.7);ctx.lineTo(-s*.4,0);ctx.lineTo(-s*.8,s*.7);ctx.closePath();ctx.fillStyle=COL.cyan;ctx.fill();ctx.strokeStyle=COL.ink;ctx.lineWidth=2;ctx.stroke();
+  if(Math.abs(p)>0){ctx.fillStyle=COL.orange;ctx.fillRect(-s*1.3,-2,s*.6,4);}ctx.restore();
+  // barra de bloque
+  const by=ay+sh+30;const blen=Math.max(1,Math.abs(p));txt(ctx,`BLOQUE: RITMO ${p} · ${blen} TICK${blen>1?'S':''}`,pad,by,{size:9,color:COL.muted});
+  for(let j=0;j<blen;j++){const done=j<blen-r;rect(ctx,pad+j*22,by+10,18,12,done?COL.orange:COL.panel2,COL.ink,2);}
+  // H
+  const Hv=SHH[sts[k]][dist-pos[k]+SHR];const H0=SHH[SH_S0][dist+SHR];const hx=W-pad-150;
+  txt(ctx,'H (TICKS RESTANTES)',W-pad,by,{size:9,color:COL.muted,align:'right'});
+  rect(ctx,hx,by+10,150,12,COL.panel2,COL.ink,2);rect(ctx,hx+2,by+12,146*(Hv/H0),8,COL.yellow);txt(ctx,String(Hv),hx-6,by+16,{size:12,font:FMO,weight:'700',color:COL.yellow,align:'right'});
+  // tira de ritmos
+  const ty=by+46;txt(ctx,'SALIDA',pad,ty,{size:9,color:COL.muted});let x=pad+52;let blocksShown=0;for(let j=1;j<=k;j++)if(SH_STATES[sts[j-1]][1]===0)blocksShown++;
+  f.paces.forEach((pc,j)=>{if(j>blocksShown)return;const s2=String(pc);ctx.font=`700 12px ${FMO}`;const w=ctx.measureText(s2).width+10;if(x+w>W-pad)return;rect(ctx,x,ty-9,w,18,j===blocksShown?COL.yellow:COL.panel2,null);txt(ctx,s2,x+w/2,ty+1,{size:12,font:FMO,weight:'700',color:j===blocksShown?COL.ink:COL.text,align:'center'});x+=w+4;});
+}
+const axisP=Player($('#animAxis'),{height:W=>{const bw=Math.min(40,(W-36)/11-4);return 26+bw*.8+56+34+30+46+24;},draw:drawAxis,frames:axisFrames(6)});
+watch(axisP);
+tabs('shipTabs',d=>{axisP.pause();axisP.setFrames(axisFrames(+d.d));axisP.play();});
+
+const AS={gx:9,gy:3,asts:[[4,1],[7,6]],T:49,margin:4};
+function astarFrames(w){
+  const tr=[];const r=shSolve(AS.gx,AS.gy,AS.T,AS.asts,SHH,SHR,AS.margin,w,tr,200000);const fr=[];
+  const ck=shCheck(AS.gx,AS.gy,AS.T,AS.asts,r.xs,r.ys);const opt=Math.max(SHH[SH_S0][AS.gx+SHR],SHH[SH_S0][AS.gy+SHR]);
+  const base={w,win:r.win,blk:r.blk,GD:r.GD,exp:tr};
+  fr.push({...base,upto:0,cap:`Meta (${AS.gx},${AS.gy}), límite <b>${AS.T}</b> ticks, dos asteroides. Sin obstáculos bastarían max(Hx,Hy) = <b>${opt}</b> ticks, pero la recta cruza zonas prohibidas.`});
+  fr.push({...base,upto:0,gd:true,cap:`Cota GD: BFS con movimientos de rey desde la meta por celdas libres (números). La nave avanza como mucho 1 celda por eje y tick, así que GD nunca sobreestima. h = max(Hx, Hy, GD).`});
+  const N=22;for(let k=1;k<=N;k++){const u=Math.round(tr.length*k/N);fr.push({...base,upto:u,dur:.45,cap:`A* con peso ${w}: <b>${u}</b> nodos (x, y, estadoX, estadoY) expandidos. Se poda todo nodo con g + 1 + h &gt; ${AS.T}. El color marca cuántos estados de ritmo se expandieron en cada celda.`});}
+  const ticks=ck.px.length-1;const st=Math.max(1,Math.ceil(ticks/16));
+  for(let k=0;k<=ticks;k+=st)fr.push({...base,upto:tr.length,path:ck,tick:k,dur:.4,cap:`Ruta encontrada: tick ${k}/${ticks}. Cada eje sigue su propia cadena de ritmos; la colisión se comprueba en cada tick.`});
+  fr.push({...base,upto:tr.length,path:ck,tick:ticks,cap:`Peso ${w}: <b>${tr.length} expansiones</b>, llegada en <b>${ticks}</b> ticks (límite ${AS.T}). Checker: ${ck.ok?'<b style="color:var(--green)">✓ ritmos legales, sin colisión, en reposo en la estación</b>':'✗ '+esc(ck.why)}. Prueba otros pesos: más peso = menos expansiones aquí, pero ruta peor y colas peligrosas en laberintos.`});
+  fr.ok=ck.ok;fr.exp=tr.length;fr.ticks=ticks;return fr;
+}
+function drawAstar(ctx,W,H,frames,i,t){
+  const f=frames[i];const {xlo,xhi,ylo,yhi}=f.win;const nx=xhi-xlo+1,ny=yhi-ylo+1;const cs=Math.floor(Math.min((W-16)/nx,(H-16)/ny));const x0=(W-nx*cs)/2,y0=(H-ny*cs)/2;
+  const prevU=i>0&&frames[i-1].upto!==undefined?frames[i-1].upto:0;const upto=Math.round(lerp(Math.min(prevU,f.upto),f.upto,t));
+  const heat=new Map();for(let k=0;k<upto;k++){const [x,y]=f.exp[k];const key=x+','+y;heat.set(key,(heat.get(key)||0)+1);}
+  // y hacia arriba: fila 0 = yhi
+  const X=x=>x0+(x-xlo)*cs,Y=y=>y0+(yhi-y)*cs;
+  for(let y=ylo;y<=yhi;y++)for(let x=xlo;x<=xhi;x++){const b=f.blk[(x-xlo)+(y-ylo)*nx];rect(ctx,X(x),Y(y),cs,cs,b?'#3a2238':((x+y)&1?'#141b33':'#172040'));
+    const hv=heat.get(x+','+y);if(hv&&!b){const a=Math.min(1,.25+Math.log2(1+hv)/5);alpha(ctx,a,()=>rect(ctx,X(x)+1,Y(y)+1,cs-2,cs-2,COL.cyan));}
+    if(f.gd&&!b&&cs>=14)txt(ctx,String(f.GD[(x-xlo)+(y-ylo)*nx]),X(x)+cs/2,Y(y)+cs/2+1,{size:Math.min(10,cs*.5),font:FMO,color:COL.muted,align:'center'});}
+  ctx.strokeStyle='rgba(4,6,13,.5)';ctx.lineWidth=1;for(let x=0;x<=nx;x++){ctx.beginPath();ctx.moveTo(x0+x*cs,y0);ctx.lineTo(x0+x*cs,y0+ny*cs);ctx.stroke();}for(let y=0;y<=ny;y++){ctx.beginPath();ctx.moveTo(x0,y0+y*cs);ctx.lineTo(x0+nx*cs,y0+y*cs);ctx.stroke();}
+  for(const [ax,ay] of AS.asts){const cx=X(ax)+cs/2,cy=Y(ay)+cs/2;ctx.beginPath();ctx.arc(cx,cy,cs*.42,0,7);ctx.fillStyle=COL.red;ctx.fill();ctx.strokeStyle=COL.ink;ctx.lineWidth=2;ctx.stroke();rect(ctx,cx-cs*.18,cy-cs*.15,cs*.14,cs*.14,'#ffb3a8');
+    const zx0=Math.max(xlo,ax-2),zx1=Math.min(xhi,ax+2),zy0=Math.max(ylo,ay-2),zy1=Math.min(yhi,ay+2);rect(ctx,X(zx0),Y(zy1),(zx1-zx0+1)*cs,(zy1-zy0+1)*cs,null,'rgba(255,93,79,.55)',2);}
+  rect(ctx,X(0)+2,Y(0)+2,cs-4,cs-4,null,COL.text,2);rect(ctx,X(AS.gx)+2,Y(AS.gy)+2,cs-4,cs-4,'rgba(95,214,138,.35)',COL.green,3);
+  if(f.path){const {px,py}=f.path;const k=f.tick;ctx.beginPath();for(let j=0;j<=k;j++){const a=X(px[j])+cs/2,b=Y(py[j])+cs/2;j?ctx.lineTo(a,b):ctx.moveTo(a,b);}ctx.strokeStyle=COL.yellow;ctx.lineWidth=Math.max(3,cs*.2);ctx.lineJoin='round';ctx.stroke();
+    const kp=i>0&&frames[i-1].tick!==undefined?frames[i-1].tick:0;const kk=lerp(Math.min(kp,k),k,t);const j0=Math.floor(kk),j1=Math.min(k,j0+1);const sx=lerp(X(px[j0]),X(px[j1]),kk-j0)+cs/2,sy=lerp(Y(py[j0]),Y(py[j1]),kk-j0)+cs/2;
+    const s=cs*.42;ctx.beginPath();ctx.moveTo(sx+s,sy);ctx.lineTo(sx-s*.8,sy-s*.7);ctx.lineTo(sx-s*.4,sy);ctx.lineTo(sx-s*.8,sy+s*.7);ctx.closePath();ctx.fillStyle=COL.cyan;ctx.fill();ctx.strokeStyle=COL.ink;ctx.lineWidth=2;ctx.stroke();}
+  badge(ctx,'PESO '+f.w+' · '+upto+' EXP',x0+4,y0+4,COL.yellow,{size:9});
+}
+const astarP=Player($('#animAstar'),{height:W=>{const nx=AS.gx+2*AS.margin+1,ny=AS.gy+2*AS.margin+1;const cs=Math.floor(Math.min((W-16)/nx,36));return ny*cs+16;},draw:drawAstar,frames:astarFrames(2)});
+watch(astarP);
+tabs('astarTabs',d=>{astarP.pause();astarP.setFrames(astarFrames(+d.w));astarP.play();});
+
+// =================== 07 · Reintentos ===================
+const RS={w:6,h:5,grid:['..X..X','..X..X','......','......','......']};
+const restartFr=lawnFrames(1,RS,{tries:6,iters:2,restartDemo:true});
+const restartP=Player($('#animRestart'),{height:W=>Math.min(W,520)*0.72+40,draw:drawLawnFrame,frames:restartFr});
+watch(restartP);
+function stress(withRestarts){
+  const box=$('#stressBox');const rng=mulberry32(2025);let done=0,feas=0,solved=0,failed=0,bad=0;const hist=[0,0,0,0];const N=120;let attempts=0;
+  const render=()=>{const mx=Math.max(1,...hist);box.innerHTML=`<div class="stat">${withRestarts?'CON reintentos':'SIN reintentos'} · factibles ${feas}/${N} · resueltos <b style="color:var(--green)">${solved}</b> · fallos <b style="color:var(--red)">${failed}</b> · checker ✗ ${bad}</div>`+
+    (withRestarts?['1 intento','2 intentos','3 intentos','4+'].map((l,k)=>`<div class="bar"><span>${l}</span><span class="b" style="width:${Math.round(hist[k]/mx*60)}%"></span><span>${hist[k]}</span></div>`).join(''):'')+
+    `<div class="bar"><span>resueltos</span><span class="b" style="width:${Math.round(solved/Math.max(1,feas)*60)}%"></span><span>${solved}</span></div><div class="bar"><span>fallos</span><span class="b r" style="width:${Math.round(failed/Math.max(1,feas)*60)}%"></span><span>${failed}</span></div>`;};
+  const step=()=>{const t0=performance.now();while(feas<N&&performance.now()-t0<30&&attempts<20000){attempts++;
+      const w=6+Math.floor(rng()*2),h=5+Math.floor(rng()*2);const g=Array.from({length:h},()=>Array(w).fill('.'));const k=4+Math.floor(rng()*5);for(let j=0;j<k;j++)g[Math.floor(rng()*h)][Math.floor(rng()*w)]='X';const grid=g.map(r=>r.join(''));
+      if(!hasHamCycle(w,h,grid))continue;feas++;
+      const r=solveLawnCycle(w,h,grid,1+feas,withRestarts?50:1,1);
+      if(r.ok){const c=checkLawnPath(w,h,grid,r.moves,true);if(!c.ok)bad++;solved++;hist[Math.min(3,r.tries-1)]++;}else failed++;}
+    render();if(feas<N&&attempts<20000)setTimeout(step,0);};
+  step();
+}
+$('#stressOn').onclick=()=>stress(true);$('#stressOff').onclick=()=>stress(false);
+
+// =================== 08 · Trampas ===================
+const SHIFTED=[...'Diagonals do not count'].map(c=>String.fromCharCode(c.charCodeAt(0)+1)).join('');
+const TRAPS=[
+ ['PDF con texto oculto o cifrado',`<p>En Lawn Mower L6 una línea clave venía con la fuente desplazada (y en Spaceship L3 el “límite muy generoso”). Si una frase parece basura, desplaza los códigos ASCII.</p><div class="mini"><span class="lbl">EN EL PDF (ILUSTRACIÓN)</span><pre id="shiftTxt">${SHIFTED}</pre></div><p style="margin-top:8px"><button type="button" class="pill" id="shiftBtn">Descifrar (−1)</button></p>`],
+ ['Requisitos solo en la explicación del ejemplo',`<p>La regla real puede aparecer solo en el texto que explica el ejemplo, no en el enunciado.</p><div class="mini row"><div><span class="lbl">ENUNCIADO (ILUSTRACIÓN)</span><pre>Visit every free
+cell exactly once.</pre></div><div><span class="lbl">EXPLICACIÓN DEL EJEMPLO</span><pre>…the end must be
+<span class="hl">next to the start</span>
+(<span class="hl">no diagonals</span>).</pre></div></div>`],
+ ['x = columna, y = fila',`<p>“x y” en la entrada es ancho y alto; la matriz se indexa <code>grid[y][x]</code>. W/S cambian y, A/D cambian x.</p><div class="mini"><svg viewBox="0 0 200 110" role="img" aria-label="Rejilla con x creciendo hacia la derecha e y hacia abajo"><g fill="#1d2646" stroke="#04060d" stroke-width="2">${Array.from({length:12},(_,k)=>`<rect x="${30+(k%4)*34}" y="${14+Math.floor(k/4)*28}" width="34" height="28"/>`).join('')}</g><rect x="98" y="42" width="34" height="28" fill="#ffd23f" stroke="#04060d" stroke-width="2"/><text x="115" y="61" font-family="JetBrains Mono" font-size="11" text-anchor="middle" fill="#04060d">2,1</text><text x="170" y="12" font-family="Silkscreen" font-size="10" fill="#4cc9f0">x →</text><text x="4" y="104" font-family="Silkscreen" font-size="10" fill="#ff9f43">y ↓</text></svg><span class="mu">celda (x=2, y=1) = grid[1][2]</span></div>`],
+ ['El camino no tiene casilla de inicio',`<p>La salida es solo una cadena de movimientos: el inicio se <b>infiere</b> (probar desplazamientos) o se deduce porque cubre todas las celdas.</p><div class="mini"><span class="lbl">SALIDA</span><pre>DDSAAS…   <span class="mu">¿desde dónde?</span></pre><span class="lbl" style="margin-top:6px">CHECKER</span><pre>for inicio in libres:
+  if todo cae en libres: <span class="ok">✓</span></pre></div>`],
+ ['“Matrix of integers” pero el ejemplo usa X / .',`<p>Room Planner L7: el texto pide enteros y el ejemplo imprime <code>X</code> y <code>.</code>. Cuando chocan, <b>manda el ejemplo</b>.</p><div class="mini row"><div><span class="lbl">ENUNCIADO</span><pre class="bad">1 1 0 2 2
+0 0 0 0 0</pre></div><div><span class="lbl">EJEMPLO</span><pre class="ok">XX.XX
+.....</pre></div></div>`],
+ ['Reglas de líneas en blanco al final',`<p>Copia el formato exacto: línea en blanco entre casos (o no), salto final, sin espacios colgando. Y parsea tolerante a líneas vacías extra.</p><div class="mini"><pre>XX.X<span class="mu">⏎</span>
+....<span class="mu">⏎</span>
+<span class="hl"> ⏎ </span> <span class="mu">← separador del ejemplo</span>
+X.XX<span class="mu">⏎</span></pre></div>`],
+ ['Cabeceras pegadas a la cuadrícula',`<p>Bloques “W H” seguidos de filas sin separador, o asteroides en una línea larguísima: parsea por <b>tokens</b> (<code>split()</code>), no por líneas.</p><div class="mini"><pre><span class="hl">2</span>
+<span class="hl">4 3</span>
+....
+.X..
+....
+<span class="hl">3 3</span>
+...</pre><span class="mu">tokens: N, W, H, H filas, W, H…</span></div>`],
+ ['Celdas vs. movimientos (±1)',`<p>N celdas = N−1 movimientos; ancho de la caja = máx − mín <b>+ 1</b>; un ritmo 0 cuesta 1 tick. Comprueba siempre con el ejemplo.</p><div class="mini"><svg viewBox="0 0 200 50" role="img" aria-label="Cuatro celdas unidas por tres movimientos">${[0,1,2,3].map(k=>`<rect x="${12+k*46}" y="10" width="30" height="30" fill="#5fd68a" stroke="#04060d" stroke-width="2"/>`).join('')}${[0,1,2].map(k=>`<text x="${49+k*46}" y="30" font-family="JetBrains Mono" font-size="12" fill="#ffd23f" text-anchor="middle">→</text>`).join('')}</svg><span class="mu">4 celdas · 3 movimientos</span></div>`],
+ ['El enunciado admite varias respuestas',`<p>“There may be multiple correct solutions” = no persigas el ejemplo. Escribe el checker y valida tú.</p><div class="mini row"><div><span class="lbl">EJEMPLO</span><pre>RPSSRPSS</pre></div><div><span class="lbl">NUESTRA</span><pre>RRRPRPSS <span class="ok">✓</span></pre></div></div>`],
+ ['Diagramas con flechas engañosas',`<p>En RPS las flechas iban del ganador al perdedor y en 5 estilos el dibujo se malinterpreta: la <b>cita textual</b> es la fuente fiable. Verifica la tabla con el ejemplo del L1.</p><div class="mini"><pre>"Scissors cuts Paper,
+ Paper covers Rock…"  <span class="ok">← fiable</span></pre></div>`]
+];
+$('#trapList').innerHTML=TRAPS.map((t,k)=>`<details class="trap"${k<2?' open':''}><summary><span class="ic">!</span>${t[0]}</summary><div class="bd">${t[1]}</div></details>`).join('');
+(function(){const b=$('#shiftBtn'),p=$('#shiftTxt');let dec=false,timer=0;b.onclick=()=>{clearInterval(timer);const target=dec?SHIFTED:'Diagonals do not count';dec=!dec;b.textContent=dec?'Volver a cifrar (+1)':'Descifrar (−1)';
+  if(RM){p.textContent=target;return;}let k=0;timer=setInterval(()=>{k++;p.innerHTML=[...target].map((c,i)=>i<k?`<span class="${dec?'ok':''}">${esc(c)}</span>`:esc(p.textContent[i]||'')).join('');if(k>=target.length)clearInterval(timer);},45);};})();
+
+// =================== 09 · Checklist + mapa ===================
+const STEPS=['Lee el L1 entero y el ejemplo. Anota el formato exacto de entrada y salida (orden de campos, líneas en blanco, separadores).',
+ 'Busca lo escondido: texto cifrado o con fuente rara en el PDF, reglas que solo salen en la explicación del ejemplo, y el sandbox/visualizador HTML si existe.',
+ 'Fija convenciones: x = columna, y = fila; celdas vs. movimientos; qué cuesta un tick.',
+ 'Parser por tokens (<code>split()</code>), tolerante a líneas vacías; rutas con <code>Path(__file__).parent</code>.',
+ 'Resuelve L1–L2 directo como funciones reutilizables y compara byte a byte con el ejemplo.',
+ 'Desde el L3: si hay varias respuestas, escribe <b>primero el checker</b> (re-simula las reglas, independiente del solver).',
+ 'Mutation test: estropea una salida buena y comprueba que el checker la rechaza.',
+ 'Identifica la forma del problema (mapa de abajo) y reutiliza el motor del nivel anterior; cambia solo la regla nueva.',
+ 'Si la solución es heurística: semilla + reintentos + presupuesto, y estrés con instancias aleatorias factibles (fuerza bruta en pequeño).',
+ 'Ejecuta todos los inputs, pasa el checker en cada uno, vigila tiempos (segundos, no minutos) y sube los .out.'];
+$('#steps').innerHTML=STEPS.map((s,k)=>`<li><label><input type="checkbox" aria-label="Paso ${k+1}"><span>${s}</span></label></li>`).join('');
+const MAP=[['Torneo en el que eliges el orden','Solo importa el multiconjunto: búsqueda sobre vectores de conteo + memo de fallos','RPS L3–L5'],
+ ['Torneo con hojas fijas, libres (X) y del adversario (Z)','DP de abajo arriba con conjuntos de ganadores (bitmask), minimales, ∃X ∀Z','RPS L6–L7'],
+ ['Recorrer todas las celdas una vez (camino o ciclo)','Paridad de colores + flujo máximo (2-factor) + giros 2×2 + reintentos','Lawn L4–L7'],
+ ['Camino sin casilla de inicio','Probar desplazamientos dentro de la holgura de la caja','Lawn L3 (checker)'],
+ ['Empaquetar piezas que no se tocan','Territorio 2×(L+1) en caja (x+1)×(y+1): no tocarse = no solaparse','Room L4–L7'],
+ ['Máximo de rectángulos en una caja','DP guillotina sobre subrectángulos + molinete para cajas pequeñas','Room L3–L7'],
+ ['Movimiento con inercia / ritmos','Autómata por eje + tabla exacta por BFS inverso; ejes independientes → max','Spaceship L3–L4'],
+ ['Ruta con obstáculos y límite de tiempo','A* ponderado (peso ≈ 2) con cota exacta, poda g+1+h > límite, ventana creciente, núcleo en C; tiempo en la clave si el mapa se mueve','Spaceship L5–L8'],
+ ['Varias respuestas válidas','Checker independiente + mutation test','Todos desde L3'],
+ ['Algoritmo no demostrado','Semillas, reintentos, presupuesto y estrés con fuerza bruta','RPS L3–L5 · Lawn L4–L7 · Room L4–L7']];
+$('#techMap tbody').innerHTML=MAP.map(r=>`<tr><td data-h="Forma">${r[0]}</td><td data-h="Técnica">${r[1]}</td><td data-h="Dónde">${r[2]}</td></tr>`).join('');
+
+// nav activa
+(function(){const links=[...document.querySelectorAll('nav.top a.lk')];const ob=new IntersectionObserver(es=>{for(const e of es)if(e.isIntersecting){links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id));const on=links.find(a=>a.classList.contains('on'));if(on){const ol=on.closest('ol');ol.scrollLeft=on.parentElement.offsetLeft-ol.clientWidth/2+on.offsetWidth/2;}}},{rootMargin:'-45% 0px -50% 0px'});
+  document.querySelectorAll('section.pat').forEach(s=>ob.observe(s));})();
+document.fonts&&document.fonts.ready.then(()=>PLAYERS.forEach(p=>p.render()));
+</script>
+</body>
+</html>

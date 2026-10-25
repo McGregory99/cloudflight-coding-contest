@@ -1,0 +1,2459 @@
+<!DOCTYPE html>
+<!-- Features to add:
+    - Manual mode correct max speed
+    - Accelerate by clicking
+    - Manual mode proper physics on the improved collision detection
+    Features to consider:
+    - Minimap & detaching camera + panning (manual camera)
+-->
+
+<html lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="description" content="This is a visualizer for the 40th CCC, school edition. Use this to help verify your solutions! To use it, open this file in your browser.">
+    <title>CCC | Cityscape</title>
+</head>
+
+<body>
+<header>
+    <div>
+        <h1>Drone simulator</h1>
+        <p>This is an interactive tool to help you <strong>visualize</strong> your solutions and <strong>prototype</strong> them.</p>
+        <p>You are free to change it and use it as you see fit!</p>
+    </div>
+    <div title="M">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="39 48 384 284" height="100" id="codinator">
+            <polygon fill="#fddd00" points="
+                        59.65 53.93 52.5 53.93 52.5 61.08 59.65 61.08 66.8 61.08 66.8 53.93 59.65 53.93
+                    "/>
+            <polygon fill="#fddd00" points="
+                        173.98 311.18 173.98 318.33 181.13 318.33
+                        181.13 311.18 181.13 304.04 181.13 296.89
+                        173.98 296.89 173.98 304.04 173.98 311.18
+                    "/>
+            <rect fill="#fddd00" x="181.13" y="318.33" width="7.15" height="7.15"/>
+            <polygon fill="#fddd00" points="
+                        409.79 61.08 409.79 53.93 402.65 53.93 395.5 53.93 395.5 61.08 402.65 61.08 409.79 61.08
+                    "/>
+            <path fill="#fddd00" d="
+                        m409.79,103.95v-14.29h-7.15v-14.29h-7.15v-14.29h-7.15v7.15h-7.15v14.29h7.15v7.15h7.15v14.29h7.15
+                        v21.44h-7.15v7.15h-7.15v7.15h-71.46v7.15h-21.44v7.15h-14.29v7.15h-7.15v-7.15h-14.29v-7.15h-57.17
+                        v7.15h-14.29v7.15h-7.15v-7.15h-14.29v-7.15h-21.44v-7.15h-71.46v-7.15h-7.15v-7.15h-7.15v-21.44h7.15
+                        v-14.29h7.15v-7.15h7.15v-14.29h-7.15v-7.15h-7.15v14.29h-7.15v14.29h-7.15v14.29h-7.15v42.87h7.15
+                        v7.15h7.15v7.15h35.73v7.15h35.73v7.15h7.15v7.15h7.15v28.58h7.15v7.15h7.15v42.87h7.15v35.73h7.15
+                        v-7.15h7.15v-7.15h28.58v-7.15h14.29v-7.15h14.29v7.15h14.29v7.15h28.58v7.15h7.15v7.15h7.15
+                        v-35.73h7.15v-42.87h7.15v-7.15h7.15v-28.58h7.15v-7.15h7.15v-7.15h35.73v-7.15h35.73v-7.15h7.15
+                        v-7.15h7.15v-42.87h-7.15Zm-128.62,128.62v14.29h-7.15v7.15h-28.58v-14.29h14.29v-7.15h14.29
+                        v-7.15h7.15v7.15Zm-71.46,21.44h-21.44v-7.15h-7.15v-21.44h7.15v7.15h14.29v7.15h14.29v14.29h-7.15Z
+                    "/>
+            <polygon fill="#fddd00" points="
+                         281.17 304.04 281.17 311.18 281.17 318.33
+                         288.32 318.33 288.32 311.18 288.32 304.04
+                         288.32 296.89 281.17 296.89 281.17 304.04
+                    "/>
+            <rect fill="#fddd00" x="274.02" y="318.33" width="7.15" height="7.15"/>
+        </svg>
+    </div>
+</header>
+<main>
+    <canvas id="canvas"></canvas>
+    <div id="controls">
+        <div id="controls-frame-range">
+            <input type="range" id="simFrameSlider" horizontal>
+        </div>
+        <div id="controls-simulation">
+            <div id="controls-simulation-cols">
+                <div id="controls-text-input">
+                    <div id="controls-game-input">
+                        <div class="controls-game-textarea">
+                            <label for="levelInput">Input</label><br>
+                            <textarea id="levelInput"
+                                      cols="20" rows="8" placeholder="Input test case"
+                            ></textarea>
+                        </div>
+                        <div class="controls-game-textarea">
+                            <label for="levelSolution">Solution</label><br>
+                            <textarea id="levelSolution"
+                                      cols="44" rows="8" placeholder="Your solution for the test case"
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div id="controls-simulation-frame-controls">
+                    <div class="controls-simulation-buttons">
+                        <label id="frame-counter" for="simFrameSlider">
+                            <span id="simCurrentFrame">0</span>
+                            <span>/</span>
+                            <span id="simFrameCount">0</span>
+                        </label>
+                        <div class="controls-button-group">
+                            <button id="simPlay">Pause</button>
+                            <label for="simPlay"><small>Space</small></label>
+                        </div>
+                        <div class="controls-button-group">
+                            <button id="simReverse">Reverse</button>
+                            <label for="simReverse"><small>R</small></label>
+                        </div>
+                        <div class="controls-button-group">
+                            <button id="simBackStep" disabled>Step Back</button>
+                            <label for="simBackStep"><small>Left</small></label>
+                        </div>
+                        <div class="controls-button-group">
+                            <button id="simNextStep" disabled>Step Next</button>
+                            <label for="simNextStep"><small>Right</small></label>
+                        </div>
+                        <div class="controls-button-group">
+                            <button id="simSlower">Slower</button>
+                            <label for="simSlower"><small>Comma</small></label>
+                        </div>
+                        <div class="controls-button-group">
+                            <button id="simFaster">Faster</button>
+                            <label for="simFaster"><small>Period</small></label>
+                        </div>
+                    </div>
+                    <div class="controls-simulation-buttons">
+                        <div class="controls-toggle-group">
+                            <div class="controls-toggle-group-line">
+                                <input type="checkbox" id="replayLoopAtEnd">
+                                <label for="replayLoopAtEnd">Loop at end</label>
+                            </div>
+                            <span><small>L</small></span>
+                        </div>
+                        <div class="controls-toggle-group">
+                            <div class="controls-toggle-group-line">
+                                <div>
+                                    <input type="radio" id="replay-camera-track-drone-and-landing-pad" name="replayCamera" checked>
+                                    <label for="replay-camera-track-drone-and-landing-pad">Track drone and landing pad</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="replay-camera-track-drone" name="replayCamera">
+                                    <label for="replay-camera-track-drone">Track drone</label>
+                                </div>
+                            </div>
+                            <span><small>C</small></span>
+                        </div>
+                        <div class="controls-button-group">
+                            <button id="simZoomOut">Zoom out</button>
+                            <label for="simZoomOut"><small>Minus</small></label>
+                        </div>
+                        <div class="controls-button-group">
+                            <button id="simZoomIn">Zoom in</button>
+                            <label for="simZoomIn"><small>Plus</small></label>
+                        </div>
+                    </div>
+                </div>
+                <div class id="controls-other">
+                    <div>
+                        <strong>Result:</strong>
+                        <span>
+                            <strong id="sim-result-type"></strong>
+                            <span id="sim-result"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div id="controls-simulation-speed">
+                <label for="simSpeed">Simulation speed</label>
+                <div class="controls-vertical-slider">
+                    <input type="range" id="simSpeed" list="simSpeedMarkers" vertical
+                           value="6" min="0" max="9">
+                    <datalist id="simSpeedMarkers">
+                        <option value="9" label="8"></option>
+                        <option value="8" label="4"></option>
+                        <option value="7" label="2"></option>
+                        <option value="6" label="1"></option>
+                        <option value="5" label="1/2"></option>
+                        <option value="4" label="1/4"></option>
+                        <option value="3" label="1/8"></option>
+                        <option value="2" label="1/16"></option>
+                        <option value="1" label="1/32"></option>
+                        <option value="0" label="0"></option>
+                    </datalist>
+                </div>
+                <label for="simSpeed"><small>0 - 9</small></label>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+
+<style>
+    *, ::before, ::after {
+        box-sizing: border-box;
+    }
+    html {
+        width: 100%;
+        height: 100%;
+
+        color-scheme: dark;
+        background: #27272A;
+        font-family: Arial, serif;
+    }
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 1rem 2rem;
+
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    h1 {
+        color: #FDDD00;
+        margin: 0;
+    }
+    p, label {
+        margin: 0;
+    }
+    strong {
+        color: #FDDD00;
+    }
+    strong[success="true"] {
+        color: green;
+    }
+    strong[success="false"] {
+        color: red;
+    }
+    small {
+        color: lightgray;
+    }
+    header {
+        display: flex;
+    }
+    button, select {
+        min-width: 5rem;
+        min-height: 3rem;
+        border: 2px solid #fddd00;
+        border-radius: 5px;
+        font-family: monospace;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    button {
+        background: #fddd00;
+        color: black;
+    }
+    button[disabled] {
+        border: 2px solid #FDDD0040;
+        background: #fddd0040;
+        cursor: not-allowed;
+    }
+    textarea {
+        background: #27272a;
+        outline: none;
+        border: 2px solid white;
+        border-radius: 5px;
+        padding: 0.5rem;
+    }
+
+    input[type="range"] {
+        margin: 0;
+    }
+    input[type="range"][horizontal] {
+        height: 8px;
+    }
+    input[type="range"][vertical] {
+        writing-mode: vertical-rl;
+        direction: rtl;
+        width: 8px;
+    }
+
+    input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        cursor: pointer;
+        outline: none;
+        border-radius: 16px;
+        background: #ccc;
+        overflow: hidden;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        border: none;
+    }
+
+    input[type="range"][horizontal]::-webkit-slider-thumb {
+        height: 16px;
+        width: 8px;
+        background-color: #FDDD00;
+        box-shadow: -2000rem 0 0 2000rem #FDDD00;
+    }
+
+    input[type="range"][vertical]::-webkit-slider-thumb {
+        height: 8px;
+        width: 32px;
+        background-color: #FD8D00;
+        box-shadow: 0 2000rem 0 2000rem #FDDD00;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        border: none;
+    }
+
+    input[type="range"][horizontal]::-moz-range-thumb {
+        height: 16px;
+        width: 8px;
+        background-color: #FDDD00;
+        box-shadow: -2000rem 0 0 2000rem #FDDD00;
+    }
+
+    input[type="range"][vertical]::-moz-range-thumb {
+        height: 8px;
+        width: 32px;
+        background-color: #FD8D00;
+        box-shadow: 0 2000rem 0 2000rem #FDDD00;
+    }
+
+    main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    #canvas {
+        flex: 1;
+        background-color: black;
+        margin: 0;
+    }
+    #controls-frame-range {
+        width: calc(100vw - 4rem);
+        & input[type="range"] {
+            width: 100%;
+            margin: 0;
+        }
+        > label {
+            margin-left: 2rem;
+        }
+    }
+    #controls-simulation-frame-controls {
+        display: grid;
+        grid-template-rows: auto auto;
+    }
+    #frame-counter {
+        margin: 2rem 0 0 2rem;
+        width: 8rem;
+    }
+    .controls-simulation-buttons {
+        display: flex;
+    }
+    #controls {
+    }
+    #controls-simulation {
+        display: flex;
+    }
+    #controls-simulation-cols {
+        display: grid;
+        grid-template-columns: auto auto;
+    }
+    #controls-text-input {
+        .controls-button-group {
+        }
+    }
+    #controls-other {
+        display: flex;
+    }
+    #controls-game-input {
+        display: grid;
+        grid-template-columns: auto auto auto auto;
+    }
+    .controls-game-textarea {
+        margin: 0.5rem 2rem 0 0
+    }
+    #controls-simulation-speed {
+        margin-left: auto;
+        .controls-vertical-slider {
+            display: flex;
+            & datalist {
+                display: flex;
+                color: white;
+                flex-direction: column;
+                justify-content: space-between;
+                padding: 0 8px;
+                & option {
+                    font-size: 18px;
+                    width: 0;
+                    position: relative;
+                    left: -5px;
+                }
+            }
+        }
+    }
+    .controls-button-group {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        padding: 0 0.25rem 0 0.25rem;
+        & button {
+            width: 4rem;
+            height: 2rem;
+        }
+    }
+    .controls-toggle-group {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 0.25rem 0 0.25rem;
+        & small {
+            padding-left: 6px;
+        }
+    }
+    .controls-toggle-group-line {
+        min-height: 3rem;
+    }
+    footer {
+        padding-top: 2rem;
+        display: flex;
+        justify-content: center;
+        * {
+            padding: 0 2rem 0 2rem;
+        }
+    }
+    input[type="checkbox"] {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+    textarea {
+        resize: none;
+        margin-top: 0.5rem;
+    }
+    #codinator {
+        cursor: help;
+    }
+</style>
+
+<script>
+    /** @const {number} - The game level */
+    const LEVEL = 5;
+
+    /**
+     * @typedef GlobalState
+     * @type {object}
+     * @property {number} level - The level of the game.
+     * @property {RenderState} render - Container for rendering context and values.
+     * @property {GameState} game - Container for all game related data.
+     */
+
+    /**
+     * @typedef RenderState
+     * @type {object}
+     * @property {CanvasRenderingContext2D} context - The canvas rendering context.
+     * @property {number} w - The width of the drawing area in pixels.
+     * @property {number} h - The height of the drawing area in pixels.
+     * @property {number} scaleIndex - The scale option. Index of scaleToUToPx.
+     * @property {Array.<number>} scaleToUToPx - A map from scale to the desired unit to pixel ratio.
+     * @property {Array.<string>} scaleToUToPxLabel - Labels for scaleToUToPx to draw on screen.
+     * @property {number} uToPx - The size of a unit in pixels.
+     * @property {number} gridCellSize - The size of a grid cell in pixels.
+     * @property {number} infoTextBoxPadding - The distance between the edge of the screen and info boxes.
+     * @property {number} infoTextPadding - The distance between the edge of the info box and its content.
+     * @property {number} droneMinimumPixelWidth - The minimum width in pixels to draw the drone.
+     * @property {number} droneMinimumPixelHeight - The minimum height in pixels to draw the drone.
+     * @property {Array.<{speed: number, color: Color}>} speedPoints - Drawing information on how to paint each speed.
+     * @property {SVGImageElement} droneImage - The drone image to be drawn generally
+     * @property {boolean} drawVectorX
+     * @property {boolean} drawVectorY
+     * @property {boolean} drawVector
+     * @property {boolean} drawGrid
+     * @property {boolean} drawPast
+     * @property {boolean} drawFuture
+     */
+
+    /**
+     * @typedef GameState
+     * @type {object}
+     * @property {number} lastTimeSinceStart - Last time since start in ms
+     * @property {number} logicTimeStepThreshold - Base time threshold for performing a logic update
+     * @property {number} logicTimeSinceLastStep - Time elapsed since last logic step
+     * @property {InputState} input - Inputs from UI.
+     * @property {number} simSpeed - Simulation speed - update rate multiplier.
+     * @property {Array.<number>} simSpeedOptions - The available speeds.
+     * @property {boolean} simRunning - The simulation is running.
+     * @property {number} replayFrameLimit - The maximum amount of frames to reach the goal.
+     * @property {boolean} replayRunning - The simulation is in replay mode.
+     * @property {boolean} replayForwards - The simulation replay direction.
+     * @property {number} replayFrameIndex - The frame (or step) of the replay.
+     * @property {any[]} replayStates - All of the states for the calculated simulation.
+     * @property {boolean} replayLoopAtEnd - Stop the replay when it reached the end.
+     * @property {Vector2} camera - The position of the camera in world space.
+     * @property {Drone} drone - Drone entity.
+     * @property {number} gravity - Gravity in units per update.
+     * @property {number} pastPositionsMaxCount - How many positions to track.
+     * @property {Array.<Vector2>} pastPositions - Tracked positions.
+     * @property {number} futurePositionsMaxCount - How many positions to predict.
+     * @property {Array.<Vector2>} futurePositions - Predicted positions.
+     * @property {Array.<Vector2>} futureVelocities - Predicted velocities.
+     * @property {number} flyingHeight - The target flying height.
+     * @property {LandingPad} helipad - Helipad entity.
+     * @property {Array.<Building>} buildings - Building entities.
+     * @property {Array.<SilentZone>} silentZones - SilentZones entities.
+     */
+
+    /**
+     * @typedef InputState
+     * @type {object}
+     * @property {boolean} up
+     * @property {boolean} down
+     * @property {boolean} left
+     * @property {boolean} right
+     * @property {boolean} shift
+     * @property {boolean} nextTick
+     * @property {boolean} prevTick
+     * @property {boolean} mouseIn
+     * @property {Vector2} mouseScreenPosition
+     * @property {Vector2} mouseNormalizedPosition
+     */
+
+    /**
+     * @typedef Drone
+     * @type {object}
+     * @property {Vector2} p - The entity position in world space.
+     * @property {Vector2} v - The entity velocity in world space.
+     * @property {Vector2} a - The entity acceleration in world space.
+     * @property {number} w - The width in world space.
+     * @property {number} h - The height in world space
+     */
+
+    /**
+     * @typedef LandingPad
+     * @type {object}
+     * @property {Vector2} p - The position of the landing pad in world space.
+     */
+
+    /**
+     * @typedef Building
+     * @type {object}
+     * @property {Vector2} p - The position of the building in world space.
+     * @property {number} w - The width of the building in world space.
+     * @property {number} h - The height of the building in world space.
+     * @property {boolean} [hasLandingPad] - Does this building have the landing pad?
+     */
+
+    /**
+     * @typedef SilentZone
+     * @type {object}
+     * @property {number} x - The x position coordinate of the silent zone in world space.
+     * @property {number} w - The width of the silent zone in world space.
+     */
+
+    /**
+     * @typedef Vector2
+     * @type {object}
+     * @property {number} x - The x coordinate.
+     * @property {number} y - The y coordinate.
+     */
+
+    /**
+     * @typedef Color
+     * @type {object}
+     * @property {number} r - Red channel, 8 bit unsigned int
+     * @property {number} g - Green channel, 8 bit unsigned int
+     * @property {number} b - Blue channel, 8 bit unsigned int
+     * @property {number} a - Alpha channel, 0-1 float
+     */
+
+    /** @type {GlobalState} */
+    const state = {
+        level: LEVEL,
+    };
+
+    const MAX_ACCELERATION_ABSOLUTE_SUM = 20;
+
+    const MIN_LANDING_VELOCITY_Y = -1;
+    const MAX_LANDING_VELOCITY_Y = 0;
+
+    const canvas = document.getElementById('canvas');
+    const frameSlider = document.getElementById('simFrameSlider');
+    const currentFrameDisplay = document.getElementById('simCurrentFrame');
+    const frameCountDisplay = document.getElementById('simFrameCount');
+    const simPlayButton = document.getElementById('simPlay');
+    const simReverseButton = document.getElementById('simReverse');
+    const simBackStepButton = document.getElementById('simBackStep');
+    const simNextStepButton = document.getElementById('simNextStep');
+    const simSlowerButton = document.getElementById('simSlower');
+    const simFasterButton = document.getElementById('simFaster');
+    const replayCheckbox = document.getElementById('replayLoopAtEnd');
+    const simZoomOutButton = document.getElementById('simZoomOut');
+    const simZoomInButton = document.getElementById('simZoomIn');
+    const replayCameraTrackDroneAndLandingPad = document.getElementById('replay-camera-track-drone-and-landing-pad');
+    const replayCameraTrackDrone = document.getElementById('replay-camera-track-drone');
+    const simSpeedSlider = document.getElementById('simSpeed');
+    const simSpeedMarkers = document.getElementById('simSpeedMarkers');
+    const levelInput = document.getElementById('levelInput');
+    const levelSolution = document.getElementById('levelSolution');
+    const simResultType = document.getElementById('sim-result-type');
+    const simResult = document.getElementById('sim-result');
+    const codinator = document.getElementById('codinator');
+
+    const levelToInputs = {
+        4: '5923 3701 132',
+        5: '6500 1500 104\n' +
+            '3\n' +
+            '3000 5000 3500\n' +
+            '6000 7000 1500\n' +
+            '8000 10000 5500\n',
+        6: '-30000 3125 300\n' +
+            '6\n' +
+            '-2500 -1000 5000\n' +
+            '-5500 -4500 10000\n' +
+            '-12000 -7000 12500\n' +
+            '-29500 -15000 6500\n' +
+            '-30250 -29750 3125\n' +
+            '-32500 -30500 20000\n' +
+            '2\n' +
+            '-7000 -2500\n' +
+            '-29500 -28000',
+    }
+
+    const levelToSolutions = {
+        4: '1,11 0,19 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 9,10 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 10,0 0,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 10,0 -10,0 -10,0 -10,0 -10,0 -10,0 -10,0 -10,10 -10,0 -10,0 -10,0 -10,0 -10,0 -10,0 -10,0 -10,0 -10,0 -10,0 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 -10,10 -10,10 -10,10 -10,10 -10,10 3,10 -3,10 0,9',
+        5: '0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 20,0 0,0 20,0 20,0 20,0 20,0 20,0 20,0 20,0 20,0 20,0 20,0 20,0 20,0 20,0 20,0 20,0 20,0 20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 -20,0 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,1 0,9 0,0 0,0 0,0 0,10 0,0 0,10 0,20 0,20 0,20 0,20 0,19',
+        6: '0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 -10,10 0,10 0,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,10 10,0 10,0 10,0 10,0 -10,0 -10,0 -10,0 -10,0 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,6 0,4 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,10 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,20 0,19',
+    }
+
+    // Main lifecycle
+
+    function init() {
+        const scaleToUToPxLabel = [
+            '1/256', '3/512',
+            '1/128', '3/256',
+            '1/64', '3/128',
+            '1/32', '3/64',
+            '1/16', '3/32',
+            '1/8', '3/16',
+            '1/4', '3/8',
+            '1/2', '3/4',
+            '1/1', '3/2',
+            '2/1'
+        ];
+        const scaleToUToPx = scaleToUToPxLabel.map(it => eval(it));
+        const scaleIndex = scaleToUToPx.indexOf(1 / 16);
+        state.render = {
+            context: canvas.getContext('2d'),
+            w: canvas.width,
+            h: canvas.height,
+            scaleIndex,
+            scaleToUToPx,
+            scaleToUToPxLabel,
+            uToPx: scaleToUToPx[scaleIndex],
+            gridCellSize: 1000,
+            infoTextBoxPadding: 8,
+            infoTextPadding: 4,
+            droneMinimumPixelWidth: 50,
+            droneMinimumPixelHeight: 50,
+            speedPoints: [{
+                speed: Math.max(Math.abs(MIN_LANDING_VELOCITY_Y), Math.abs(MAX_LANDING_VELOCITY_Y)),
+                color: color(0, 127, 0),
+            }, {
+                speed: 500,
+                color: color(0, 255, 0),
+            }, {
+                speed: 1000,
+                color: color(255, 255, 0),
+            }, {
+                speed: 1500,
+                color: color(255, 0, 0),
+            }, {
+                speed: 2000,
+                color: color(127, 0, 0),
+            }],
+            droneImage: createDroneImage('#FFF'),
+            drawVectorX: false,
+            drawVectorY: false,
+            drawVector: false,
+            drawGrid: true,
+            drawPast: true,
+            drawFuture: true,
+        };
+
+        addEventListener('keydown', onKeydown);
+        addEventListener('keyup', onKeyup);
+        canvas.addEventListener('mousemove', onCanvasMouseMove);
+        canvas.addEventListener('mousedown', onCanvasMouseDown);
+        canvas.addEventListener('mouseup', onCanvasMouseUp);
+        canvas.addEventListener('mouseout', onCanvasMouseOut);
+        canvas.addEventListener('wheel', onCanvasWheel);
+        frameSlider.addEventListener('input', () => simFrameSliderUpdate());
+        simPlayButton.addEventListener('click', () => simPlay());
+        simReverseButton.addEventListener('click', () => simReverse());
+        simBackStepButton.addEventListener('click', () => simStepBack());
+        simNextStepButton.addEventListener('click', () => simStepNext());
+        simSlowerButton.addEventListener('click', () => simSlower());
+        simFasterButton.addEventListener('click', () => simFaster());
+        replayCheckbox.addEventListener('input', () => replayLoopAtEndUpdate());
+        simZoomOutButton.addEventListener('click', () => zoom(-1));
+        simZoomInButton.addEventListener('click', () => zoom(1));
+        replayCameraTrackDroneAndLandingPad.addEventListener('click', () => simSetCameraModeTrackBothObjects(true));
+        replayCameraTrackDrone.addEventListener('click', () => simSetCameraModeTrackBothObjects(false));
+        simSpeedSlider.addEventListener('input', () => simSpeedChange());
+        levelInput.addEventListener('input', () => updateInput(true));
+        levelSolution.addEventListener('input', () => updateSolution());
+        codinator.addEventListener('click', () => simMode());
+
+        initGameState();
+        levelInput.addEventListener('drop', updateInputDrop);
+        levelInput.value = levelToInputs[state.level];
+        updateInput();
+
+        levelSolution.addEventListener('drop', updateSolutionDrop);
+        levelSolution.value = levelToSolutions[state.level];
+        updateSolution();
+
+        handleSpilloverEvents();
+
+        simSetCameraModeTrackBothObjects(true);
+
+        // Start logic and graphics loop
+        window.requestAnimationFrame(loop);
+    }
+
+    /**
+     * Make that elements you click on won't interact with other events.
+     * e.g. you click on a button, and it gets highlighted and when you pause (space) it gets triggered.
+     */
+    function handleSpilloverEvents() {
+        const interactiveElements = [
+            ...document.getElementsByTagName('input'),
+            ...document.getElementsByTagName('button'),
+        ];
+        interactiveElements.forEach(
+            (element) => element.addEventListener('click', () => element.blur())
+        );
+    }
+
+    function initGameState() {
+        // NOTE(alex): Sim speed options are populated from the template
+        const simSpeedLabels = [...simSpeedMarkers.getElementsByTagName('option')].map(option => option.label).reverse();
+        const simSpeedOptions = simSpeedLabels.map(speedLabel => eval(speedLabel));
+        const simSpeed = 1;
+
+        const gridSize = state.render.gridCellSize;
+        const halfGridSize = 0.5 * gridSize;
+        state.game = {
+            lastTimeSinceStart: 0,
+            logicTimeStepThreshold: 16.6,
+            logicTimeSinceLastStep: 0,
+            input: {
+                up: false,
+                down: false,
+                left: false,
+                right: false,
+                shift: false,
+                nextTick: false,
+                prevTick: false,
+                mouseIn: false,
+                mouseScreenPosition: v2(),
+                mouseNormalizedPosition: v2(),
+            },
+            simSpeed,
+            simSpeedOptions,
+            simRunning: true,
+            replayFrameLimit: 0,
+            replayRunning: true,
+            replayForwards: true,
+            replayFrameIndex: 0,
+            replayStates: [],
+            replayLoopAtEnd: replayCheckbox.checked,
+            camera: v2(),
+            drone: {
+                p: v2(0, halfGridSize),
+                v: v2(),
+                a: v2(),
+                w: 500,
+                h: 500,
+            },
+            gravity: -10,
+            pastPositionsMaxCount: 1000,
+            pastPositions: [],
+            futurePositionsMaxCount: 500,
+            futurePositions: [],
+            futureVelocities: [],
+            flyingHeight: 0,
+            helipad: {
+                p: v2(0, 0),
+            },
+            buildings: [],
+            silentZones: [],
+        };
+    }
+
+    /**
+     * Main loop function. Gets called by `window.requestAnimationFrame`.
+     * @param {number} timeSinceStart - Time in ms elapsed since the start.
+     */
+    function loop(timeSinceStart) {
+        const deltaTime = timeSinceStart - state.game.lastTimeSinceStart;
+        state.game.lastTimeSinceStart = timeSinceStart;
+
+        update(deltaTime);
+        draw();
+        window.requestAnimationFrame(loop);
+    }
+
+    /**
+     * Main game state update loop. Gets called every frame.
+     * @param {number} deltaTime - Time delta since last update call.
+     */
+    function update(deltaTime) {
+        if (state.game.simSpeed > 0 && state.game.simRunning) {
+            const threshold = state.game.logicTimeStepThreshold / state.game.simSpeed;
+            state.game.logicTimeSinceLastStep += deltaTime;
+            while (state.game.logicTimeSinceLastStep > threshold && state.game.simRunning) {
+                state.game.logicTimeSinceLastStep -= threshold;
+                logicUpdate(state.game.replayForwards, false);
+            }
+        } else if (state.game.input.nextTick) {
+            state.game.input.nextTick = false;
+            logicUpdate(true, true);
+        } else if (state.game.input.prevTick) {
+            state.game.input.prevTick = false;
+            logicUpdate(false, true);
+        }
+    }
+
+    /**
+     * Logic update loop.
+     * This updates the state of the drone. Framerate independent.
+     * @param {boolean} forwards - Direction of flow.
+     * @param {boolean} manual - True if the update is triggered step by step.
+     */
+    function logicUpdate(forwards = true, manual = false) {
+        if (state.game.replayRunning) {
+            if (forwards) {
+                if (state.game.replayFrameIndex < state.game.replayStates.length - 1) {
+                    ++state.game.replayFrameIndex;
+                } else {
+                    if (manual || state.game.replayLoopAtEnd) {
+                        state.game.replayFrameIndex = 0;
+                    } else {
+                        state.game.replayFrameIndex = state.game.replayStates.length - 1;
+                        simPlay();
+                    }
+                }
+            } else {
+                if (state.game.replayFrameIndex > 0) {
+                    --state.game.replayFrameIndex;
+                } else {
+                    if (manual || state.game.replayLoopAtEnd) {
+                        state.game.replayFrameIndex = state.game.replayStates.length - 1;
+                    } else {
+                        state.game.replayFrameIndex = 0;
+                        simPlay();
+                    }
+                }
+            }
+            this.setDroneStateFromFrameIndex();
+            currentFrameDisplay.textContent = `${state.game.replayFrameIndex}`;
+            frameSlider.value = state.game.replayFrameIndex;
+        } else {
+            state.game.drone.a = v2(0, state.game.input.shift ? 0 : 8);
+            if (state.game.input.up) {
+                state.game.drone.a.y = state.game.input.shift ? 20 : 12;
+            }
+            if (state.game.input.down) {
+                state.game.drone.a.y = state.game.input.shift ? 0 : 8;
+            }
+            if (state.game.input.left) {
+                state.game.drone.a.x = state.game.input.shift ? -20 : -2;
+            }
+            if (state.game.input.right) {
+                state.game.drone.a.x = state.game.input.shift ? 20 : 2;
+            }
+
+            if (state.game.pastPositions.length >= state.game.pastPositionsMaxCount) {
+                state.game.pastPositions.pop();
+            }
+            state.game.pastPositions.unshift(v2v(state.game.drone.p));
+
+            simMove(
+                state.game.drone.p,
+                state.game.drone.v,
+                state.game.drone.a,
+                state.game.buildings,
+                state.game.silentZones,
+            );
+        }
+
+        this.predictFuturePositions();
+    }
+
+    function setDroneStateFromFrameIndex() {
+        const currentReplayState = state.game.replayStates[state.game.replayFrameIndex];
+        state.game.drone.p = v2v(currentReplayState.p);
+        state.game.drone.v = v2v(currentReplayState.v);
+        state.game.drone.a = v2v(currentReplayState.a);
+    }
+
+    function predictFuturePositions() {
+        const futurePosition = v2v(state.game.drone.p);
+        const futureVelocity = v2v(state.game.drone.v);
+        const futureAcceleration = v2(0, 0);
+        if (!state.game.replayRunning && !state.game.input.shift) {
+            futureAcceleration.y = 8;
+        }
+        state.game.futurePositions = [];
+        state.game.futureVelocities = [];
+        for (let index = 0; index < state.game.futurePositionsMaxCount; ++index) {
+            const {collided} = simMove(
+                futurePosition,
+                futureVelocity,
+                futureAcceleration,
+                state.game.replayRunning ? null : state.game.buildings,
+                state.game.silentZones,
+            );
+            if (state.game.replayRunning && collided) {
+                break;
+            }
+            state.game.futurePositions.push(v2v(futurePosition));
+            state.game.futureVelocities.push(v2v(futureVelocity));
+        }
+    }
+
+    const SPEED_LIMIT = 2000000000;
+
+    /**
+     * Calculate the next position and velocity given the acceleration.
+     * @param {Vector2} position - Initial position, will be updated with the new position.
+     * @param {Vector2} velocity - Initial velocity, will be updated with the new velocity.
+     * @param {Vector2} acceleration - Acceleration to apply to velocity.
+     * @param {Array.<Building>} [buildings] - Building entities.
+     * @param {Array.<SilentZone>} [silentZones] - Silent zones entities.
+     * @returns {{collided: boolean, landingSpeed: number, acceleratedInSilentZone: boolean}} collision detected
+     */
+    function simMove(position, velocity, acceleration, buildings, silentZones) {
+        let collided = false;
+        let landingSpeed = 0
+        velocity.x = clamp(velocity.x + acceleration.x, -SPEED_LIMIT, SPEED_LIMIT);
+        velocity.y = clamp(velocity.y + acceleration.y + state.game.gravity, -SPEED_LIMIT, SPEED_LIMIT);
+
+        if (position.y + velocity.y <= 0) {
+            collided = true;
+            landingSpeed = velocity.y;
+            position.y = 0;
+            velocity.y = 0;
+        }
+
+        if (buildings && buildings.length) {
+            collided = handleCollisions(position, velocity, buildings) || collided;
+        }
+
+        let acceleratedInSilentZone = false;
+        if (silentZones && silentZones.length) {
+            acceleratedInSilentZone = handleSilentZones(position, acceleration, silentZones) || acceleratedInSilentZone;
+        }
+
+        position.x += velocity.x;
+        position.y += velocity.y;
+        return {collided, landingSpeed, acceleratedInSilentZone};
+    }
+
+    /**
+     * Test if the next position would be inside any building, if so resolve the collision by
+     * moving the position back to the intersection point of the colliding side.
+     * @param {Vector2} position - Current position.
+     * @param {Vector2} velocity - Current velocity.
+     * @param {Array.<Building>} buildings - Building entities.
+     * @returns {boolean} collision detected.
+     */
+    function handleCollisions(position, velocity, buildings) {
+        const newPosition = v2(
+            position.x + velocity.x,
+            position.y + velocity.y,
+        );
+        const helipad = state.game.helipad;
+        if ((newPosition.x === helipad.p.x) && (newPosition.y === helipad.p.y)) {
+            // TODO(alex): refine this
+            return true;
+        }
+        for (const building of buildings) {
+            const left = building.p.x - 0.5 * building.w;
+            const right = building.p.x + 0.5 * building.w;
+            const top = building.p.y + building.h;
+            const bottom = building.p.y;
+            if (left <= newPosition.x && newPosition.x <= right && bottom <= newPosition.y && newPosition.y <= top) {
+                const xCollision = bottom <= position.y && position.y <= top;
+                const yCollision = left <= position.x && position.x <= right;
+                if (xCollision) {
+                    position.x = clamp(position.x, left - 1, right + 1);
+                    velocity.x = 0;
+                }
+                if (yCollision) {
+                    position.y = clamp(position.y, bottom - 1, top + 1);
+                    velocity.y = 0;
+                }
+                return true;
+            }
+            if (collidesLineRect(position, newPosition, left, right, bottom, top)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function collidesLineRect(p0, p1, left, right, bottom, top) {
+        const rectBL = v2(left, bottom)
+        const rectBR = v2(right, bottom);
+        const rectTL = v2(left, top);
+        const rectTR = v2(right, top);
+
+        if (p0.y > top && p1.y > top) {
+            return false;
+        }
+
+        if (p0.x < left && p1.left < left) {
+            return false;
+        }
+
+        if (p0.x > right && p1.left > right) {
+            return false;
+        }
+
+        const collidesL = collidesLineLine(p0, p1, rectBL, rectTL);
+        const collidesR = collidesLineLine(p0, p1, rectBR, rectTR);
+        const collidesT = collidesLineLine(p0, p1, rectTL, rectTR);
+        const collidesB = collidesLineLine(p0, p1, rectBL, rectBR);
+
+        return collidesL || collidesR || collidesT || collidesB;
+    }
+
+    function collidesLineLine(p0, p1, r0, r1) {
+        const d = (r1.y - r0.y) * (p1.x - p0.x) - (r1.x - r0.x) * (p1.y - p0.y);
+
+        const a0 = (r1.x - r0.x) * (p0.y - r0.y) - (r1.y - r0.y) * (p0.x - r0.x);
+        const dA = a0 / d;
+        const b0 = (p1.x - p0.x) * (p0.y - r0.y) - (p1.y - p0.y) * (p0.x - r0.x);
+        const dB = b0 / d;
+
+        return 0 <= dA && dA <= 1 && 0 <= dB && dB <= 1;
+    }
+
+    /**
+     * Test if the drone accelerated in a silent zone.
+     * @param {Vector2} position - The current position of the drone.
+     * @param {Vector2} acceleration - The current acceleration of the drone.
+     * @param {Array.<SilentZone>} silentZones - Silent zone entities.
+     * @returns {boolean} accelerated in a silent zone.
+     */
+    function handleSilentZones(position, acceleration, silentZones) {
+        if (acceleration.x === 0 && acceleration.y === 0) {
+            return false;
+        }
+        for (const silentZone of silentZones) {
+            const silentZoneFromX = silentZone.x - 0.5 * silentZone.w;
+            const silentZoneToX = silentZone.x + 0.5 * silentZone.w;
+            if (silentZoneFromX <= position.x && position.x <= silentZoneToX) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Draw loop.
+     */
+    function draw() {
+        canvas.width = 0
+        canvas.height = 0
+        // NOTE(alex): this prevents the game from freezing
+        const w = Math.max(canvas.offsetWidth, 1);
+        const h = Math.max(canvas.offsetHeight, 1);
+        canvas.width = w;
+        canvas.height = h;
+        state.render.w = w;
+        state.render.h = h;
+        state.render.context.clearRect(0, 0, w, h);
+
+        const {drone, helipad, buildings, silentZones} = state.game;
+        if (replayCameraTrackDroneAndLandingPad.checked) {
+            const screenEdgeOffsetX = Math.min(400, 0.25 * w);
+            const screenEdgeOffsetY = Math.min(600, 0.25 * h);
+            const helipadToCameraLengthX = Math.abs(helipad.p.x - drone.p.x);
+            const helipadToCameraLengthY = Math.abs(helipad.p.y - drone.p.y);
+            const ratioX = (w - screenEdgeOffsetX) / helipadToCameraLengthX;
+            const ratioY = (h - screenEdgeOffsetY) / helipadToCameraLengthY;
+            const ratio = Math.min(ratioX, ratioY);
+            state.render.uToPx = clamp(
+                ratio,
+                0,
+                state.render.scaleToUToPx[state.render.scaleToUToPx.indexOf(3 / 16)]
+            );
+            const cameraGroundOffsetY = (0.5 * h) / state.render.uToPx - state.render.gridCellSize;
+            state.game.camera = v2(
+                0.5 * (drone.p.x + helipad.p.x),
+                Math.max(0.5 * (drone.p.y + helipad.p.y), cameraGroundOffsetY),
+            );
+        } else {
+            state.render.uToPx = state.render.scaleToUToPx[state.render.scaleIndex];
+            const cameraGroundOffsetY = (0.5 * h) / state.render.uToPx - state.render.gridCellSize;
+            state.game.camera = v2(
+                drone.p.x,
+                Math.max(drone.p.y, cameraGroundOffsetY),
+            );
+        }
+
+        // World space
+        drawGrid(state.render);
+
+        drawSilentZones(state.render, silentZones);
+        drawGround(state.render);
+        drawFlyingHeight(state.render, state.game.flyingHeight);
+        drawBuildings(state.render, buildings);
+        drawHelipad(state.render, helipad);
+        drawDrone(state.render, drone);
+
+        // UI space
+        drawStats(state.render, drone);
+        drawMapScale(state.render);
+        drawMode(state.render);
+        drawGizmo(state.render);
+    }
+
+    /**
+     * Convert a point from world coordinates to screen space coordinates with respect to the camera.
+     * @param {Vector2} worldPosition - Point in world coordinates.
+     * @return {Vector2} - Point in screen space coordinates translated to the camera location.
+     */
+    function worldToScreenSpace(worldPosition) {
+        const worldCenteredX = worldPosition.x - state.game.camera.x;
+        const worldCenteredY = worldPosition.y - state.game.camera.y;
+        const screenX = state.render.uToPx * worldCenteredX + 0.5 * state.render.w;
+        const screenY = state.render.h - (state.render.uToPx * worldCenteredY + 0.5 * state.render.h);
+        return v2(screenX, screenY);
+    }
+
+    /**
+     * Draws all silent zones.
+     * @param {RenderState} render - The render state.
+     * @param {Array.<SilentZone>} silentZones - Silent zones entities.
+     */
+    function drawSilentZones(render, silentZones) {
+        for (const silentZone of silentZones) {
+            drawSilentZone(render, silentZone);
+        }
+    }
+
+    /**
+     * Draw a silent zone.
+     * @param {RenderState} render - The render state.
+     * @param {SilentZone} silentZone - Silent zone entity.
+     */
+    function drawSilentZone(render, silentZone) {
+        const silentZoneScreenP = worldToScreenSpace(v2(
+            silentZone.x, 0
+        ));
+        const x = silentZoneScreenP.x;
+        const w = state.render.uToPx * silentZone.w;
+        render.context.fillStyle = 'rgba(190, 0, 0, 0.4)';
+        render.context.fillRect(x - 0.5 * w, 0, w, render.h);
+    }
+
+    /**
+     * Draw the ground.
+     * @param {RenderState} render - The render state.
+     */
+    function drawGround(render) {
+        const groundScreenP = worldToScreenSpace(v2());
+        const backgroundSize = render.uToPx * render.gridCellSize / 4;
+        render.context.fillStyle = 'rgb(40, 20, 0)';
+        render.context.fillRect(0, groundScreenP.y - backgroundSize, render.w, state.render.uToPx * 2 * state.render.gridCellSize);
+        render.context.fillStyle = 'rgb(127, 63, 0)';
+        render.context.fillRect(0, groundScreenP.y, render.w, state.render.uToPx * 2 * state.render.gridCellSize);
+    }
+
+    /**
+     * Draw the target height.
+     * @param {RenderState} render - The render state.
+     * @param {number} height - The target height.
+     */
+    function drawFlyingHeight(render, height) {
+        if (state.level !== 4) {
+            return;
+        }
+        const heightLimitScreenP = worldToScreenSpace(v2(0, height));
+        render.context.strokeStyle  = 'rgba(255, 255, 0, 1)';
+        render.context.lineWidth = 2;
+        render.context.beginPath();
+        render.context.moveTo(0, heightLimitScreenP.y);
+        render.context.lineTo(render.w, heightLimitScreenP.y);
+        render.context.stroke();
+        render.context.closePath();
+    }
+
+    /**
+     * Draw a metric grid to indicate positioning and scale.
+     * @param {RenderState} render - The render state.
+     */
+    function drawGrid(render) {
+        if (!state.render.drawGrid) {
+            return;
+        }
+
+        const gridCellSizeScreen = state.render.uToPx * render.gridCellSize;
+
+        const gridLinesX = Math.ceil(0.5 * render.w / gridCellSizeScreen);
+        const gridOffsetX = Math.ceil(state.game.camera.x / render.gridCellSize);
+        const gridFromX = gridOffsetX - gridLinesX;
+        const gridToX = gridOffsetX + gridLinesX;
+
+        const gridLinesY = Math.ceil(render.h / gridCellSizeScreen) + 1;
+        const gridOffsetY = Math.ceil(state.game.camera.y / render.gridCellSize);
+        const gridFromY = gridOffsetY - gridLinesY;
+        const gridToY = gridOffsetY + gridLinesY;
+
+        const gridCount = Math.max(gridLinesX, gridLinesY);
+        const decider = gridModeLineDecider(gridCount);
+
+        for (let x = gridFromX; x < gridToX; ++x) {
+            const shouldDrawLine = setGridMode(render, x, decider);
+            if (shouldDrawLine) {
+                const gridSpaceP = worldToScreenSpace(v2(render.gridCellSize * x, 0));
+                render.context.fillRect(gridSpaceP.x - 1, 0, 2, render.h);
+            }
+        }
+
+        for (let y = gridFromY; y < gridToY; ++y) {
+            const shouldDrawLine = setGridMode(render, y, decider);
+            if (shouldDrawLine) {
+                const gridSpaceP = worldToScreenSpace(v2(0, render.gridCellSize * y));
+                render.context.fillRect(0, gridSpaceP.y - 1, render.w, 2);
+            }
+        }
+    }
+
+    /**
+     * Find how often to draw strong and weak lines.
+     * @param {number} count - The maximum number of lines to draw.
+     * @return {{strongLineDivisor: number, weakLineDivisor: number}}
+     */
+    function gridModeLineDecider(count) {
+        let reducedCount = count;
+        let strongLineDivisor = 5;
+        let weakLineDivisor = 1;
+        while (reducedCount >= 25) {
+            reducedCount = Math.floor(reducedCount / 5);
+            strongLineDivisor *= 5;
+            weakLineDivisor *= 5;
+        }
+        return {strongLineDivisor, weakLineDivisor};
+    }
+
+    /**
+     * Sets the color for the appropriate line to draw.
+     * Every 5th line is a main line and will have a stronger accent. Weaker lines will have a darker color.
+     * For very large counts of lines don't draw ternary or worse lines at all! The return value should be used for that.
+     * @param {RenderState} render - The render context
+     * @param {number} value - The grid line index to draw.
+     * @param {number} strongLineDivisor - Strongly draw a line once per this many lines.
+     * @param {number} weakLineDivisor - Weakly draw a line once per this many lines.
+     * @return {boolean} - should the line be drawn at all.
+     */
+    function setGridMode(render, value, {strongLineDivisor, weakLineDivisor}) {
+        if (value % strongLineDivisor === 0) {
+            render.context.fillStyle = 'rgb(100, 100, 100)';
+        } else if (value % weakLineDivisor === 0) {
+            render.context.fillStyle = 'rgb(50, 50, 50)';
+        } else {
+            return false;
+        }
+        return true;
+
+    }
+
+    /**
+     * Draw the buildings.
+     * @param {RenderState} render
+     * @param {Array.<Building>} buildings
+     */
+    function drawBuildings(render, buildings) {
+        for (const building of buildings) {
+            const buildingScreenP = worldToScreenSpace(v2v(building.p));
+            const width = render.uToPx * building.w;
+            const height = render.uToPx * building.h;
+            const backgroundSize = render.uToPx * render.gridCellSize / 8;
+
+            drawSideParallelepiped(render, buildingScreenP.x, buildingScreenP.y - height, width, height, backgroundSize, 'rgb(40, 40, 40)');
+            drawTopParallelepiped(render, buildingScreenP.x, buildingScreenP.y - height, width, backgroundSize, 'rgb(60, 60, 60)');
+            drawFront(render, buildingScreenP.x, buildingScreenP.y - height, width, height, 'rgb(120, 120, 120)');
+
+            if (building.hasLandingPad) {
+                const landingPadOffset = Math.min(height, render.uToPx * render.gridCellSize / 12);
+                drawSideParallelepiped(render, buildingScreenP.x, buildingScreenP.y - height, width, landingPadOffset, backgroundSize, 'rgb(77, 67, 0)');
+                drawTopParallelepiped(render, buildingScreenP.x, buildingScreenP.y - height, width, backgroundSize, 'rgb(128, 111, 0)');
+                drawFront(render, buildingScreenP.x, buildingScreenP.y - height, width, landingPadOffset, 'rgb(179, 156, 0)');
+                drawBeacons(render, v2(buildingScreenP.x, buildingScreenP.y - height), width, backgroundSize);
+            }
+        }
+    }
+
+    /**
+     * Draw the helipad.
+     * @param {RenderState} render
+     * @param {LandingPad} helipad
+     */
+    function drawHelipad(render, helipad) {
+        const helipadScreenPosition = worldToScreenSpace(v2(
+            helipad.p.x,
+            helipad.p.y,
+        ));
+
+        if (helipad.p.y === 0) {
+            const width = render.uToPx * 500;
+            const backgroundSize = render.uToPx * render.gridCellSize / 8;
+            drawTopParallelepiped(render, helipadScreenPosition.x, helipadScreenPosition.y, width, backgroundSize, 'rgb(128, 111, 0)');
+            drawBeacons(render, helipadScreenPosition, width, backgroundSize);
+        }
+
+        const width = 32;
+        render.context.strokeStyle = 'red';
+        render.context.lineWidth = 1;
+        render.context.beginPath();
+        render.context.moveTo(helipadScreenPosition.x - 0.5 * width, helipadScreenPosition.y - 0.5 * width);
+        render.context.lineTo(helipadScreenPosition.x + 0.5 * width, helipadScreenPosition.y + 0.5 * width)
+        render.context.closePath();
+        render.context.stroke();
+        render.context.beginPath();
+        render.context.moveTo(helipadScreenPosition.x - 0.5 * width, helipadScreenPosition.y + 0.5 * width);
+        render.context.lineTo(helipadScreenPosition.x + 0.5 * width, helipadScreenPosition.y - 0.5 * width)
+        render.context.closePath();
+        render.context.stroke();
+    }
+
+    function drawFront(render, x, y, width, height, color) {
+        render.context.strokeStyle = 'rgb(20, 20, 20)';
+        render.context.lineWidth = 1;
+        render.context.fillStyle = color;
+        render.context.fillRect(x - 0.5 * width, y, width, height);
+        render.context.strokeRect(x - 0.5 * width, y, width, height);
+    }
+
+    function drawSideParallelepiped(render, x, y, width, height, backgroundSize, color) {
+        render.context.strokeStyle = 'rgb(20, 20, 20)';
+        render.context.lineWidth = 1;
+        render.context.fillStyle = color;
+        render.context.beginPath();
+        render.context.moveTo(x + 0.5 * width, y);
+        render.context.lineTo(x + 0.5 * width + backgroundSize, y - backgroundSize);
+        render.context.lineTo(x + 0.5 * width + backgroundSize, y - backgroundSize + height);
+        render.context.lineTo(x + 0.5 * width, y + height);
+        render.context.closePath();
+        render.context.fill();
+        render.context.stroke();
+    }
+
+    function drawTopParallelepiped(render, x, y, width, backgroundSize, color) {
+        render.context.strokeStyle = 'rgb(20, 20, 20)';
+        render.context.lineWidth = 1;
+        render.context.fillStyle = color;
+        render.context.beginPath();
+        render.context.moveTo(x - 0.5 * width, y);
+        render.context.lineTo(x - 0.5 * width + backgroundSize, y - backgroundSize);
+        render.context.lineTo(x + 0.5 * width + backgroundSize, y - backgroundSize);
+        render.context.lineTo(x + 0.5 * width , y);
+        render.context.closePath();
+        render.context.fill();
+        render.context.stroke();
+    }
+
+    function drawBeacons(render, helipadScreenPosition, width, backgroundSize) {
+        const beaconRadius = render.uToPx * 50;
+        render.context.fillStyle = 'rgb(38, 200, 10)';
+        drawBeacon(render, helipadScreenPosition.x - 0.5 * width, helipadScreenPosition.y, beaconRadius);
+        drawBeacon(render, helipadScreenPosition.x - 0.5 * width + backgroundSize, helipadScreenPosition.y - backgroundSize, beaconRadius);
+        drawBeacon(render, helipadScreenPosition.x + 0.5 * width, helipadScreenPosition.y, beaconRadius);
+        drawBeacon(render, helipadScreenPosition.x + 0.5 * width + backgroundSize, helipadScreenPosition.y - backgroundSize, beaconRadius);
+    }
+
+    function drawBeacon(render, x, y, r) {
+        render.context.beginPath();
+        render.context.arc(x, y, r, 0, 2 * Math.PI);
+        render.context.closePath();
+        render.context.fill();
+    }
+
+    /**
+     * Draw the drone.
+     * @param {RenderState} render
+     * @param {Drone} drone
+     */
+    function drawDrone(render, drone) {
+        const droneScreenP = worldToScreenSpace(v2v(drone.p));
+
+        const width = Math.max(render.uToPx * drone.w, state.render.droneMinimumPixelWidth);
+        const height = Math.max(render.uToPx * drone.h, state.render.droneMinimumPixelHeight);
+
+        render.context.save();
+        render.context.translate(droneScreenP.x, droneScreenP.y);
+        const maxXSpeed = 20;
+        const droneAngle = (clamp(drone.a.x, -maxXSpeed, maxXSpeed) / maxXSpeed) * 90;
+        render.context.rotate(droneAngle * Math.PI / 180);
+        render.context.translate(-0.5 * width, -0.5 * height);
+        render.context.drawImage(render.droneImage, 0, 0, width, height);
+        render.context.restore();
+
+        const velocityX = 16 * render.uToPx * drone.v.x;
+        const velocityY = 16 * render.uToPx * drone.v.y;
+
+        // Velocity lines
+        if (state.render.drawVectorX) {
+            render.context.strokeStyle = 'red';
+            render.context.lineWidth = 2;
+            render.context.beginPath();
+            render.context.moveTo(droneScreenP.x, droneScreenP.y);
+            render.context.lineTo(droneScreenP.x + velocityX, droneScreenP.y);
+            render.context.stroke();
+            render.context.closePath();
+        }
+
+        if (state.render.drawVectorY) {
+            render.context.strokeStyle = 'blue';
+            render.context.lineWidth = 2;
+            render.context.beginPath();
+            render.context.moveTo(droneScreenP.x, droneScreenP.y);
+            render.context.lineTo(droneScreenP.x, droneScreenP.y - velocityY);
+            render.context.stroke();
+            render.context.closePath();
+        }
+
+        if (state.render.drawVector) {
+            render.context.strokeStyle = 'white';
+            render.context.lineWidth = 2;
+            render.context.beginPath();
+            render.context.moveTo(droneScreenP.x, droneScreenP.y);
+            render.context.lineTo(droneScreenP.x + velocityX, droneScreenP.y - velocityY);
+            render.context.stroke();
+            render.context.closePath();
+        }
+
+        // Past positions
+        if (state.render.drawPast) {
+            if (state.game.replayRunning) {
+                const from = state.game.replayFrameIndex;
+                const to = Math.max(0, state.game.replayFrameIndex - state.game.pastPositionsMaxCount);
+                for (let index = from; index >= to; --index) {
+                    const pastScreenP = worldToScreenSpace(state.game.replayStates[index].p);
+                    const pastPositionOpacity = 1 - mapValue(state.game.replayFrameIndex - index, 0, state.game.pastPositionsMaxCount - 1);
+                    render.context.fillStyle = `rgba(253, 221, 0, ${pastPositionOpacity})`;
+                    render.context.fillRect(pastScreenP.x - 1, pastScreenP.y - 1, 2, 2);
+                }
+            } else {
+                for (let index = 0; index < state.game.pastPositions.length; ++index) {
+                    const pastScreenP = worldToScreenSpace(state.game.pastPositions[index]);
+                    const pastPositionOpacity = 1 - mapValue(index, 0, state.game.pastPositionsMaxCount - 1);
+                    render.context.fillStyle = `rgba(253, 221, 0, ${pastPositionOpacity})`;
+                    render.context.fillRect(pastScreenP.x - 1, pastScreenP.y - 1, 2, 2);
+                }
+            }
+        }
+
+        // Trajectory
+        let previousScreenP = droneScreenP;
+        if (state.render.drawFuture) {
+            render.context.strokeStyle = 'green';
+            render.context.lineWidth = 2;
+            for (let index = 0; index < state.game.futurePositions.length; ++index) {
+                const futurePosition = state.game.futurePositions[index];
+                const futureVelocity = state.game.futureVelocities[index];
+                const futureSpeed = v2length(futureVelocity);
+                render.context.strokeStyle = speedColor(render, futureSpeed);
+                render.context.beginPath();
+                render.context.moveTo(previousScreenP.x, previousScreenP.y);
+                const futureScreenP = worldToScreenSpace(futurePosition);
+                render.context.lineTo(futureScreenP.x, futureScreenP.y,);
+                render.context.stroke();
+                render.context.closePath();
+                previousScreenP = futureScreenP;
+            }
+        }
+    }
+
+    /**
+     * Draw the position and velocity of the drone on the screen.
+     * @param {RenderState} render - The render state.
+     * @param {Drone} drone - The drone entity.
+     */
+    function drawStats(render, drone) {
+        const padding = render.infoTextBoxPadding;
+        const inner = render.infoTextBoxPadding + render.infoTextPadding;
+        let lastY = 0;
+        const sectionOffset = 24;
+        const lineOffset = 16;
+
+        render.context.font = 'bold 16px courier';
+        render.context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        render.context.fillRect(padding, padding, 150, 300);
+
+        const droneOnGround = drone.p.x === 0 && drone.p.y === 0;
+        const droneSafeLandingVelocityX = drone.v.x === 0
+        const droneSafeLandingVelocityY = MIN_LANDING_VELOCITY_Y <= drone.v.y && drone.v.y <= MAX_LANDING_VELOCITY_Y;
+        const droneSafeLandingVelocity = droneSafeLandingVelocityX && droneSafeLandingVelocityY;
+        const droneLandedSafely = droneSafeLandingVelocity && drone.p.x === state.game.helipad.p.x && drone.p.y === state.game.helipad.p.y;
+        const droneAccelerationAbsoluteSum = Math.abs(drone.a.x) + Math.abs(drone.a.y);
+        const droneAcceleratedToFast = droneAccelerationAbsoluteSum > MAX_ACCELERATION_ABSOLUTE_SUM;
+
+        const mouseNormalizedPosition = state.game.input.mouseNormalizedPosition;
+        const mouseWorldPos = v2(
+            ((mouseNormalizedPosition.x * render.w) / (2 * render.uToPx)) + state.game.camera.x,
+            ((mouseNormalizedPosition.y * render.h) / (2 * render.uToPx)) + state.game.camera.y,
+        );
+        render.context.fillStyle = 'rgb(180, 180, 180)';
+        render.context.fillText(`Mouse:`, inner, lastY += sectionOffset);
+        render.context.fillText(` Position`, inner, lastY += sectionOffset);
+        render.context.fillText(`  x = ${state.game.input.mouseIn ? mouseWorldPos.x.toFixed(2) : 'outside'}`, inner, lastY += lineOffset);
+        render.context.fillText(`  y = ${state.game.input.mouseIn ? mouseWorldPos.y.toFixed(2) : 'outside'}`, inner, lastY += lineOffset);
+
+        render.context.fillStyle = 'rgb(255, 255, 255)';
+        render.context.fillText(`Drone:`, inner, lastY += sectionOffset);
+        if (droneOnGround) {
+            render.context.fillStyle = 'rgb(180, 180, 180)';
+        } else if (droneLandedSafely) {
+            render.context.fillStyle = 'rgb(0, 150, 0)';
+        }
+        render.context.fillText(` Position`, inner, lastY += sectionOffset);
+        render.context.fillText(`  x = ${drone.p.x}`, inner, lastY += lineOffset);
+        if (state.level === 4) {
+            if (drone.p.y >= state.game.flyingHeight) {
+                render.context.fillStyle = 'rgb(255, 255, 0)';
+            } else {
+                render.context.fillStyle = 'rgb(255, 255, 255)';
+            }
+        }
+        if (droneOnGround) {
+            render.context.fillStyle = 'rgb(180, 180, 180)';
+        } else if (droneLandedSafely) {
+            render.context.fillStyle = 'rgb(0, 150, 0)';
+        }
+        render.context.fillText(`  y = ${drone.p.y}`, inner, lastY += lineOffset);
+
+        render.context.fillStyle = droneSafeLandingVelocity ? 'rgb(0, 150, 0)' : 'rgb(255, 255, 255)';
+        render.context.fillText(` Velocity`, inner, lastY += sectionOffset);
+        render.context.fillStyle = droneSafeLandingVelocityX ? 'rgb(0, 150, 0)' : 'rgb(255, 255, 255)';
+        render.context.fillText(`  x = ${drone.v.x}`, inner, lastY += lineOffset);
+        render.context.fillStyle = droneSafeLandingVelocityY ? 'rgb(0, 150, 0)' : 'rgb(255, 255, 255)';
+        render.context.fillText(`  y = ${drone.v.y}`, inner, lastY += lineOffset);
+        const speed = v2length(drone.v);
+        render.context.fillStyle = speedColor(render, speed);
+        render.context.fillText(`|v|= ${speed.toFixed(2)}`, inner, lastY += lineOffset);
+
+        render.context.fillStyle = 'rgb(255, 255, 255)';
+        if (droneAcceleratedToFast) {
+            render.context.fillStyle = 'rgb(255, 0, 0)';
+        }
+        render.context.fillText(` Acceleration`, inner, lastY += sectionOffset);
+        render.context.fillText(`  x = ${drone.a.x}`, inner, lastY += lineOffset);
+        render.context.fillText(`  y = ${drone.a.y}`, inner, lastY += lineOffset);
+
+        const speedSteps = Math.floor(droneAccelerationAbsoluteSum / 2);
+        let speedometer = Array(10).fill(' ');
+        for (let i = 1; i <= speedSteps; ++i) {
+            speedometer[i - 1] = '▓';
+        }
+        if (droneAccelerationAbsoluteSum % 2 === 1) {
+            speedometer[speedSteps] = '░';
+        }
+        render.context.fillText(` █${speedometer.join('')}█`, inner, lastY + lineOffset);
+    }
+
+    /**
+     *  Returns a color based on the speed, the faster, the redder.
+     * @param {RenderState} render
+     * @param {number} speed
+     * @return {string} Color string
+     */
+    function speedColor(render, speed) {
+        const speedPoint = searchSpeedPoints(render, speed);
+        if (speedPoint.from && speedPoint.to) {
+            const t = mapValue(speed, speedPoint.from.speed, speedPoint.to.speed);
+            return colorStyle(colorLerp(t, speedPoint.from.color, speedPoint.to.color));
+        } else {
+            const {color} = speedPoint.from || speedPoint.to;
+            return colorStyle(color);
+        }
+    }
+
+    function searchSpeedPoints(render, speed) {
+        for (let index = 0; index < render.speedPoints.length; ++index) {
+            const speedPoint = render.speedPoints[index];
+            if (speed <= speedPoint.speed) {
+                if (index === 0) {
+                    return {
+                        from: null,
+                        to: speedPoint,
+                    }
+                }
+                return {
+                    from: render.speedPoints[index - 1],
+                    to: speedPoint,
+                };
+            }
+        }
+        return {
+            from: render.speedPoints[render.speedPoints.length - 1],
+            to: null,
+        }
+    }
+
+    /**
+     * Draws a fancy scale of current zoom level.
+     * @param {RenderState} render
+     */
+    function drawMapScale(render) {
+        const sizeX = 328;
+        const sizeY = 80;
+        const offsetBox = v2(
+            render.w - sizeX - render.infoTextBoxPadding,
+            render.infoTextBoxPadding
+        );
+        render.context.font = 'bold 12px courier';
+        render.context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        render.context.fillRect(offsetBox.x, offsetBox.y, sizeX, sizeY);
+
+        const pixelSizes = Array(9).fill(0).map((_, index) => index * 32);
+
+        const offsetX = offsetBox.x + 12;
+        const offsetY = offsetBox.y + 48;
+        // Draw pixel scale
+        for (let i = 0; i < pixelSizes.length; ++i) {
+            const x = pixelSizes[i];
+            const isLast = (i === pixelSizes.length - 1);
+
+            render.context.fillStyle = (i % 2 === 0) ? 'white' : 'gray';
+            render.context.fillRect(offsetX + x, offsetY, 2, 12);
+            const bottomText = `${x}${isLast ? 'px' : ''}`;
+            render.context.fillText(`${bottomText}`, offsetX + x - 4, offsetY + 24);
+            if (!isLast) {
+                render.context.fillStyle = (i % 2 === 0) ? 'white' : 'black';
+                const boxPixelSize = pixelSizes[i + 1] - x;
+                render.context.fillRect(offsetX + x, offsetY, boxPixelSize, 6);
+            }
+        }
+
+        // Draw metric grid
+        const bestFit = findBestFit();
+        if (bestFit !== null) {
+            for (let i = 0; i < bestFit.values.length; ++i) {
+                const element = bestFit.values[i];
+                const x = element.px;
+                const isLast = (i === bestFit.values.length - 1);
+                render.context.fillStyle = (i % 2 === 0) ? 'gray' : 'white'
+                render.context.fillRect(offsetX + x, offsetY - 13, 2, 12);
+                const bottomText = `${element.u}${isLast ? bestFit.unit : ''}`;
+                render.context.fillText(`${bottomText}`, offsetX + x - 4, offsetY - 18);
+                if (!isLast) {
+                    render.context.fillStyle = (i % 2 === 0) ? 'black' : 'white';
+                    const boxPixelSize = bestFit.values[i + 1].px - x;
+                    render.context.fillRect(offsetX + x, offsetY - 7, boxPixelSize, 6);
+                }
+            }
+        }
+
+        render.context.fillStyle = 'white';
+        let scaleText;
+        if (render.uToPx === render.scaleToUToPx[render.scaleIndex]) {
+            scaleText = `${render.scaleToUToPxLabel[render.scaleIndex]}`;
+        } else {
+            scaleText = `${render.uToPx}`
+        }
+        render.context.fillText(`Scale Units to Pixels: ${scaleText}`, offsetX, offsetY - 35);
+    }
+
+    function findBestFit() {
+        const uSizes = [
+            1, 5,
+            10, 20, 25, 50, 75,
+            100, 200, 250, 500, 750,
+            1000, 2000, 2500, 5000, 7500,
+            10000, 20000, 25000, 50000, 75000,
+            100000, 200000, 250000, 500000, 750000,
+        ];
+        for (let uSize of uSizes) {
+            const pxSize = uSize * state.render.uToPx;
+            const fit = Math.floor(300 / pxSize);
+            const useUnits = uSize <= 1500;
+            if (fit >= 5 && fit <= 9) {
+                const div = useUnits ? 1 : 1000;
+                return {
+                    values: Array(fit).fill(0).map((_, index) => ({u: index * uSize / div, px: index * pxSize})),
+                    unit: useUnits ? 'u' : 'Mu'
+                };
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Draw info about the simulation mode.
+     * @param {RenderState} render - The render state.
+     */
+    function drawMode(render) {
+        // If manual mode display it on screen
+        if (!state.game.replayRunning) {
+            const sizeX = 200;
+            const sizeY = 80;
+            render.context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            render.context.fillRect(render.w - sizeX - state.render.infoTextBoxPadding, render.h - sizeY - state.render.infoTextBoxPadding, sizeX, sizeY);
+            render.context.font = 'bold 16px courier';
+            render.context.fillStyle = 'rgb(200, 20, 12)';
+            let lastOffsetY = render.h - sizeY - state.render.infoTextPadding;
+            render.context.fillText(' MANUAL MODE ACTIVE', render.w - sizeX, lastOffsetY += 16);
+            render.context.fillText('WASD - Accelerate', render.w - sizeX, lastOffsetY += 16);
+            render.context.fillText('Shift - Turbo', render.w - sizeX, lastOffsetY += 16);
+            render.context.fillText('M - Replay mode', render.w - sizeX, lastOffsetY + 16);
+        } else {
+            const sizeX = 120;
+            const sizeY = 20;
+            render.context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            render.context.fillRect(render.w - sizeX - state.render.infoTextBoxPadding, render.h - sizeY - state.render.infoTextBoxPadding, sizeX, sizeY);
+            render.context.font = 'bold 16px courier';
+            render.context.fillStyle = 'rgb(20, 200, 20)';
+            let lastOffsetY = render.h - sizeY - state.render.infoTextPadding;
+            render.context.fillText('Replay Mode', render.w - sizeX, lastOffsetY + 10);
+        }
+    }
+
+    /**
+     * Draw coordinate system info.
+     * @param {RenderState} render - The render state.
+     */
+    function drawGizmo(render) {
+        render.context.lineWidth = 1;
+        render.context.font = 'bold 16px courier';
+
+        render.context.fillStyle = 'rgb(255, 0, 0)';
+        render.context.strokeStyle = 'rgb(255, 0, 0)';
+        render.context.beginPath();
+        render.context.moveTo(0.5 + 16, 0.5 + render.h - 16);
+        render.context.lineTo(0.5 + 16 + 32, 0.5 + render.h - 16);
+        render.context.lineTo(0.5 + 16 + 32 - 8, 0.5 + render.h - 16 + 4);
+        render.context.moveTo(0.5 + 16 + 32, 0.5 + render.h - 16);
+        render.context.lineTo(0.5 + 16 + 32 - 8, 0.5 + render.h - 16 - 4);
+        render.context.stroke();
+        render.context.closePath();
+        render.context.fillText('X', 16 + 32, render.h - 16 + 5);
+
+        render.context.fillStyle = 'rgb(0, 255, 0)';
+        render.context.strokeStyle = 'rgb(0, 255, 0)';
+        render.context.beginPath();
+        render.context.moveTo(0.5 + 16, 0.5 + render.h - 16);
+        render.context.lineTo(0.5 + 16, 0.5 + render.h - 16 - 32);
+        render.context.lineTo(0.5 + 16, 0.5 + render.h - 16 - 32);
+        render.context.lineTo(0.5 + 16 - 4, 0.5 + render.h - 16 - 24);
+        render.context.moveTo(0.5 + 16, 0.5 + render.h - 16 - 32);
+        render.context.lineTo(0.5 + 16 + 4, 0.5 + render.h - 16 - 24);
+        render.context.stroke();
+        render.context.closePath();
+        render.context.fillText('Y', 16 - 4, render.h - 16 - 32 - 2);
+
+        render.context.fillStyle = 'rgb(255, 255, 255)';
+        render.context.fillRect(16, render.h - 16, 1, 1);
+    }
+
+    // Input
+
+    /**
+     * Parse level input and update the state.
+     * @param {boolean} recalculateSolution
+     */
+    function updateInput(recalculateSolution = false) {
+        const lines = sanitizeInput(levelInput.value).split('\n');
+        let lastLineIndex = 0;
+
+        state.game.drone = {
+            p: v2(),
+            v: v2(),
+            a: v2(),
+            w: 500,
+            h: 500,
+        };
+
+        if (state.level === 4) {
+            const [landingPadX, flyingHeight, timeLimit] = lines[lastLineIndex++].split(' ').map(it => Number.parseInt(it));
+            state.game.helipad = { p: v2(landingPadX || 0, 0) };
+            state.game.flyingHeight = flyingHeight;
+            state.game.replayFrameLimit = timeLimit;
+        } else if (state.level >= 5) {
+            const [landingPadX, landingPadY, timeLimit] = lines[lastLineIndex++].split(' ').map(it => Number.parseInt(it));
+            state.game.helipad = { p: v2(landingPadX || 0, (landingPadY || 0)) };
+            state.game.replayFrameLimit = timeLimit;
+
+            const buildingCount = Number.parseInt(lines[lastLineIndex++]);
+            const buildings = [];
+            for (let buildingIndex = 0; buildingIndex < buildingCount; ++buildingIndex) {
+                const [buildingFromX, buildingToX, buildingH] = lines[lastLineIndex++].split(' ').map(it => Number.parseInt(it));
+                const hasLandingPad = buildingH === landingPadY && (buildingFromX <= landingPadX && landingPadX <= buildingToX);
+                buildings.push({
+                    p: v2((buildingToX + buildingFromX) / 2, 0),
+                    w: buildingToX - buildingFromX,
+                    h: buildingH,
+                    hasLandingPad,
+                });
+            }
+            buildings.sort((b0, b1) => b0.p.x - b1.p.x);
+            state.game.buildings = buildings;
+        }
+        if (state.level >= 6) {
+            const silentZoneCount = Number.parseInt(lines[lastLineIndex++]);
+            const silentZones = [];
+            for (let silentZoneIndex = 0; silentZoneIndex < silentZoneCount; ++silentZoneIndex) {
+                const silentZoneData = lines[lastLineIndex++];
+                const [silentZoneFromX, silentZoneToX] = silentZoneData.split(' ').map(it => Number.parseInt(it));
+                silentZones.push({
+                    x: (silentZoneFromX + silentZoneToX) / 2,
+                    w: silentZoneToX - silentZoneFromX,
+                });
+            }
+            state.game.silentZones = silentZones;
+        }
+
+        if (recalculateSolution) {
+            updateSolution();
+        }
+    }
+
+    /**
+     * Parse solution and update the state.
+     */
+    function updateSolution() {
+        if (levelSolution.value === '-') {
+            currentFrameDisplay.textContent = '-';
+            frameCountDisplay.textContent = '-';
+            displaySimResult(0, 'Super secret testing value! But also not a valid solution :)', false);
+            return;
+        }
+        currentFrameDisplay.textContent = '0';
+        frameCountDisplay.textContent = '0';
+
+        const pairs = sanitizeInput(levelSolution.value).split(' ');
+        if (pairs[0].length === 0) {
+            displaySimResult(0, 'No solution provided', false);
+            return;
+        }
+        const splitPairs = pairs.map((pair) => pair.split(','));
+        for (const splitPair of splitPairs) {
+            if (splitPair.length !== 2 || splitPair[0].length === 0 || splitPair[1].length === 0) {
+                displaySimResult(0, 'Invalid solution format', false);
+                return;
+            }
+        }
+        const accelerations = splitPairs
+            .map((splitPair) => splitPair.map((part) => Number.parseInt(part)))
+            .map(([x, y]) => v2(x, y));
+        for (const acceleration of accelerations) {
+            if (acceleration.y < 0) {
+
+            }
+        }
+
+        resetDrone();
+        const droneState = {
+            p: v2(state.game.drone.p.x, state.game.drone.p.y),
+            v: v2(),
+            a: v2(),
+        };
+        const droneStates = [];
+        droneStates.push({
+            p: v2v(droneState.p),
+            v: v2v(droneState.v),
+            a: v2v(droneState.a),
+        });
+        simResultType.textContent = '';
+        simResult.textContent = '';
+        for (let index = 0; index < accelerations.length; ++index){
+            const stateIndex = droneStates.length
+            const acceleration = accelerations[index];
+            if (acceleration.y < 0) {
+                displaySimResult(stateIndex, 'Y Acceleration is below 0!', false);
+                break;
+            }
+            if ((acceleration.y + Math.abs(acceleration.x)) > MAX_ACCELERATION_ABSOLUTE_SUM) {
+                displaySimResult(stateIndex, 'Drone accelerated too fast!', false);
+                break;
+            }
+            droneState.a = acceleration;
+            const {collided, landingSpeed, acceleratedInSilentZone} = simMove(
+                droneState.p,
+                droneState.v,
+                droneState.a,
+                state.game.buildings,
+                state.game.silentZones,
+            );
+            droneStates.push({
+                p: v2v(droneState.p),
+                v: v2v(droneState.v),
+                a: v2v(droneState.a),
+            });
+            if (simResultType.textContent === '') {
+                if (collided) {
+                    const isOnHelipad = (droneState.p.y === state.game.helipad.p.y) && (droneState.p.x === state.game.helipad.p.x);
+                    if (isOnHelipad) {
+                        if (MIN_LANDING_VELOCITY_Y <= landingSpeed && landingSpeed <= MAX_LANDING_VELOCITY_Y && droneState.v.x === 0) {
+                            if (index === accelerations.length - 1) {
+                                displaySimResult(stateIndex, 'Drone landed safely on the landing pad!', true);
+                            } else {
+                                displaySimResult(stateIndex, 'Drone did not stop immediately after landing!', false);
+                            }
+                        } else {
+                            displaySimResult(stateIndex, `Drone crashed on the landing pad! (landing velocity y: ${landingSpeed})`, false);
+                        }
+                    } else {
+                        displaySimResult(stateIndex, 'Drone crashed!', false);
+                    }
+                    break;
+                }
+                if (acceleratedInSilentZone) {
+                    displaySimResult(stateIndex, 'Accelerated in a silent zone!', false);
+                }
+            }
+        }
+
+        if (state.game.replayFrameLimit && (droneStates.length - 1) > state.game.replayFrameLimit) {
+            displaySimResult(0, 'Exceeded the maximum time!', false);
+        }
+
+        if (state.level === 4) {
+            const reachedFlight = droneStates.length > 0 && (droneStates.filter(s => (s.p.y >= state.game.flyingHeight)).length > 0);
+            if (!reachedFlight) {
+                displaySimResult(0, 'Drone did not fly up to the specified height!', false);
+            }
+        }
+
+        if (simResultType.textContent === '') {
+            displaySimResult(0, 'Drone did not reach the landing pad!', false);
+        }
+
+        const frameCount = droneStates.length - 1
+
+        state.game.replayFrameIndex = 0;
+        state.game.replayStates = droneStates;
+        state.game.replayDroneState = droneStates[0];
+        if (!state.game.replayRunning) {
+            simPlay();
+        }
+
+        currentFrameDisplay.textContent = '0';
+        frameCountDisplay.textContent = `${frameCount}`;
+        frameSlider.min = 0;
+        frameSlider.max = frameCount;
+    }
+
+    function displaySimResult(index, message, success) {
+        simResultType.textContent = success ? 'SUCCESS' : 'FAILURE';
+        simResultType.setAttribute('success', `${success}`);
+        if (success || !index) {
+            simResult.textContent = `${message}`;
+        } else {
+            simResult.textContent = `[Frame ${index}]: ${message}`;
+        }
+    }
+
+    /**
+     * Populate the input text area with the file content that's being dragged.
+     * @param {DragEvent} event
+     */
+    function updateInputDrop(event) {
+        handleDrop(event, levelInput);
+    }
+
+    /**
+     * Populate the solution text area with the file content that's being dragged.
+     * @param {DragEvent} event
+     */
+    function updateSolutionDrop(event) {
+        handleDrop(event, levelSolution);
+    }
+
+    /**
+     * Populate the given text area with the file content that's being dragged.
+     * @param {DragEvent} event
+     * @param {HTMLElement} element
+     */
+    function handleDrop(event, element) {
+        event.preventDefault();
+        const file = event.dataTransfer.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+            element.value = reader.result;
+        }
+        reader.readAsText(file, 'UTF-8');
+    }
+
+    function simSetCameraModeTrackBothObjects(value) {
+        if (value) {
+            replayCameraTrackDroneAndLandingPad.checked = true;
+            replayCameraTrackDrone.checked = false;
+            simZoomOutButton.disabled = true;
+            simZoomInButton.disabled = true;
+        } else {
+            replayCameraTrackDroneAndLandingPad.checked = false;
+            replayCameraTrackDrone.checked = true;
+            simZoomOutButton.disabled = false;
+            simZoomInButton.disabled = false;
+        }
+    }
+
+    /**
+     * Start the replay using the precalculated states front the input and solutions.
+     */
+    function simMode() {
+        if (state.game.replayRunning) {
+            state.game.replayRunning = false;
+        } else {
+            state.game.pastPositions = [];
+            state.game.replayRunning = true;
+        }
+        frameSlider.disabled = !state.game.replayRunning;
+        simReverseButton.disabled = !state.game.replayRunning;
+        simBackStepButton.disabled = !state.game.replayRunning;
+    }
+
+    function resetDrone() {
+        state.game.drone.p = v2();
+        state.game.drone.v = v2();
+        state.game.drone.a = v2();
+        state.game.pastPositions = [];
+        state.game.futurePositions = [];
+        state.game.futureVelocities = [];
+    }
+
+    const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+    /**
+     * @param {KeyboardEvent} event
+     */
+    function onKeydown(event) {
+        if (event.target.nodeName === 'TEXTAREA') {
+            return;
+        }
+
+        state.game.input.shift = event.shiftKey;
+
+        if (event.code === 'KeyW') {
+            state.game.input.up = true;
+        } else if (event.code === 'KeyA') {
+            state.game.input.left = true;
+        } else if (event.code === 'KeyS') {
+            state.game.input.down = true;
+        } else if (event.code === 'KeyD') {
+            state.game.input.right = true;
+        } else if (event.code === 'Space') {
+            simPlay();
+        } else if (event.code === 'KeyR') {
+            simReverse();
+        } else if (event.code === 'ArrowLeft') {
+            simStepBack();
+        } else if (event.code === 'ArrowRight') {
+            simStepNext();
+        } else if (event.code === 'Comma') {
+            simSlower();
+        } else if (event.code === 'Period') {
+            simFaster();
+        } else if (event.code === 'KeyL') {
+            replayCheckbox.checked = !replayCheckbox.checked;
+            replayLoopAtEndUpdate()
+        } else if (event.code === 'KeyC') {
+            simSetCameraModeTrackBothObjects(!replayCameraTrackDroneAndLandingPad.checked);
+        } else if (event.key === '+') {
+            zoom(1);
+        } else if (event.key === '-') {
+            zoom(-1);
+        } else if (event.code === 'KeyM') {
+            simMode();
+        } else if (DIGITS.indexOf(event.key) > -1) {
+            simSpeedSet(Number.parseInt(event.key))
+        }
+    }
+
+    /**
+     * @param {KeyboardEvent} event
+     */
+    function onKeyup(event) {
+        state.game.input.shift = event.shiftKey;
+
+        if (event.code === 'KeyW') {
+            state.game.input.up = false;
+        } else if (event.code === 'KeyA') {
+            state.game.input.left = false;
+        } else if (event.code === 'KeyS') {
+            state.game.input.down = false;
+        } else if (event.code === 'KeyD') {
+            state.game.input.right = false;
+        }
+    }
+
+    /**
+     * @param {MouseEvent} event
+     */
+    function onCanvasMouseMove(event) {
+        updateMouseInputState(event);
+    }
+
+    /**
+     * @param {MouseEvent} event
+     */
+    function onCanvasMouseDown(event) {
+        updateMouseInputState(event);
+    }
+
+    /**
+     * @param {MouseEvent} event
+     */
+    function onCanvasMouseUp(event) {
+        updateMouseInputState(event);
+    }
+
+    function onCanvasMouseOut() {
+        state.game.input.mouseIn = false;
+    }
+
+    function updateMouseInputState(event) {
+        state.game.input.mouseIn = true;
+        const rect = canvas.getBoundingClientRect();
+        state.game.input.mouseScreenPosition = v2(
+            event.clientX - rect.left,
+            event.clientY - rect.top
+        );
+        state.game.input.mouseNormalizedPosition = v2(
+            mapValue(state.game.input.mouseScreenPosition.x, 0, canvas.width, -1, 1),
+            mapValue(canvas.height - state.game.input.mouseScreenPosition.y, 0, canvas.height, -1, 1)
+        );
+    }
+
+    /**
+     * @param {WheelEvent} event
+     */
+    function onCanvasWheel(event) {
+        event.preventDefault();
+        if (event.deltaY > 0) {
+            zoom(-1);
+        } else if (event.deltaY < 0) {
+            zoom(1);
+        }
+    }
+
+    /**
+     * Change the zoom level by delta.
+     * @param {number} delta - Zoom differential.
+     */
+    function zoom(delta) {
+        if (replayCameraTrackDrone.checked) {
+            state.render.scaleIndex = clamp(state.render.scaleIndex + delta, 0, state.render.scaleToUToPx.length - 1)
+            simZoomOutButton.disabled = false;
+            simZoomInButton.disabled = false;
+            if (state.render.scaleIndex === 0) {
+                simZoomOutButton.disabled = true;
+            } else if (state.render.scaleIndex === state.render.scaleToUToPx.length - 1) {
+                simZoomInButton.disabled = true;
+            }
+        }
+    }
+
+    /**
+     * Slider input handling.
+     */
+    function simFrameSliderUpdate() {
+        const frameIndex = frameSlider.value;
+        currentFrameDisplay.textContent = `${frameIndex}`;
+        state.game.replayFrameIndex = frameIndex;
+        this.setDroneStateFromFrameIndex();
+        this.predictFuturePositions();
+    }
+
+    /**
+     * Pause or resume the simulation.
+     */
+    function simPlay() {
+        if (state.game.simRunning) {
+            state.game.simRunning = false;
+            simNextStepButton.disabled = false;
+            simBackStepButton.disabled = false;
+            if (!state.game.replayLoopAtEnd && state.game.replayFrameIndex === state.game.replayStates.length - 1) {
+                simPlayButton.textContent = 'Replay';
+            } else {
+                simPlayButton.textContent = 'Play';
+            }
+        } else {
+            state.game.simRunning = true;
+            simNextStepButton.disabled = true;
+            simBackStepButton.disabled = true;
+            simPlayButton.textContent = 'Pause';
+            if (!state.game.replayLoopAtEnd) {
+                const firstFrame = state.game.replayFrameIndex === 0;
+                const lastFrame = state.game.replayFrameIndex === state.game.replayStates.length - 1;
+                if (state.game.replayForwards) {
+                    if (lastFrame) {
+                        state.game.replayFrameIndex = 0;
+                    }
+                } else {
+                    if (firstFrame) {
+                        state.game.replayFrameIndex = state.game.replayStates.length - 1;
+                    }
+                }
+            }
+        }
+    }
+
+    function replayLoopAtEndUpdate() {
+        state.game.replayLoopAtEnd = replayCheckbox.checked;
+    }
+
+    function simSpeedChange() {
+        const speedIndex = Number.parseInt(simSpeedSlider.value);
+        simNextStepButton.disabled = state.game.simRunning;
+        simBackStepButton.disabled = state.game.simRunning;
+
+        simFasterButton.disabled = false;
+        simSlowerButton.disabled = false;
+        if (speedIndex === 0) {
+            simSlowerButton.disabled = true;
+            simNextStepButton.disabled = false;
+        } else if (speedIndex === state.game.simSpeedOptions.length - 1) {
+            simFasterButton.disabled = true;
+            simBackStepButton.disabled = false;
+        }
+
+        state.game.simSpeed = state.game.simSpeedOptions[speedIndex];
+    }
+
+    function simSlower() {
+        const speedOption = Number.parseInt(simSpeedSlider.value);
+        if (speedOption > 0) {
+            simSpeedSlider.value = speedOption - 1;
+            simSpeedChange();
+        }
+    }
+
+    function simFaster() {
+        const speedOption = Number.parseInt(simSpeedSlider.value);
+        if (speedOption < 9) {
+            simSpeedSlider.value = speedOption + 1;
+            simSpeedChange();
+        }
+    }
+
+    function simSpeedSet(value) {
+        simSpeedSlider.value = clamp(value, 0, 9);
+        simSpeedChange();
+
+    }
+
+    function simReverse() {
+        if (!simReverseButton.disabled) {
+            state.game.replayForwards = !state.game.replayForwards;
+        }
+    }
+
+    function simStepNext() {
+        if (!simNextStepButton.disabled) {
+            state.game.input.nextTick = true;
+        }
+    }
+
+    function simStepBack() {
+        if (!simBackStepButton.disabled) {
+            state.game.input.prevTick = true;
+        }
+    }
+
+    // Util functions
+
+    /**
+     * Vector2 constructor.
+     * @property {number} x
+     * @property {number} y
+     * @return {Vector2}
+     */
+    function v2(x = 0, y = 0) {
+        return {x, y};
+    }
+
+    /**
+     * Vector2 copy constructor.
+     * @param {number} x
+     * @param {number} y
+     * @return {Vector2}
+     */
+    function v2v({x, y}) {
+        return {x, y};
+    }
+
+    /**
+     * Clamp value between min and max.
+     * @param {number} value - Value to clamp.
+     * @param {number} min - Minimum value.
+     * @param {number} max - Maximum value.
+     * @return {number} The clamped value.
+     */
+    function clamp(value, min, max) {
+        if (value < min) {
+            return min;
+        } else if (value > max) {
+            return max;
+        }
+        return value;
+    }
+
+    /**
+     * Maps the value in the given range (from, to) to (dstFrom, dstTo).
+     * @param {number} value
+     * @param {number} from
+     * @param {number} to
+     * @param {number} [dstFrom=0]
+     * @param {number} [dstTo=1]
+     * @return {number}
+     */
+    function mapValue(value, from, to, dstFrom = 0, dstTo = 1) {
+        const clampedValue = clamp(value, from, to);
+        const deltaValue = clampedValue - from;
+        const range = to - from;
+        return dstFrom + (deltaValue / range) * (dstTo - dstFrom);
+    }
+
+    /**
+     * Computes and returns the length of the vector.
+     * @param {Vector2} value
+     * @return {number}
+     */
+    function v2length(value) {
+        return Math.sqrt(value.x * value.x + value.y * value.y);
+    }
+
+    /**
+     * Initialize a color.
+     * @param {number} r
+     * @param {number} g
+     * @param {number} b
+     * @param {number} [a = 1.0]
+     * @return {Color}
+     */
+    function color(r, g, b, a = 1.0) {
+        return {r, g, b, a};
+    }
+
+    /**
+     * Converts the color to a canvas style color.
+     * @param {Color} c - Color
+     * @return {string} Canvas style
+     */
+    function colorStyle(c) {
+        return `rgba(${c.r}, ${c.g}, ${c.b}, ${c.a})`;
+    }
+
+    /**
+     * Linearly interpolates the two colors.
+     * @param {number} t - Interpolating color.
+     * @param {Color} colorFrom - Color to interpolate from (t = 0).
+     * @param {Color} colorTo - Color to interpolate to (t = 1).
+     * @return {Color} interpolated color
+     */
+    function colorLerp(t, colorFrom, colorTo) {
+        const r = lerp(t, colorFrom.r, colorTo.r);
+        const g = lerp(t, colorFrom.g, colorTo.g);
+        const b = lerp(t, colorFrom.b, colorTo.b);
+        const a = lerp(t, colorFrom.a, colorTo.a);
+        return color(r, g, b, a);
+    }
+
+    /**
+     * Linear interpolation.
+     * @param {number} t - Interpolating value.
+     * @param {number} from - Value to interpolate from.
+     * @param {number} to - Value to interpolate to.
+     * @return {number} Interpolated value.
+     */
+    function lerp(t, from, to) {
+        return (1.0 - t) * from + t * to;
+    }
+
+    /**
+     * Cleans up the input string. Trims the input and 'compresses' all adjacent spaces into one whitespace.
+     * Normalizes the break characters to just LF. Also replaces any SPACE LF SPACE to LF - to play nicely with split.
+     * @param {string} input
+     * @return {string}
+     */
+    function sanitizeInput(input) {
+        return input.trim()
+            .replace(/[\r\n]/g, '\n')
+            .replace(/(\s*\n\s*)/g, '\n')
+            .replace(/[^\S\n]+/g, ' ');
+    }
+
+    /**
+     * Create the drone SVG.
+     * @param {string} [fillColor = '#ffffff']
+     * @return {SVGImageElement}
+     */
+    function createDroneImage(fillColor = '#ffffff') {
+        const svgNamespace = 'http://www.w3.org/2000/svg';
+        let pathString = 'M19.53 28.49a3.852 3.852 0 0 0-3.533 2.343C6.706 31.364-.029 32.257 0 32.955' +
+            'c.027.693 6.712.997 15.928.724c.32.862.936 1.58 1.738 2.027H16.17v2.742h-1.83' +
+            'a.874.874 0 0 0-.875.874v1.954c0 .483.391.874.874.874h12.316' +
+            'c3.103.73 3.45 1.843 5.774 3.88c-.38 2.113-.94 4.42-1.378 6.414v16.973' +
+            'a2.092 2.092 0 1 0 4.185 0V61.21c-.048-6.9 1.066-9.69 4.905-15.031l.965-.448' +
+            'c0 4.146 2.866 4.395 6.908 5.32h-3.036c-.924 0-1.674.75-1.674 1.675v10' +
+            'c0 .924.75 1.674 1.674 1.674h10.044c.924 0 1.674-.75 1.674-1.674v-10' +
+            'c0-.925-.75-1.674-1.674-1.674h-3.033c4.041-.928 6.905-1.176 6.905-5.321l.965.448' +
+            'c4.857 5.026 4.905 8.447 4.905 15.03v8.207a2.092 2.092 0 0 0 4.185 0V52.444' +
+            'c-.513-2.191-1.062-4.487-1.58-6.762c2.199-2.155 3.101-2.64 5.956-3.532h12.336' +
+            'a.874.874 0 0 0 .874-.874v-1.954a.874.874 0 0 0-.874-.874H83.83v-2.742h-1.496' +
+            'a3.852 3.852 0 0 0 1.738-2.027c9.216.273 15.901-.031 15.928-.724' +
+            'c.029-.698-6.706-1.59-15.997-2.122a3.852 3.852 0 0 0-6.943-.302' +
+            'c-9.307-.283-16.103.018-16.142.716c-.029.693 6.615 1.58 15.827 2.112' +
+            'a3.852 3.852 0 0 0 1.839 2.347h-1.496v2.742C67.654 38.426 60.352 33.685 50 33.49' +
+            'c-10.003.212-18.38 4.958-27.088 4.958v-2.742h-1.496a3.852 3.852 0 0 0 1.839-2.347' +
+            'c9.212-.532 15.856-1.42 15.827-2.112c-.039-.698-6.835-1-16.142-.716' +
+            'a3.852 3.852 0 0 0-3.41-2.04z' +
+            'M50 53.503c2.347 0 4.276 1.929 4.276 4.276c0 2.347-1.929 4.277-4.276 4.277' +
+            'c-2.347 0-4.278-1.93-4.278-4.277c0-2.347 1.93-4.276 4.278-4.276z' +
+            'm0 2.51c-.99 0-1.767.776-1.767 1.766s.777 1.766 1.767 1.766' +
+            'c.99 0 1.765-.776 1.765-1.766S50.99 56.013 50 56.013z';
+
+        const path = document.createElementNS(svgNamespace, 'path');
+        path.setAttributeNS(null, 'd', pathString);
+        path.setAttributeNS(null, 'fill', fillColor);
+
+        const svg = document.createElementNS(svgNamespace, 'svg');
+        svg.setAttributeNS(null, 'width', '100');
+        svg.setAttributeNS(null, 'height', '100');
+        svg.appendChild(path);
+
+        const svgString = new XMLSerializer().serializeToString(svg);
+        const svgDataUrl = 'data:image/svg+xml;base64,' + btoa(svgString);
+
+        const imageElement = document.createElementNS(svgNamespace, 'image');
+        imageElement.setAttributeNS(null, 'href', svgDataUrl);
+        return imageElement
+    }
+
+    // Start
+    init();
+
+    // ── CCC frontend case injection ──────────────────────────────────────────
+    // The base platform's Sandbox.vue posts { input, solution } for the clicked case into this
+    // iframe. Fill the textareas and drive the existing update handlers (input first, since
+    // updateInput(true) recomputes the derived solution state) so the clicked case renders instead
+    // of the baked-in default. Mirrors the desks single-editor sandbox injection.
+    window.addEventListener('message', function (event) {
+        const data = event.data;
+        if (!data || typeof data !== 'object') return;
+        if (data.input === undefined && data.solution === undefined) return;
+
+        if (data.input !== undefined && data.input !== null && `${data.input}`.trim().length > 0) {
+            levelInput.value = `${data.input}`;
+            updateInput(true);
+        }
+        if (data.solution !== undefined && data.solution !== null) {
+            levelSolution.value = `${data.solution}`;
+            updateSolution();
+        }
+    });
+
+</script>
+
+</html>

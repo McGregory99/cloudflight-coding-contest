@@ -1,0 +1,6 @@
+{} -> vs random 53/60, vs L3 46/60
+{"move_ring": 1.0} -> vs random 58/60, vs L3 50/60
+{"kernel_move": 3.0} -> vs random 50/60, vs L3 26/60
+{"move_ring": 1.0, "kernel_move": 3.0} -> vs random 54/60, vs L3 44/60
+{"kernel_move": 8.0} -> vs random 35/60, vs L3 24/60
+{"move_ring": 0.5, "kernel_move": 6.0, "piece_ring": 0.2} -> vs random 53/60, vs L3 37/60
